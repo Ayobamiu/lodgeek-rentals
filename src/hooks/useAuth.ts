@@ -16,7 +16,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { act } from "react-dom/test-utils";
 
 const useAuth = () => {
   const [signingIn, setSigningIn] = useState(false);
@@ -39,10 +38,6 @@ const useAuth = () => {
         }
       } else {
         setCurrentUser(undefined);
-        act(() => {
-          /* fire events that update state */
-          setLoggedIn(false);
-        });
         dispatch(updateUser(undefined));
       }
     });

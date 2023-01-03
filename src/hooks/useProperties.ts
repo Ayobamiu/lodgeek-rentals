@@ -7,7 +7,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   addProperty,
@@ -16,29 +16,20 @@ import {
 } from "../app/features/propertySlice";
 import { selectUser } from "../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { db, generateFirebaseId, PROPERTY_PATH } from "../firebase/config";
+import { db, PROPERTY_PATH } from "../firebase/config";
 import { Property } from "../models";
 
 const useProperties = () => {
   const propertyRef = collection(db, PROPERTY_PATH);
   const [addingProperty, setAddingProperty] = useState(false);
-  const [loadingProperties, setLoadingProperties] = useState(false);
-  const [propertyLoading, setPropertyLoading] = useState("");
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const loggedInUser = useAppSelector(selectUser);
 
-  useEffect(() => {
-    if (!properties.length) {
-      getUsersProperties();
-    }
-  }, [loggedInUser?.email]);
-
-  async function getUsersProperties() {
+  const getUsersProperties = useCallback(async () => {
     const propertiesCol = collection(db, PROPERTY_PATH);
     const q = query(propertiesCol, where("owner", "==", loggedInUser?.email));
 
-    setLoadingProperties(true);
     await getDocs(q)
       .then((propertiesSnapshot) => {
         const propertiesList = propertiesSnapshot.docs.map((doc) =>
@@ -50,10 +41,14 @@ const useProperties = () => {
       .catch((error) => {
         toast.error("Error Loading Properties");
       })
-      .finally(() => {
-        setLoadingProperties(false);
-      });
-  }
+      .finally(() => {});
+  }, [loggedInUser?.email, dispatch]);
+
+  useEffect(() => {
+    if (!properties.length) {
+      getUsersProperties();
+    }
+  }, [loggedInUser?.email, properties.length, getUsersProperties]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);
@@ -89,7 +84,6 @@ const useProperties = () => {
     addProperty: handleAddProperty,
     addingProperty,
     getPropertyData,
-    propertyLoading,
   };
 };
 export default useProperties;

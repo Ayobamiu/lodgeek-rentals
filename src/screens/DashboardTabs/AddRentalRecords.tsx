@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import Header from "../../assets/flex-ui-assets/images/headers/header.jpg";
 import { Rent, RentType } from "../../models";
 import { useNavigate } from "react-router-dom";
-import useProperties from "../../hooks/useProperties";
 import { selectProperties } from "../../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -36,7 +35,6 @@ export default function AddRentalRecords() {
     setShowRentStarts(false);
   };
 
-  const { getPropertyData, propertyLoading } = useProperties();
   const { addingRentalRecord, handleAddRentalRecord } = useRentalRecords();
   const properties = useAppSelector(selectProperties);
   const newRentalRecord = useAppSelector(selectNewRentalRecord);
@@ -113,7 +111,12 @@ export default function AddRentalRecords() {
       });
     }
     setRents(r);
-  }, [newRentalRecord.rentPer, newRentalRecord.rentStarts]);
+  }, [
+    newRentalRecord.rentPer,
+    newRentalRecord.rentStarts,
+    newRentalRecord.property,
+    newRentalRecord.rent,
+  ]);
 
   const removeLastRent = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     e.stopPropagation();

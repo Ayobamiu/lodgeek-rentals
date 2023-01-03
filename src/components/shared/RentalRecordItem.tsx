@@ -1,14 +1,6 @@
-import {
-  faCheckCircle,
-  faTimesCircle,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { collection, getDocs, query, where } from "firebase/firestore";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
-import { db, RENTAL_RECORD_PATH } from "../../firebase/config";
 import useAuth from "../../hooks/useAuth";
 import useProperties from "../../hooks/useProperties";
 import useRentalRecords from "../../hooks/useRentalRecords";
@@ -23,7 +15,7 @@ type RentalRecordItemProp = {
 
 export default function RentalRecordItem(props: RentalRecordItemProp) {
   const { rentalRecordData } = props;
-  const { getPropertyData, propertyLoading } = useProperties();
+  const { getPropertyData } = useProperties();
   const { getRentsForARentalRecord } = useRents();
   const { rentalRecordStatuses } = useRentalRecords();
   const { getUserData } = useAuth();
@@ -39,7 +31,7 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
       });
       setProperty(propertyData);
     })();
-  }, [rentalRecordData.property]);
+  }, [rentalRecordData.property, getPropertyData]);
 
   const [tenant, setTenant] = useState<User>();
   const [loadingTenant, setLoadingTenant] = useState(false);
@@ -53,7 +45,7 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
       );
       setTenant(tenantData);
     })();
-  }, [rentalRecordData.tenant]);
+  }, [rentalRecordData.tenant, getUserData]);
 
   const [rents, setRents] = useState<Rent[]>([]);
   const [loadingRents, setLoadingRents] = useState(false);
@@ -67,7 +59,7 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
       });
       setRents(rentsData as Rent[]);
     })();
-  }, [rentalRecordData.id]);
+  }, [rentalRecordData.id, getRentsForARentalRecord]);
 
   const tenantFullName = tenant
     ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`

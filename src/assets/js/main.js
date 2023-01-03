@@ -19,8 +19,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const backdrop = document.querySelectorAll(".navbar-backdrop");
 
   if (close.length) {
-    for (var i = 0; i < close.length; i++) {
-      close[i].addEventListener("click", function () {
+    for (var x = 0; x < close.length; x++) {
+      close[x].addEventListener("click", function () {
         for (var j = 0; j < menu.length; j++) {
           menu[j].classList.toggle("hidden");
         }
@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (backdrop.length) {
-    for (var i = 0; i < backdrop.length; i++) {
-      backdrop[i].addEventListener("click", function () {
+    for (var y = 0; y < backdrop.length; y++) {
+      backdrop[y].addEventListener("click", function () {
         for (var j = 0; j < menu.length; j++) {
           menu[j].classList.toggle("hidden");
         }

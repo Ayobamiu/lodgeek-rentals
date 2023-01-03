@@ -1,7 +1,7 @@
 import { collection, getDocs, query, where } from "firebase/firestore";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { db, RENTAL_RECORD_PATH, RENT_PATH } from "../firebase/config";
+import { db, RENT_PATH } from "../firebase/config";
 import { Rent } from "../models";
 
 const useRents = () => {

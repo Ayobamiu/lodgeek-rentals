@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavigateFunction } from "react-router-dom";
 import useQuery from "../hooks/useQuery";
 import RentalRecords from "./DashboardTabs/RentalRecords";
 import AddRentalRecords from "./DashboardTabs/AddRentalRecords";
@@ -7,7 +7,7 @@ import PaymentHistory from "./DashboardTabs/PaymentHistory";
 import Properties from "./DashboardTabs/Properties";
 import Rents from "./DashboardTabs/Rents";
 import useAuth from "../hooks/useAuth";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppSelector } from "../app/hooks";
 import { selectUser } from "../app/features/userSlice";
 import { User } from "../models";
 import AddProperty from "./DashboardTabs/AddProperty";
@@ -19,23 +19,17 @@ export default function Dashboard() {
   let query = useQuery();
   const navigate = useNavigate();
   const loggedInUser = useAppSelector(selectUser);
-  console.log({ user: loggedInUser });
   const { signingOut, handleSignOutUser } = useAuth();
 
   useEffect(() => {
     if (!loggedInUser?.email) {
       navigate("/");
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, navigate]);
 
   useEffect(() => {
-    const currentTab = query.get("tab");
-    console.log({ tab: query.get("tab") });
-
-    if (!currentTab) {
-      navigate("/dashboard?tab=rentalRecords");
-    }
-  }, [query.get("tab")]);
+    goBack(query, navigate);
+  }, [navigate, query]);
 
   const styleActiveTab = (name: string): string => {
     if (name === query.get("tab")) {
@@ -48,8 +42,6 @@ export default function Dashboard() {
   const toggleNav = () => {
     setNavOpen(!navOpen);
   };
-
-  const dispatch = useAppDispatch();
 
   const ProfilePhoto = ({ user }: { user: User | undefined }) => {
     const initials = `${user?.firstName[0] || "-"}${user?.lastName[0] || "-"}`;
@@ -668,4 +660,11 @@ export default function Dashboard() {
       {query.get("tab") === "rents" && <Rents />}
     </div>
   );
+}
+function goBack(query: URLSearchParams, navigate: NavigateFunction) {
+  const currentTab = query.get("tab");
+
+  if (!currentTab) {
+    navigate("/dashboard?tab=rentalRecords");
+  }
 }

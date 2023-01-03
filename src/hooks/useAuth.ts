@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { auth, db, USER_PATH } from "../firebase/config";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
 import { User } from "../models";
@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   addUser as addUserToStore,
-  selectUser,
   selectUsers,
   updateUser,
 } from "../app/features/userSlice";
@@ -22,13 +21,21 @@ const useAuth = () => {
   const [signingUp, setSigningUp] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const usersRef = collection(db, "users");
-
-  const [loggedIn, setLoggedIn] = useState<boolean>();
   const [currentUser, setCurrentUser] = useState<any>();
-  const loggedInUser = useAppSelector(selectUser);
   const users = useAppSelector(selectUsers);
 
   const dispatch = useAppDispatch();
+  const getLoggedInUser = useCallback(
+    async (email: string) => {
+      const docRef = doc(db, "users", email);
+      const docSnap = await getDoc(docRef);
+      const user = docSnap.data() as User;
+      console.log({ user });
+
+      dispatch(updateUser(user));
+    },
+    [dispatch]
+  );
 
   useEffect(() => {
     const observer = onAuthStateChanged(auth, (user) => {
@@ -44,7 +51,7 @@ const useAuth = () => {
     return () => {
       observer();
     };
-  }, []);
+  }, [dispatch, getLoggedInUser]);
 
   const addUser = async (data: User) => {
     await setDoc(doc(usersRef, data.email), data)
@@ -56,29 +63,15 @@ const useAuth = () => {
       });
   };
 
-  const getLoggedInUser = async (email: string) => {
-    console.log({ email });
-
-    const docRef = doc(db, "users", email);
-    const docSnap = await getDoc(docRef);
-    const user = docSnap.data() as User;
-    console.log({ user });
-
-    dispatch(updateUser(user));
-  };
-
   const handleSignInUser = (email: string, password: string) => {
     setSigningIn(true);
 
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(() => {
         // Signed in
-        const user = userCredential.user;
-
         // ...
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         toast.error(errorMessage);
       })
@@ -96,9 +89,9 @@ const useAuth = () => {
     setSigningUp(true);
 
     createUserWithEmailAndPassword(auth, email, password)
-      .then(async (userCredential) => {
+      .then(async () => {
         // Signed in
-        const user = userCredential.user;
+
         const userData = {
           firstName,
           lastName,
@@ -106,14 +99,12 @@ const useAuth = () => {
           createdDate: Date.now(),
           lastUpdated: Date.now(),
         };
-        console.log({ userData });
 
         await addUser(userData);
 
         // ...
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         toast.error(errorMessage);
         // ..

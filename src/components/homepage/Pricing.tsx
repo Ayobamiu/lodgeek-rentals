@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import CheckBoxGreen from "../../assets/flex-ui-assets/elements/pricing/checkbox-green.svg";
 
 export default function Pricing() {
@@ -37,35 +38,51 @@ export default function Pricing() {
                 <p className="mb-6 text-coolGray-400 font-medium">
                   Basic features for up to 10 users.
                 </p>
-                <a
+                <Link
                   className="inline-block py-4 px-7 mb-4 w-full text-base md:text-lg leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Get Started
-                </a>
-                <a
+                </Link>
+                <Link
                   className="inline-block py-3 px-7 w-full text-coolGray-500 font-medium text-center bg-white hover:bg-coolGray-100 focus:ring-2 focus:ring-coolGray-100 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Learn more
-                </a>
+                </Link>
               </div>
               <div className="border-b border-coolGray-100"></div>
               <ul className="self-start px-8 pt-8">
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Complete documentation"
+                  />
                   <span>Complete documentation</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Working materials in Figma"
+                  />
                   <span>Working materials in Figma</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="100GB cloud storage"
+                  />
                   <span>100GB cloud storage</span>
                 </li>
                 <li className="flex items-center text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="500 team members"
+                  />
                   <span>500 team members</span>
                 </li>
               </ul>
@@ -96,35 +113,51 @@ export default function Pricing() {
                 <p className="mb-6 text-coolGray-400 font-medium">
                   Basic features for up to 30 users.
                 </p>
-                <a
+                <Link
                   className="inline-block py-4 px-7 mb-4 w-full text-base md:text-lg leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Get Started
-                </a>
-                <a
+                </Link>
+                <Link
                   className="inline-block py-3 px-7 w-full text-coolGray-500 font-medium text-center bg-white hover:bg-coolGray-100 focus:ring-2 focus:ring-coolGray-100 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Learn more
-                </a>
+                </Link>
               </div>
               <div className="border-b border-coolGray-100"></div>
               <ul className="self-start px-8 pt-8">
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Complete documentation"
+                  />
                   <span>Complete documentation</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Working materials in Figma"
+                  />
                   <span>Working materials in Figma</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="100GB cloud storage"
+                  />
                   <span>100GB cloud storage</span>
                 </li>
                 <li className="flex items-center text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="500 team members"
+                  />
                   <span>500 team members</span>
                 </li>
               </ul>
@@ -150,35 +183,51 @@ export default function Pricing() {
                 <p className="mb-6 text-coolGray-400 font-medium">
                   Basic features for up to 100 users.
                 </p>
-                <a
+                <Link
                   className="inline-block py-4 px-7 mb-4 w-full text-base md:text-lg leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Get Started
-                </a>
-                <a
+                </Link>
+                <Link
                   className="inline-block py-3 px-7 w-full text-coolGray-500 font-medium text-center bg-white hover:bg-coolGray-100 focus:ring-2 focus:ring-coolGray-100 focus:ring-opacity-50 rounded-md shadow-sm"
-                  href="#"
+                  to="/"
                 >
                   Learn more
-                </a>
+                </Link>
               </div>
               <div className="border-b border-coolGray-100"></div>
               <ul className="self-start px-8 pt-8">
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Complete documentation"
+                  />
                   <span>Complete documentation</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="Working materials in Figma"
+                  />
                   <span>Working materials in Figma</span>
                 </li>
                 <li className="flex items-center mb-3 text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="100GB cloud storage"
+                  />
                   <span>100GB cloud storage</span>
                 </li>
                 <li className="flex items-center text-coolGray-500 font-medium">
-                  <img className="mr-3" src={CheckBoxGreen} />
+                  <img
+                    className="mr-3"
+                    src={CheckBoxGreen}
+                    alt="500 team members"
+                  />
                   <span>500 team members</span>
                 </li>
               </ul>

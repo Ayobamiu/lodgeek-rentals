@@ -9,13 +9,12 @@ import {
   writeBatch,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   addRentalRecord,
   addRentalRecords,
   selectRentalRecords,
-  setRentalRecords,
   updateRentalRecord,
 } from "../app/features/rentalRecordSlice";
 import { selectUser } from "../app/features/userSlice";
@@ -31,29 +30,18 @@ import { Rent, RentalRecord } from "../models";
 const useRentalRecords = () => {
   const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
-  const [updatingRentalRecord, setUpdatingRentalRecord] = useState(false);
-  const [loadingRentalRecords, setLoadingRentalRecords] = useState(false);
-  const [updatingRents, setUpdatingRents] = useState(false);
+
   const dispatch = useAppDispatch();
   const rentalRecords = useAppSelector(selectRentalRecords);
   const loggedInUser = useAppSelector(selectUser);
 
-  useEffect(() => {
-    if (!rentalRecords.length) {
-      console.log({ email: loggedInUser?.email });
-      getUsersRentalRecords();
-      getRentalRecordsForYourTenants();
-    }
-  }, [loggedInUser?.email]);
-
-  async function getUsersRentalRecords() {
+  const getUsersRentalRecords = useCallback(async () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
     const q = query(
       rentalRecordsCol,
       where("tenant", "==", loggedInUser?.email)
     );
 
-    setLoadingRentalRecords(true);
     await getDocs(q)
       .then((rentalRecordsSnapshot) => {
         const rentalRecordsList = rentalRecordsSnapshot.docs.map((doc) =>
@@ -65,19 +53,16 @@ const useRentalRecords = () => {
       .catch((error) => {
         toast.error("Error Loading Rental Records");
       })
-      .finally(() => {
-        setLoadingRentalRecords(false);
-      });
-  }
+      .finally(() => {});
+  }, [loggedInUser?.email, dispatch]);
 
-  async function getRentalRecordsForYourTenants() {
+  const getRentalRecordsForYourTenants = useCallback(async () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
     const q = query(
       rentalRecordsCol,
       where("owner", "==", loggedInUser?.email)
     );
 
-    setLoadingRentalRecords(true);
     await getDocs(q)
       .then((rentalRecordsSnapshot) => {
         const rentalRecordsList = rentalRecordsSnapshot.docs.map((doc) =>
@@ -89,10 +74,20 @@ const useRentalRecords = () => {
       .catch((error) => {
         toast.error("Error Loading Rental Records");
       })
-      .finally(() => {
-        setLoadingRentalRecords(false);
-      });
-  }
+      .finally(() => {});
+  }, [loggedInUser?.email, dispatch]);
+
+  useEffect(() => {
+    if (!rentalRecords.length) {
+      getUsersRentalRecords();
+      getRentalRecordsForYourTenants();
+    }
+  }, [
+    loggedInUser?.email,
+    rentalRecords.length,
+    getUsersRentalRecords,
+    getRentalRecordsForYourTenants,
+  ]);
 
   const handleAddRentalRecord = async (data: RentalRecord, rents: Rent[]) => {
     if (!loggedInUser?.email) {
@@ -174,15 +169,13 @@ const useRentalRecords = () => {
     if (!data.id) {
       return toast.error("Error getting data.");
     }
-    setUpdatingRentalRecord(true);
+
     await updateDoc(doc(rentalRecordRef, data.id), data)
       .then((c) => {
         //TODO: Send Email Invite to tenant.
         dispatch(updateRentalRecord(data));
       })
-      .finally(() => {
-        setUpdatingRentalRecord(false);
-      });
+      .finally(() => {});
   };
 
   const getRentalRecordData = async (

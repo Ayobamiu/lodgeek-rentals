@@ -1,69 +1,70 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 export default function Footer() {
   return (
     <section className="bg-white pattern-white-bg">
       <div className="container px-4 mx-auto">
         <div className="pt-24 pb-11 mx-auto max-w-4xl">
-          <a className="block md:mx-auto mb-5 max-w-max" href="#">
+          <Link className="block md:mx-auto mb-5 max-w-max" to="/">
             <FlexUIGreenLight className="h-8 w-[95px]" />
-          </a>
+          </Link>
           <div className="flex flex-wrap justify-center -mx-3 lg:-mx-6">
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Product
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Features
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Pricing
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Resources
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Careers
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Help
-              </a>
+              </Link>
             </div>
             <div className="w-full md:w-auto p-3 md:px-6">
-              <a
+              <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
-                href="#"
+                to="/"
               >
                 Privacy
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -1,12 +1,8 @@
-import {
-  faCheckCircle,
-  faTimes,
-  faTimesCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCheckCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { NavigateFunction, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
@@ -19,11 +15,10 @@ import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
 import { Property, Rent, RentalRecord, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
-import { Dialog, Transition } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
-  const { search } = useLocation();
 
   const navigate = useNavigate();
 
@@ -38,10 +33,7 @@ export default function RentalRecordDetails() {
   const loggedInUser = useAppSelector(selectUser);
 
   useEffect(() => {
-    const rentalRecordId = query.get("rentalRecordId");
-    if (!rentalRecordId) {
-      navigate("/dashboard?tab=rentalRecords");
-    }
+    const rentalRecordId = goBack(query, navigate);
 
     const loadRelatedRentalRecord = async () => {
       if (!rentalRecordId) return;
@@ -55,9 +47,9 @@ export default function RentalRecordDetails() {
     };
 
     loadRelatedRentalRecord();
-  }, [query.get("tab"), query.get("rentalRecordId")]);
+  }, [query, navigate, getRentalRecordData]);
 
-  const { getPropertyData, propertyLoading } = useProperties();
+  const { getPropertyData } = useProperties();
   const { getRentsForARentalRecord } = useRents();
   const { getUserData } = useAuth();
   const [property, setProperty] = useState<Property>();
@@ -76,7 +68,7 @@ export default function RentalRecordDetails() {
     if (rentalRecordData?.property) {
       loadRelatedProperty();
     }
-  }, [rentalRecordData?.property]);
+  }, [rentalRecordData?.property, getPropertyData]);
 
   const [owner, setOwner] = useState<User>();
   const [loadingOwner, setLoadingOwner] = useState(false);
@@ -94,7 +86,7 @@ export default function RentalRecordDetails() {
       setOwner(ownerData);
     };
     loadRelatedOwner();
-  }, [rentalRecordData?.owner]);
+  }, [rentalRecordData?.owner, getUserData]);
 
   const ownerFullName = owner
     ? `${owner?.firstName || "-"} ${owner?.lastName || "-"}`
@@ -114,7 +106,7 @@ export default function RentalRecordDetails() {
       setTenant(tenantData);
     };
     loadRelatedTenant();
-  }, [rentalRecordData?.tenant]);
+  }, [rentalRecordData?.tenant, getUserData]);
 
   const [rents, setRents] = useState<Rent[]>([]);
   const [loadingRents, setLoadingRents] = useState(false);
@@ -130,15 +122,13 @@ export default function RentalRecordDetails() {
       setRents(rentsData as Rent[]);
     };
     loadRelatedRents();
-  }, [rentalRecordData?.id]);
+  }, [rentalRecordData?.id, getRentsForARentalRecord]);
 
   const tenantFullName = tenant
     ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`
     : rentalRecordData?.tenant;
 
-  const gotoAddRentalRecords = () => {};
   const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
-  console.log({ selectedRents });
 
   let [isOpen, setIsOpen] = useState(true);
   const payRent = () => {
@@ -476,6 +466,14 @@ export default function RentalRecordDetails() {
     </div>
   );
 }
+function goBack(query: URLSearchParams, navigate: NavigateFunction) {
+  const rentalRecordId = query.get("rentalRecordId");
+  if (!rentalRecordId) {
+    navigate("/dashboard?tab=rentalRecords");
+  }
+  return rentalRecordId;
+}
+
 function rentSelected(selectedRents: Rent[], rent: Rent) {
   return selectedRents.findIndex((i) => i.id === rent.id) > -1;
 }

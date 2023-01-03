@@ -5,7 +5,6 @@ import Features from "../components/homepage/Features";
 import Pricing from "../components/homepage/Pricing";
 import HomePageCTA from "../components/homepage/HomePageCTA";
 import Footer from "../components/shared/Footer";
-import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import { selectUser } from "../app/features/userSlice";
@@ -17,7 +16,7 @@ export default function HomePage() {
     if (loggedInUser?.email) {
       navigate("/dashboard?tab=rentalRecords");
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, navigate]);
 
   return (
     <div>

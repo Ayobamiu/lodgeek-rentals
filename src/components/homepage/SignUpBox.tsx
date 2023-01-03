@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ReactComponent as FlexCircleGreen } from "../../assets/flex-ui-assets/logos/flex-circle-green.svg";
 import useAuth from "../../hooks/useAuth";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 

@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 import SignUpBox from "./SignUpBox";
 
@@ -8,60 +9,60 @@ export default function HomepageHeader() {
         <nav className="flex justify-between p-6 px-4">
           <div className="flex justify-between items-center w-full">
             <div className="w-1/2 xl:w-1/3">
-              <a className="block max-w-max" href="#">
+              <Link className="block max-w-max" to="/">
                 <FlexUIGreenLight className="h-8 w-[120px]" />
-              </a>
+              </Link>
             </div>
             <div className="w-1/2 xl:w-1/3">
               <ul className="hidden xl:flex xl:justify-center">
                 <li className="mr-12">
-                  <a
+                  <Link
                     className="text-coolGray-500 hover:text-coolGray-900 font-medium"
-                    href="#"
+                    to="/"
                   >
                     Product
-                  </a>
+                  </Link>
                 </li>
                 <li className="mr-12">
-                  <a
+                  <Link
                     className="text-coolGray-500 hover:text-coolGray-900 font-medium"
-                    href="#"
+                    to="/"
                   >
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li className="mr-12">
-                  <a
+                  <Link
                     className="text-coolGray-500 hover:text-coolGray-900 font-medium"
-                    href="#"
+                    to="/"
                   >
                     Resources
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a
+                  <Link
                     className="text-coolGray-500 hover:text-coolGray-900 font-medium"
-                    href="#"
+                    to="/"
                   >
                     Pricing
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
             <div className="w-1/2 xl:w-1/3">
               <div className="hidden xl:flex items-center justify-end">
-                <a
+                <Link
                   className="inline-block py-2 px-4 mr-2 leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium rounded-md"
-                  href="#"
+                  to="/"
                 >
                   Log In
-                </a>
-                <a
+                </Link>
+                <Link
                   className="inline-block py-2 px-4 text-sm leading-5 text-green-50 bg-green-500 hover:bg-green-600 font-medium focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
-                  href="#"
+                  to="/"
                 >
                   Sign Up
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -92,64 +93,64 @@ export default function HomepageHeader() {
           <div className="fixed top-0 left-0 bottom-0 w-full lg:w-4/6 max-w-xs bg-white">
             <nav className="relative p-6 h-full overflow-y-auto">
               <div className="flex flex-col justify-between h-full">
-                <a className="inline-block" href="#">
+                <Link className="inline-block" to="/">
                   <FlexUIGreenLight className="h-8" />
-                </a>
+                </Link>
                 <ul className="py-6">
                   <li>
-                    <a
+                    <Link
                       className="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Product
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
+                    <Link
                       className="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Features
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
+                    <Link
                       className="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Pricing
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a
+                    <Link
                       className="block py-3 px-4 text-coolGray-500 hover:text-coolGray-900 font-medium hover:bg-coolGray-50 rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Resources
-                    </a>
+                    </Link>
                   </li>
                 </ul>
                 <div className="flex flex-wrap">
                   <div className="w-full mb-2">
-                    <a
+                    <Link
                       className="inline-block py-2 px-4 w-full text-sm leading-5 text-coolGray-500 hover:text-coolGray-900 bg-transparent font-medium text-center rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Log In
-                    </a>
+                    </Link>
                   </div>
                   <div className="w-full">
-                    <a
+                    <Link
                       className="inline-block py-2 px-4 w-full text-sm leading-5 text-white bg-green-500 hover:bg-green-600 font-medium text-center focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
-                      href="#"
+                      to="/"
                     >
                       Sign Up
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
             </nav>
-            <a className="navbar-close absolute top-5 p-4 right-3" href="#">
+            <Link className="navbar-close absolute top-5 p-4 right-3" to="/">
               <svg
                 width="12"
                 height="12"
@@ -162,7 +163,7 @@ export default function HomepageHeader() {
                   fill="#556987"
                 ></path>
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

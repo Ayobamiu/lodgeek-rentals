@@ -23,9 +23,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-const auth = firebase.auth();
 const db = getFirestore(app);
+const fv = firebase.firestore.FieldValue;
+const auth = firebase.auth();
+const analytics = getAnalytics(app);
 // const firestore = firebase.firestore();
 
 export const generateFirebaseId = (path: string) => {
@@ -48,4 +49,5 @@ export {
   RENTAL_RECORD_PATH,
   RENT_PATH,
   USER_PATH,
+  fv,
 };

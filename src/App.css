@@ -36,3 +36,7 @@
     transform: rotate(360deg);
   }
 }
+.pattern-white-bg{
+  background-image: url('./assets/flex-ui-assets/elements/pattern-white.svg');
+  background-position: center;
+}

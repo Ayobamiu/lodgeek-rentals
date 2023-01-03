@@ -18,9 +18,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "downlevelIteration": true,
   },
   "include": [
     "src"
-  ]
+  ],
+  "paths": {
+    "*": [ "lodgeek-rental/@types/alltypes.d.ts"]
+  },
+  "exclude": [ "node_modules", "lodgeek-rental/@types/alltypes.d.ts",  ]
+
 }

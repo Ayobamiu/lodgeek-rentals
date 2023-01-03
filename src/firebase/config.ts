@@ -4,7 +4,8 @@ import firebase from "firebase/compat/app";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import "firebase/compat/auth";
-import { collection, doc, FieldValue, getFirestore } from "firebase/firestore";
+import { collection, doc, getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -24,10 +25,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const fv = FieldValue;
+// const fv = firebase.firestore.FieldValue;
 console.log(firebase.firestore);
+const auth = getAuth();
 
-const auth = firebase.auth();
 const analytics = getAnalytics(app);
 // const firestore = firebase.firestore();
 
@@ -45,11 +46,9 @@ const RENT_PATH = "rents";
 export {
   analytics,
   auth,
-  app,
   db,
   PROPERTY_PATH,
   RENTAL_RECORD_PATH,
   RENT_PATH,
   USER_PATH,
-  fv,
 };

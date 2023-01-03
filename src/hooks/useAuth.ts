@@ -10,6 +10,12 @@ import {
   selectUsers,
   updateUser,
 } from "../app/features/userSlice";
+import {
+  createUserWithEmailAndPassword,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+} from "firebase/auth";
 
 const useAuth = () => {
   const [signingIn, setSigningIn] = useState(false);
@@ -25,7 +31,7 @@ const useAuth = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    const observer = auth.onAuthStateChanged((user) => {
+    const observer = onAuthStateChanged(auth, (user) => {
       console.log({ user: user?.email });
 
       if (user) {
@@ -67,8 +73,7 @@ const useAuth = () => {
   const handleSignInUser = (email: string, password: string) => {
     setSigningIn(true);
 
-    auth
-      .signInWithEmailAndPassword(email, password)
+    signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
@@ -93,8 +98,7 @@ const useAuth = () => {
   ) => {
     setSigningUp(true);
 
-    auth
-      .createUserWithEmailAndPassword(email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then(async (userCredential) => {
         // Signed in
         const user = userCredential.user;
@@ -124,8 +128,7 @@ const useAuth = () => {
 
   const handleSignOutUser = () => {
     setSigningOut(true);
-    auth
-      .signOut()
+    signOut(auth)
       .then(() => {
         // Sign-out successful.
         dispatch(updateUser(undefined));

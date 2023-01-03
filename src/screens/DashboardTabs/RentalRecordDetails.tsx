@@ -416,6 +416,7 @@ export default function RentalRecordDetails() {
               .sort((a: Rent, b: Rent) => a.dueDate - b.dueDate)
               .map((rent, index) => (
                 <button
+                  key={index}
                   onClick={() => {
                     const rentNotClickable =
                       !showPayRentButton || rent.status === "paid";

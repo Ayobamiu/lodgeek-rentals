@@ -386,6 +386,7 @@ export default function AddRentalRecords() {
           <div className="flex gap-5 justify-start my-5 flex-wrap">
             {rents.map((rent, index) => (
               <button
+                key={index}
                 disabled={addingRentalRecord}
                 className="flex flex-col items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] relative"
                 onClick={() => {

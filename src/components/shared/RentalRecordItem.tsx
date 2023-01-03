@@ -101,7 +101,10 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
           rents
             .sort((a: Rent, b: Rent) => a.dueDate - b.dueDate)
             .map((rent, index) => (
-              <button className="flex flex-col items-center bg-gray-300 lg:p-3 p-2 lg:gap-3 gap-2 rounded-xl lg:min-w-[70px] relative">
+              <button
+                key={index}
+                className="flex flex-col items-center bg-gray-300 lg:p-3 p-2 lg:gap-3 gap-2 rounded-xl lg:min-w-[70px] relative"
+              >
                 {rent.status === "paid" && (
                   <div className="px-1 text-xs bg-[green] text-white font-bold shadow-sm rounded absolute -bottom-2">
                     Paid

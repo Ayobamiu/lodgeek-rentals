@@ -21,7 +21,6 @@
     "font-awesome": "^4.7.0",
     "global": "^4.4.0",
     "moment": "^2.29.4",
-    "query-string": "^8.1.0",
     "react": "^18.2.0",
     "react-currency-input-field": "^3.6.9",
     "react-dom": "^18.2.0",

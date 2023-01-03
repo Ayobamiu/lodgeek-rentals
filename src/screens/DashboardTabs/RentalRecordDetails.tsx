@@ -20,14 +20,10 @@ import useRents from "../../hooks/useRents";
 import { Property, Rent, RentalRecord, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Dialog, Transition } from "@headlessui/react";
-import queryString from "query-string";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
   const { search } = useLocation();
-
-  const parsed = queryString.parse(search);
-  console.log({ query, search, rents: parsed.rents });
 
   const navigate = useNavigate();
 
@@ -147,10 +143,7 @@ export default function RentalRecordDetails() {
   let [isOpen, setIsOpen] = useState(true);
   const payRent = () => {
     if (!selectedRents.length) return toast.error("Select Rents to pay for.");
-    parsed.rents = selectedRents.map((i) => i.id);
-    parsed.showModal = "showDetails";
-    const stringified = queryString.stringify(parsed);
-    navigate(`/dashboard?${stringified}`);
+
     setIsOpen(true);
   };
 

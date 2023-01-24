@@ -115,18 +115,21 @@ const useAuth = () => {
   };
 
   const handleSignOutUser = () => {
-    setSigningOut(true);
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        dispatch(updateUser(undefined));
-      })
-      .catch((error) => {
-        // An error happened.
-      })
-      .finally(() => {
-        setSigningOut(false);
-      });
+    let text = "Are you sure to Log out?";
+    if (window.confirm(text) == true) {
+      setSigningOut(true);
+      signOut(auth)
+        .then(() => {
+          // Sign-out successful.
+          dispatch(updateUser(undefined));
+        })
+        .catch((error) => {
+          // An error happened.
+        })
+        .finally(() => {
+          setSigningOut(false);
+        });
+    }
   };
 
   const getUserData = async (email: string): Promise<User | undefined> => {

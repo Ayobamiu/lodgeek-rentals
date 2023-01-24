@@ -183,8 +183,7 @@ export default function RentalRecordDetails() {
       status: "inviteAccepted",
     })
       .then(async () => {
-        const rentalRecordLink =
-          "http://localhost:3000/dashboard?tab=rentalRecordDetails&rentalRecordId=DsTRakjwfUUifykhQb7F";
+        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
         await sendEmail(
           rentalRecordData.owner,
           `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${property?.title}`,

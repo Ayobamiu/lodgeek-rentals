@@ -125,8 +125,7 @@ const useRentalRecords = () => {
         });
 
         rentBatch.commit().then(async () => {
-          const rentalRecordLink =
-            "http://localhost:3000/dashboard?tab=rentalRecordDetails&rentalRecordId=DsTRakjwfUUifykhQb7F";
+          const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
           await sendEmail(
             rentalRecordData.tenant,
             `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,

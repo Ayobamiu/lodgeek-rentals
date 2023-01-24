@@ -11,6 +11,8 @@ import {
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { sendEmail } from "../api/email";
+import { selectProperties } from "../app/features/propertySlice";
 import {
   addRentalRecord,
   addRentalRecords,
@@ -34,6 +36,7 @@ const useRentalRecords = () => {
   const dispatch = useAppDispatch();
   const rentalRecords = useAppSelector(selectRentalRecords);
   const loggedInUser = useAppSelector(selectUser);
+  const properties = useAppSelector(selectProperties);
 
   const getUsersRentalRecords = useCallback(async () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
@@ -93,6 +96,9 @@ const useRentalRecords = () => {
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
+
+    const property = properties.find((i) => i.id === data.property);
+
     setAddingRentalRecord(true);
     const rentalRecordId = generateFirebaseId(RENTAL_RECORD_PATH);
     const rentalRecordData: RentalRecord = {
@@ -118,10 +124,17 @@ const useRentalRecords = () => {
           rentBatch.set(docRef, rentData);
         });
 
-        rentBatch.commit().then(() => {
-          //TODO: Send Email Invite to tenant.
+        rentBatch.commit().then(async () => {
+          const rentalRecordLink =
+            "http://localhost:3000/dashboard?tab=rentalRecordDetails&rentalRecordId=DsTRakjwfUUifykhQb7F";
+          await sendEmail(
+            rentalRecordData.tenant,
+            `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
+            `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
+            `Click on the link below to manage your rent at ${property?.title}.\n <a href=${rentalRecordLink}>Link</a>`
+          );
           dispatch(addRentalRecord(rentalRecordData));
-          toast.success("Succesfully Added Rental Record");
+          toast.success(`Invite sent to ${rentalRecordData.tenant}`);
         });
       })
       .catch((error) => {

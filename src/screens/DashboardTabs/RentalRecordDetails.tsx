@@ -16,6 +16,7 @@ import useRents from "../../hooks/useRents";
 import { Property, Rent, RentalRecord, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Transition } from "@headlessui/react";
+import { sendEmail } from "../../api/email";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -68,7 +69,7 @@ export default function RentalRecordDetails() {
     if (rentalRecordData?.property) {
       loadRelatedProperty();
     }
-  }, [rentalRecordData?.property, getPropertyData]);
+  }, [rentalRecordData?.property]);
 
   const [owner, setOwner] = useState<User>();
   const [loadingOwner, setLoadingOwner] = useState(false);
@@ -86,7 +87,7 @@ export default function RentalRecordDetails() {
       setOwner(ownerData);
     };
     loadRelatedOwner();
-  }, [rentalRecordData?.owner, getUserData]);
+  }, [rentalRecordData?.owner]);
 
   const ownerFullName = owner
     ? `${owner?.firstName || "-"} ${owner?.lastName || "-"}`
@@ -106,7 +107,7 @@ export default function RentalRecordDetails() {
       setTenant(tenantData);
     };
     loadRelatedTenant();
-  }, [rentalRecordData?.tenant, getUserData]);
+  }, [rentalRecordData?.tenant]);
 
   const [rents, setRents] = useState<Rent[]>([]);
   const [loadingRents, setLoadingRents] = useState(false);
@@ -122,7 +123,7 @@ export default function RentalRecordDetails() {
       setRents(rentsData as Rent[]);
     };
     loadRelatedRents();
-  }, [rentalRecordData?.id, getRentsForARentalRecord]);
+  }, [rentalRecordData?.id]);
 
   const tenantFullName = tenant
     ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`
@@ -181,7 +182,15 @@ export default function RentalRecordDetails() {
       ...rentalRecordData,
       status: "inviteAccepted",
     })
-      .then(() => {
+      .then(async () => {
+        const rentalRecordLink =
+          "http://localhost:3000/dashboard?tab=rentalRecordDetails&rentalRecordId=DsTRakjwfUUifykhQb7F";
+        await sendEmail(
+          rentalRecordData.owner,
+          `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${property?.title}`,
+          `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
+          `Click on the link below to manage your rent at ${property?.title}.\n <a href=${rentalRecordLink}>Link</a>`
+        );
         setRentalRecordData({
           ...rentalRecordData,
           status: "inviteAccepted",

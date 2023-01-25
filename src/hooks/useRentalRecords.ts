@@ -28,6 +28,7 @@ import {
   RENT_PATH,
 } from "../firebase/config";
 import { Rent, RentalRecord } from "../models";
+import formatPrice from "../utils/formatPrice";
 
 const useRentalRecords = () => {
   const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
@@ -145,7 +146,12 @@ const useRentalRecords = () => {
       });
   };
 
-  const updatePaidRents = async (rents: Rent[]) => {
+  const updatePaidRents = async (
+    rents: Rent[],
+    rentalRecordId: string,
+    owner: string,
+    propertyTitle: string
+  ) => {
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
@@ -166,8 +172,20 @@ const useRentalRecords = () => {
 
     rentBatch
       .commit()
-      .then(() => {
-        toast.success("Succesfully Updated Rents.");
+      .then(async () => {
+        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}`;
+        await sendEmail(
+          owner,
+          `${loggedInUser.firstName} ${
+            loggedInUser.lastName
+          } paid a sum of ${formatPrice(
+            rents.reduce((partialSum, a) => partialSum + a.rent, 0)
+          )} in rent for ${propertyTitle}`,
+          `Click on the link below to view payment details.\n ${rentalRecordLink}`,
+          `Click on the link below to view payment details.\n <a href=${rentalRecordLink}>Link</a>`
+        ).then(() => {
+          toast.success("Succesfully Updated Rents.");
+        });
       })
       .catch((error) => {
         toast.error("Error Updating Rents.");

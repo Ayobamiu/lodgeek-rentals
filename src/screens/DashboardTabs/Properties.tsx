@@ -12,7 +12,6 @@ export default function Properties() {
   };
   useProperties();
   const properties = useAppSelector(selectProperties);
-  console.log({ properties });
 
   return (
     <div>

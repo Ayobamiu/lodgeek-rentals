@@ -37,7 +37,7 @@ export default function AddProperty() {
       owner: loggedInUser?.email,
       id: generateFirebaseId(PROPERTY_PATH),
     };
-    console.log({ data });
+
     await addProperty(data).then(() => {
       const addPropertyForm =
         document &&
@@ -48,11 +48,6 @@ export default function AddProperty() {
   const gotoProperties = () => {
     navigate("/dashboard?tab=properties");
   };
-
-  // const { ref } = usePlacesWidget({
-  //   apiKey: "AIzaSyA1eNhWicAaaTMd-Q4khyn1lGuUQeSXHFE",
-  //   onPlaceSelected: (place) => console.log(place),
-  // });
 
   return (
     <div>
@@ -180,7 +175,6 @@ export default function AddProperty() {
                       placeholder="₦ 500,000.00"
                       decimalsLimit={2}
                       onValueChange={(value, name) => {
-                        console.log(value, name);
                         setRent(Number(value));
                       }}
                       defaultValue={rent}

@@ -217,6 +217,8 @@ export default function Dashboard() {
                         <div className="block max-w-max text-coolGray-500 hover:text-coolGray-600">
                           <button
                             className="text-coolGray-500 hover:text-coolGray-600"
+                            about="Log Out"
+                            title="Log Out"
                             onClick={handleSignOutUser}
                           >
                             {signingOut ? (
@@ -678,6 +680,8 @@ export default function Dashboard() {
                     <div className="w-auto">
                       <button
                         className="text-coolGray-500 hover:text-coolGray-600"
+                        about="Log Out"
+                        title="Log Out"
                         onClick={handleSignOutUser}
                       >
                         {signingOut ? (

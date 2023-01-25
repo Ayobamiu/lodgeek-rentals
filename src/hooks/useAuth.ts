@@ -30,8 +30,6 @@ const useAuth = () => {
       const docRef = doc(db, "users", email);
       const docSnap = await getDoc(docRef);
       const user = docSnap.data() as User;
-      console.log({ user });
-
       dispatch(updateUser(user));
     },
     [dispatch]
@@ -116,20 +114,20 @@ const useAuth = () => {
 
   const handleSignOutUser = () => {
     let text = "Are you sure to Log out?";
-    if (window.confirm(text) == true) {
-      setSigningOut(true);
-      signOut(auth)
-        .then(() => {
-          // Sign-out successful.
-          dispatch(updateUser(undefined));
-        })
-        .catch((error) => {
-          // An error happened.
-        })
-        .finally(() => {
-          setSigningOut(false);
-        });
-    }
+    // if (window.confirm(text) == true) {
+    setSigningOut(true);
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+        dispatch(updateUser(undefined));
+      })
+      .catch((error) => {
+        // An error happened.
+      })
+      .finally(() => {
+        setSigningOut(false);
+      });
+    // }
   };
 
   const getUserData = async (email: string): Promise<User | undefined> => {

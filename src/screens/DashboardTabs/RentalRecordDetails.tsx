@@ -17,6 +17,7 @@ import { Property, Rent, RentalRecord, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Transition } from "@headlessui/react";
 import { sendEmail } from "../../api/email";
+import { PaystackButton } from "react-paystack";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -35,7 +36,6 @@ export default function RentalRecordDetails() {
 
   useEffect(() => {
     const rentalRecordId = goBack(query, navigate);
-
     const loadRelatedRentalRecord = async () => {
       if (!rentalRecordId) return;
       setLoadingRentalRecord(true);
@@ -48,7 +48,7 @@ export default function RentalRecordDetails() {
     };
 
     loadRelatedRentalRecord();
-  }, [query, navigate, getRentalRecordData]);
+  }, [query]);
 
   const { getPropertyData } = useProperties();
   const { getRentsForARentalRecord } = useRents();
@@ -82,7 +82,6 @@ export default function RentalRecordDetails() {
           setLoadingOwner(false);
         }
       );
-      console.log({ ownerData });
 
       setOwner(ownerData);
     };
@@ -130,10 +129,15 @@ export default function RentalRecordDetails() {
     : rentalRecordData?.tenant;
 
   const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
+  useEffect(() => {
+    if (!selectedRents.length) {
+      setIsOpen(false);
+    }
+  }, [selectedRents]);
 
   let [isOpen, setIsOpen] = useState(true);
   const payRent = () => {
-    if (!selectedRents.length) return toast.error("Select Rents to pay for.");
+    if (!selectedRents.length) return toast.warn("Select Rents to pay for.");
 
     setIsOpen(true);
   };
@@ -142,9 +146,16 @@ export default function RentalRecordDetails() {
 
   const handlePaidRents = async () => {
     setUpdatingRents(true);
+    const rentalRecordId = query.get("rentalRecordId");
 
-    await updatePaidRents(selectedRents)
+    await updatePaidRents(
+      selectedRents,
+      rentalRecordId || "",
+      owner?.email || "",
+      property?.title || ""
+    )
       .finally(() => {
+        setSelectedRents([]);
         setUpdatingRents(false);
       })
       .then(() => {
@@ -258,8 +269,24 @@ export default function RentalRecordDetails() {
     }
   }, [selectedRents]);
 
+  const config = {
+    reference: new Date().getTime().toString(),
+    email: loggedInUser?.email || "",
+    amount:
+      selectedRents.reduce((partialSum, a) => partialSum + a.rent, 0) * 100,
+    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
+  };
+
+  const componentProps = {
+    ...config,
+    text: "Pay",
+    onSuccess: () => handlePaidRents(),
+    onClose: () => {},
+  };
+
   return (
     <div>
+      {/* Rent Invoice Table */}
       <Transition
         show={isOpen}
         enter="transition-opacity duration-150"
@@ -270,7 +297,7 @@ export default function RentalRecordDetails() {
         leaveTo="opacity-0"
       >
         <div className="bg-black bg-opacity-50 absolute h-full w-full top-0 left-0 flex items-center justify-center z-50">
-          <div className="lg:w-[600px] lg:min-h-[500px] bg-white rounded-3xl p-6 relative">
+          <div className="lg:w-[600px]  bg-white rounded-3xl p-6 relative">
             <FontAwesomeIcon
               icon={faTimes}
               className="absolute right-4 top-3 cursor-pointer"
@@ -330,16 +357,16 @@ export default function RentalRecordDetails() {
                   </tr>
                 </tfoot>
               </table>
-              <button
-                onClick={handlePaidRents}
+              <PaystackButton
                 className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
-              >
-                {updatingRents ? <ActivityIndicator /> : <span>Pay</span>}
-              </button>
+                {...componentProps}
+              />
             </div>
           </div>
         </div>
       </Transition>
+      {/* Rent Invoice Table */}
+
       <section className="container mx-auto bg-white p-8 border-b">
         <div className="flex flex-wrap items-center -m-2">
           <div className="w-full md:w-1/2 p-2">

@@ -12,12 +12,12 @@ export default function Features() {
             Features
           </span>
           <h1 className="mb-4 text-3xl md:text-4xl leading-tight text-coolGray-900 font-bold tracking-tighter">
-            Gain more insight into how people use your
+            Manage and expand your rental portfolio from anywhere.
           </h1>
           <p className="text-lg md:text-xl text-coolGray-500 font-medium">
-            With our integrated CRM, project management, collaboration and
-            invoicing capabilities, you can manage every aspect of your business
-            in one secure platform.
+            You can manage every aspect of your rental business in one secure
+            platform with our integrated CRM, rental management, payment
+            integration, and invoicing capabilities.
           </p>
         </div>
         <div className="relative mb-8 md:mb-24 mx-auto max-w-max">
@@ -43,11 +43,11 @@ export default function Features() {
                 </svg>
               </div>
               <h3 className="mb-4 text-xl md:text-2xl leading-tight font-bold">
-                Measure your performance
+                Automate rent collection
               </h3>
               <p className="text-coolGray-500 font-medium">
-                Get a complete sales dashboard in the cloud. See activity,
-                revenue and social metrics all in one place.
+                Using our secure payment integrations, Collect rents from
+                tenants right to your Account.
               </p>
             </div>
           </div>
@@ -68,11 +68,10 @@ export default function Features() {
                 </svg>
               </div>
               <h3 className="mb-4 text-xl md:text-2xl leading-tight font-bold">
-                Custom analytics
+                Sign Leases
               </h3>
               <p className="text-coolGray-500 font-medium">
-                Our calendar lets you know what is happening with customer and
-                projects so you
+                Sign Leases Electronnically. Easy.
               </p>
             </div>
           </div>
@@ -93,11 +92,10 @@ export default function Features() {
                 </svg>
               </div>
               <h3 className="mb-4 text-xl md:text-2xl leading-tight font-bold">
-                Team Management
+                Screen Renters
               </h3>
               <p className="text-coolGray-500 font-medium">
-                A tool that lets you build a dream website even if you know
-                nothing about web design or programming.
+                Select the best tenants.
               </p>
             </div>
           </div>

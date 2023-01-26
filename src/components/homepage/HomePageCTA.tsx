@@ -13,29 +13,29 @@ export default function HomePageCTA() {
           <div className="w-full md:w-1/2 px-4 mb-20 lg:mb-0">
             <div className="max-w-md mx-auto">
               <h2 className="mb-8 text-4xl md:text-5xl font-heading font-bold text-coolGray-900 md:leading-15">
-                Join 6,000+ startups growing with Flex
+                Join rental mangers growing with Lodgeek.
               </h2>
               <ul className="mb-8">
                 <li className="flex items-center mb-4">
                   <img className="mr-3" src={CheckBoxGreenCTA} alt="" />
                   <span className="text-lg md:text-xl font-heading text-coolGray-500">
-                    Mauris pellentesque congue libero nec
+                    Automate rent collection
                   </span>
                 </li>
                 <li className="flex items-center mb-4">
                   <img className="mr-3" src={CheckBoxGreenCTA} alt="" />
                   <span className="text-lg md:text-xl font-heading text-coolGray-500">
-                    Suspendisse mollis tincidunt
+                    Sign Leases
                   </span>
                 </li>
                 <li className="flex items-center">
                   <img className="mr-3" src={CheckBoxGreenCTA} alt="" />
                   <span className="text-lg md:text-xl font-heading text-coolGray-500">
-                    Praesent varius justo vel justo pulvinar
+                    Screen Renters
                   </span>
                 </li>
               </ul>
-              <div className="flex flex-wrap items-center">
+              {/* <div className="flex flex-wrap items-center">
                 <Link
                   className="inline-flex items-center justify-center px-7 py-3 h-14 w-full md:w-auto mb-2 md:mb-0 md:mr-4 md:w-auto text-lg leading-7 text-coolGray-800 bg-white hover:bg-coolGray-100 font-medium focus:ring-2 focus:ring-coolGray-200 focus:ring-opacity-50 border border-coolGray-200 border border-coolGray-100 rounded-md shadow-sm"
                   to="/"
@@ -48,7 +48,7 @@ export default function HomePageCTA() {
                 >
                   Get Started
                 </Link>
-              </div>
+              </div> */}
             </div>
           </div>
           <div className="w-full md:w-1/2 px-4">

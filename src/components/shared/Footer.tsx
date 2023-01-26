@@ -9,7 +9,7 @@ export default function Footer() {
           <Link className="block md:mx-auto mb-5 max-w-max" to="/">
             <FlexUIGreenLight className="h-8 w-[95px]" />
           </Link>
-          <div className="flex flex-wrap justify-center -mx-3 lg:-mx-6">
+          {/* <div className="flex flex-wrap justify-center -mx-3 lg:-mx-6">
             <div className="w-full md:w-auto p-3 md:px-6">
               <Link
                 className="inline-block text-lg md:text-xl text-coolGray-500 hover:text-coolGray-600 font-medium"
@@ -66,13 +66,13 @@ export default function Footer() {
                 Privacy
               </Link>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="border-b border-coolGray-100"></div>
       <div className="container px-4 mx-auto">
         <p className="py-10 md:pb-20 text-lg md:text-xl text-coolGray-400 font-medium text-center">
-          © 2021 Flex. All rights reserved.
+          © 2023 Lodgeek. All rights reserved.
         </p>
       </div>
     </section>

@@ -13,7 +13,7 @@ export default function HomepageHeader() {
                 <FlexUIGreenLight className="h-8 w-[120px]" />
               </Link>
             </div>
-            <div className="w-1/2 xl:w-1/3">
+            {/* <div className="w-1/2 xl:w-1/3">
               <ul className="hidden xl:flex xl:justify-center">
                 <li className="mr-12">
                   <Link
@@ -48,7 +48,7 @@ export default function HomepageHeader() {
                   </Link>
                 </li>
               </ul>
-            </div>
+            </div> */}
             <div className="w-1/2 xl:w-1/3">
               <div className="hidden xl:flex items-center justify-end">
                 <Link
@@ -172,7 +172,7 @@ export default function HomepageHeader() {
           <div className="flex flex-wrap items-center">
             <div className="w-full lg:w-1/2 mb-20 lg:mb-0">
               <span className="inline-block py-px px-2 mb-4 text-xs leading-5 text-white bg-green-500 font-medium uppercase rounded-9xl">
-                Header
+                Rental manager
               </span>
               <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl leading-tight text-coolGray-900 font-bold tracking-tight">
                 Simplified renting experience.

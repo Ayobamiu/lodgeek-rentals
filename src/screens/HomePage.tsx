@@ -22,9 +22,9 @@ export default function HomePage() {
     <div>
       <div className="">
         <HomepageHeader />
-        <LogoClouds />
+        {/* <LogoClouds /> */}
         <Features />
-        <Pricing />
+        {/* <Pricing /> */}
         <HomePageCTA />
         <Footer />
       </div>

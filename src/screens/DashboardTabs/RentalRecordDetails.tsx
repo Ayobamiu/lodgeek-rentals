@@ -136,7 +136,8 @@ export default function RentalRecordDetails() {
     }
   }, [selectedRents]);
 
-  let [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+
   const payRent = () => {
     if (!selectedRents.length) return toast.warn("Select Rents to pay for.");
 
@@ -149,12 +150,14 @@ export default function RentalRecordDetails() {
     setUpdatingRents(true);
     const rentalRecordId = query.get("rentalRecordId");
 
-    await updatePaidRents(
-      selectedRents,
-      rentalRecordId || "",
-      owner?.email || "",
-      property?.title || ""
-    )
+    await updatePaidRents({
+      rents: selectedRents,
+      rentalRecordId: rentalRecordId || "",
+      owner: owner?.email || "",
+      propertyTitle: property?.title || "",
+      tenantName: `${tenant?.firstName} ${tenant?.lastName}`,
+      tenantEmail: tenant?.email || "",
+    })
       .finally(() => {
         setSelectedRents([]);
         setUpdatingRents(false);

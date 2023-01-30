@@ -9,6 +9,7 @@ import {
   writeBatch,
   updateDoc,
 } from "firebase/firestore";
+import moment from "moment";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { sendEmail } from "../api/email";
@@ -27,7 +28,12 @@ import {
   RENTAL_RECORD_PATH,
   RENT_PATH,
 } from "../firebase/config";
-import { Rent, RentalRecord, RentStatus } from "../models";
+import {
+  Rent,
+  RentalRecord,
+  RentStatus,
+  UpdatePaidRentsProps,
+} from "../models";
 import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 
@@ -155,12 +161,16 @@ const useRentalRecords = () => {
       });
   };
 
-  const updatePaidRents = async (
-    rents: Rent[],
-    rentalRecordId: string,
-    owner: string,
-    propertyTitle: string
-  ) => {
+  const updatePaidRents = async (props: UpdatePaidRentsProps) => {
+    const {
+      owner,
+      propertyTitle,
+      rentalRecordId,
+      rents,
+      tenantName,
+      tenantEmail,
+    } = props;
+
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
@@ -170,6 +180,7 @@ const useRentalRecords = () => {
     }
 
     const rentBatch = writeBatch(db);
+
     rents.forEach((rentdoc) => {
       var docRef = doc(collection(db, RENT_PATH), rentdoc.id); //automatically generate unique id
       const rentData: Rent = {
@@ -183,22 +194,77 @@ const useRentalRecords = () => {
       .commit()
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}`;
-        const email = generateSimpleEmail({
-          paragraphs: ["Click on the link below to view payment details."],
-          buttons: [{ text: "View payment details", link: rentalRecordLink }],
+
+        const totalRentPaid = rents.reduce(
+          (partialSum, a) => partialSum + a.rent,
+          0
+        );
+
+        const paragraphsForLandlord = [
+          "The payment details are as follows:",
+          `Tenant: ${tenantName}`,
+          `Property: ${propertyTitle}`,
+          ...rents.map(
+            (rent) =>
+              `Rent for ${moment(rent.dueDate).format(
+                rent.rentPer === "month" ? "MMM YYYY" : "YYYY"
+              )} - ${formatPrice(rent.rent)}`
+          ),
+          `Total - ${formatPrice(totalRentPaid)}`,
+          "Click on the link below to view rent details.",
+        ];
+
+        const paragraphsForTenant = [
+          "The payment details are as follows:",
+          `Property: ${propertyTitle}`,
+          ...rents.map(
+            (rent) =>
+              `Rent for ${moment(rent.dueDate).format(
+                "MMM YYYY"
+              )} - ${formatPrice(rent.rent)}`
+          ),
+          `Total - ${formatPrice(totalRentPaid)}`,
+        ];
+
+        const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
+          totalRentPaid
+        )} in rent for ${propertyTitle}`;
+
+        const emailSubjectForTenant = "Your rent payment has been confirmed.";
+
+        const generatedEmailForLandlord = generateSimpleEmail({
+          paragraphs: paragraphsForLandlord,
+          buttons: [
+            {
+              link: rentalRecordLink,
+              text: "View details",
+            },
+          ],
+          title: emailSubjectForLandlord,
         });
-        await sendEmail(
-          owner,
-          `${loggedInUser.firstName} ${
-            loggedInUser.lastName
-          } paid a sum of ${formatPrice(
-            rents.reduce((partialSum, a) => partialSum + a.rent, 0)
-          )} in rent for ${propertyTitle}`,
-          `Click on the link below to view payment details.\n ${rentalRecordLink}`,
-          email
-        ).then(() => {
-          toast.success("Succesfully Updated Rents.");
+
+        const generatedEmailForTenant = generateSimpleEmail({
+          paragraphs: paragraphsForTenant,
+          title: emailSubjectForTenant,
         });
+        if (tenantEmail) {
+          await sendEmail(
+            tenantEmail,
+            emailSubjectForTenant,
+            paragraphsForTenant.join(" \n"),
+            generatedEmailForTenant
+          );
+        }
+        if (owner) {
+          await sendEmail(
+            owner,
+            emailSubjectForLandlord,
+            paragraphsForLandlord.join(" \n"),
+            generatedEmailForLandlord
+          ).then(() => {
+            toast.success("Payment was successfully obtained.");
+          });
+        }
       })
       .catch((error) => {
         toast.error("Error Updating Rents.");

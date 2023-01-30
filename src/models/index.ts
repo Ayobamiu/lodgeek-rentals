@@ -75,3 +75,11 @@ export enum FirebaseCollections {
   rents = "rents",
   users = "users",
 }
+export type UpdatePaidRentsProps = {
+  rents: Rent[];
+  rentalRecordId: string;
+  owner: string;
+  propertyTitle: string;
+  tenantName: string;
+  tenantEmail: string;
+};

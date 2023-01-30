@@ -42,6 +42,7 @@ export enum RentStatus {
   "Paid - Rent has been paid." = "paid",
   "Late - Due date has passed and rent has not been paid." = "late",
 }
+
 export type Rent = {
   id: string;
   property: string;

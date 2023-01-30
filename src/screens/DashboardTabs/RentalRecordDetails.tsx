@@ -13,11 +13,12 @@ import useProperties from "../../hooks/useProperties";
 import useQuery from "../../hooks/useQuery";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
-import { Property, Rent, RentalRecord, User } from "../../models";
+import { Property, Rent, RentalRecord, RentStatus, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Transition } from "@headlessui/react";
 import { sendEmail } from "../../api/email";
 import { PaystackButton } from "react-paystack";
+import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -162,7 +163,10 @@ export default function RentalRecordDetails() {
         const updatedRents = rents.map((i) => {
           const justPaid = selectedRents.findIndex((x) => x.id === i.id) > -1;
           if (justPaid) {
-            const paidRent: Rent = { ...i, status: "paid" };
+            const paidRent: Rent = {
+              ...i,
+              status: RentStatus["Paid - Rent has been paid."],
+            };
             return paidRent;
           } else {
             return i;
@@ -170,6 +174,7 @@ export default function RentalRecordDetails() {
         });
         setRents(updatedRents);
         setIsOpen(false);
+        //TODO: Send Email to landlord and tenant
       });
   };
 
@@ -195,11 +200,17 @@ export default function RentalRecordDetails() {
     })
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
+        const email = generateSimpleEmail({
+          paragraphs: [
+            `Click on the link below to manage your rent at ${property?.title}.`,
+          ],
+          buttons: [{ text: "View payment details", link: rentalRecordLink }],
+        });
         await sendEmail(
           rentalRecordData.owner,
           `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${property?.title}`,
           `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
-          `Click on the link below to manage your rent at ${property?.title}.\n <a href=${rentalRecordLink}>Link</a>`
+          email
         );
         setRentalRecordData({
           ...rentalRecordData,

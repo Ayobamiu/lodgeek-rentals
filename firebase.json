@@ -8,6 +8,7 @@
   },
   "functions": [
     {
+      "runtime": "nodejs16",
       "source": "functions",
       "codebase": "default",
       "ignore": [
@@ -24,11 +25,7 @@
   ],
   "hosting": {
     "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ]
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   },
   "storage": {
     "rules": "storage.rules"

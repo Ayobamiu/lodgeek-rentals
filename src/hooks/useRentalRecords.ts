@@ -27,8 +27,9 @@ import {
   RENTAL_RECORD_PATH,
   RENT_PATH,
 } from "../firebase/config";
-import { Rent, RentalRecord } from "../models";
+import { Rent, RentalRecord, RentStatus } from "../models";
 import formatPrice from "../utils/formatPrice";
+import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 
 const useRentalRecords = () => {
   const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
@@ -113,7 +114,7 @@ const useRentalRecords = () => {
         const rentBatch = writeBatch(db);
         rents.forEach((rentdoc) => {
           var docRef = doc(collection(db, RENT_PATH)); //automatically generate unique id
-          const rentData = {
+          const rentData: Rent = {
             ...rentdoc,
             id: docRef.id,
             rentalRecord: rentalRecordId,
@@ -121,17 +122,25 @@ const useRentalRecords = () => {
             rent: rentalRecordData.rent,
             rentPer: rentalRecordData.rentPer,
             property: rentalRecordData.property,
+            status: RentStatus["Upcoming - Rent is not due for payment."],
+            tenant: data.tenant,
           };
           rentBatch.set(docRef, rentData);
         });
 
         rentBatch.commit().then(async () => {
           const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
+          const email = generateSimpleEmail({
+            paragraphs: [
+              `Click on the link below to manage your rent at ${property?.title}.`,
+            ],
+            buttons: [{ text: "Manage rent", link: rentalRecordLink }],
+          });
           await sendEmail(
             rentalRecordData.tenant,
             `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
             `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
-            `Click on the link below to manage your rent at ${property?.title}.\n <a href=${rentalRecordLink}>Link</a>`
+            email
           );
           dispatch(addRentalRecord(rentalRecordData));
           toast.success(`Invite sent to ${rentalRecordData.tenant}`);
@@ -165,7 +174,7 @@ const useRentalRecords = () => {
       var docRef = doc(collection(db, RENT_PATH), rentdoc.id); //automatically generate unique id
       const rentData: Rent = {
         ...rentdoc,
-        status: "paid",
+        status: RentStatus["Paid - Rent has been paid."],
       };
       rentBatch.update(docRef, rentData);
     });
@@ -174,6 +183,10 @@ const useRentalRecords = () => {
       .commit()
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}`;
+        const email = generateSimpleEmail({
+          paragraphs: ["Click on the link below to view payment details."],
+          buttons: [{ text: "View payment details", link: rentalRecordLink }],
+        });
         await sendEmail(
           owner,
           `${loggedInUser.firstName} ${
@@ -182,7 +195,7 @@ const useRentalRecords = () => {
             rents.reduce((partialSum, a) => partialSum + a.rent, 0)
           )} in rent for ${propertyTitle}`,
           `Click on the link below to view payment details.\n ${rentalRecordLink}`,
-          `Click on the link below to view payment details.\n <a href=${rentalRecordLink}>Link</a>`
+          email
         ).then(() => {
           toast.success("Succesfully Updated Rents.");
         });
@@ -202,7 +215,6 @@ const useRentalRecords = () => {
 
     await updateDoc(doc(rentalRecordRef, data.id), data)
       .then((c) => {
-        //TODO: Send Email Invite to tenant.
         dispatch(updateRentalRecord(data));
       })
       .finally(() => {});

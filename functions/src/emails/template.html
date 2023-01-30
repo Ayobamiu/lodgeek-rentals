@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rent reminder for [Apartment name]</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      h1 {
+        color: blue;
+      }
+      p {
+        line-height: inherit;
+        font-size: 18px;
+      }
+      .button {
+        text-decoration: none;
+        display: inline-block;
+        color: #ffffff;
+        background-color: #22c55e;
+        border-radius: 4px;
+        padding: 10px;
+      }
+      .content {
+        width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .flex {
+        display: flex;
+        justify-content: center;
+      }
+      .p-10 {
+        padding: 10px;
+      }
+      .grey {
+        color: grey;
+      }
+      @media (max-width: 520px) {
+        .content {
+          width: auto;
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <div class="flex p-10">
+        <img
+          src="https://apply-to-usman.s3.eu-west-2.amazonaws.com/logo-no-background.png"
+          alt="Lodgeek Logo"
+          width="100px"
+        />
+      </div>
+      <p>
+        This is a friendly reminder that your rent for january is due on or
+        before 1/1/13 in the total amount of $570.
+      </p>
+      <p>
+        I thank you in advance for timely payment. Please contact me with any
+        question you may have.
+      </p>
+
+      <p>Make your payment with the following [payment link](link).</p>
+
+      <p>Sincerely, [Landlord name].</p>
+
+      <div class="flex p-10">
+        <a href="https://google.com" target="_blank" class="button">
+          Pay now
+        </a>
+      </div>
+      <div class="p-10">
+        <div class="flex">
+          <a href="https://lodgeek-rentals.vercel.app/"
+            ><small class="grey">Lodgeek Inc.</small></a
+          >
+        </div>
+        <div class="flex">
+          <small class="grey">Femi Coker Dr, Lekki, Lagos</small>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

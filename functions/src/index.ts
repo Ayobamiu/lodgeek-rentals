@@ -2,7 +2,6 @@ import { applicationDefault } from "firebase-admin/app";
 import functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-// var serviceAccount = require("./json/lodgeek-rentals-firebase-adminsdk-ui0g5-6d94baf6a4.json");
 admin.initializeApp({
   credential: applicationDefault(),
   databaseURL: "https://lodgeek-rentals-default-rtdb.firebaseio.com",

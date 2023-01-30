@@ -26,15 +26,14 @@ export async function sendRemindersForFents() {
     const diffInWeeks = dueDate.diff(today, "weeks");
     const diffInDays = dueDate.diff(today, "days");
 
-    //Upcoming Rents
-    if (rent.status === RentStatus["Upcoming - Rent is not due for payment."]) {
-      //If deudate is less than a week.
-      if (diffInWeeks < 1 && diffInDays > 1) {
+    if (isUpcomingrent(rent)) {
+      if (
+        dueDateIsLessThanAWeekAndNoReminderSent(diffInWeeks, diffInDays, rent)
+      ) {
         await fetchDataAndSendAWeekNotice(rent);
       }
 
-      //If deudate is today.
-      if (moment(rent.dueDate).isSame(Date.now(), "day")) {
+      if (dueDateIsTodayAndNoReminderSent(rent)) {
         await fetchDataAndSendDueDateNotice(rent);
       }
 
@@ -53,15 +52,38 @@ export async function sendRemindersForFents() {
       }
     }
 
-    //Late Rents
-    if (
-      rent.status ===
-      RentStatus["Late - Due date has passed and rent has not been paid."]
-    ) {
-      //Rent was due more than 5 days ago.
-      if (diffInDays < -5 && !rent.sentFirstFailedRent) {
+    if (isLateRent(rent)) {
+      if (rentDueMoreThan5DaysAgo(diffInDays, rent)) {
         await fetchDataAndSendALateRentNotice(rent);
       }
     }
   });
+}
+function dueDateIsLessThanAWeekAndNoReminderSent(
+  diffInWeeks: number,
+  diffInDays: number,
+  rent: Rent
+): boolean {
+  return diffInWeeks < 1 && diffInDays > 1 && !rent.sentAWeekReminder;
+}
+
+function dueDateIsTodayAndNoReminderSent(rent: Rent): boolean {
+  return (
+    moment(rent.dueDate).isSame(Date.now(), "day") && !rent.sentADayReminder
+  );
+}
+
+function rentDueMoreThan5DaysAgo(diffInDays: number, rent: Rent): boolean {
+  return diffInDays < -5 && !rent.sentFirstFailedRent;
+}
+
+function isUpcomingrent(rent: Rent): boolean {
+  return rent.status === RentStatus["Upcoming - Rent is not due for payment."];
+}
+
+function isLateRent(rent: Rent): boolean {
+  return (
+    rent.status ===
+    RentStatus["Late - Due date has passed and rent has not been paid."]
+  );
 }

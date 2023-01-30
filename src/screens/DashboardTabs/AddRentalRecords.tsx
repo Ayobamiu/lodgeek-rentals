@@ -3,7 +3,7 @@ import CurrencyInput from "react-currency-input-field";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { toast } from "react-toastify";
 import Header from "../../assets/flex-ui-assets/images/headers/header.jpg";
-import { Rent, RentType } from "../../models";
+import { Rent, RentStatus, RentType } from "../../models";
 import { useNavigate } from "react-router-dom";
 import { selectProperties } from "../../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -22,6 +22,7 @@ import moment from "moment";
 import formatPrice from "../../utils/formatPrice";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import DetailsBox from "../../components/shared/DetailsBox";
+import { selectUser } from "../../app/features/userSlice";
 
 export default function AddRentalRecords() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export default function AddRentalRecords() {
   const { addingRentalRecord, handleAddRentalRecord } = useRentalRecords();
   const properties = useAppSelector(selectProperties);
   const newRentalRecord = useAppSelector(selectNewRentalRecord);
+  const loggedInUser = useAppSelector(selectUser);
 
   const submitStageOne = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -93,7 +95,9 @@ export default function AddRentalRecords() {
         rent: newRentalRecord.rent,
         rentPer: newRentalRecord.rentPer,
         rentalRecord: "",
-        status: "upcoming",
+        status: RentStatus["Upcoming - Rent is not due for payment."],
+        owner: loggedInUser?.email || "",
+        tenant: newRentalRecord.tenant,
       },
     ];
     for (let index = 1; index < 5; index++) {
@@ -107,7 +111,9 @@ export default function AddRentalRecords() {
         rent: newRentalRecord.rent,
         rentPer: newRentalRecord.rentPer,
         rentalRecord: "",
-        status: "upcoming",
+        status: RentStatus["Upcoming - Rent is not due for payment."],
+        owner: loggedInUser?.email || "",
+        tenant: newRentalRecord.tenant,
       });
     }
     setRents(r);
@@ -143,7 +149,9 @@ export default function AddRentalRecords() {
       rent: newRentalRecord.rent,
       rentPer: newRentalRecord.rentPer,
       rentalRecord: "",
-      status: "upcoming",
+      status: RentStatus["Upcoming - Rent is not due for payment."],
+      owner: loggedInUser?.email || "",
+      tenant: newRentalRecord.tenant,
     });
     setRents(currentRents);
   };
@@ -393,10 +401,19 @@ export default function AddRentalRecords() {
                 disabled={addingRentalRecord}
                 className="flex flex-col items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] relative"
                 onClick={() => {
-                  if (rent.status === "paid") {
-                    toggleRent(index, { ...rent, status: "upcoming" });
+                  if (
+                    rent.status === RentStatus["Paid - Rent has been paid."]
+                  ) {
+                    toggleRent(index, {
+                      ...rent,
+                      status:
+                        RentStatus["Upcoming - Rent is not due for payment."],
+                    });
                   } else {
-                    toggleRent(index, { ...rent, status: "paid" });
+                    toggleRent(index, {
+                      ...rent,
+                      status: RentStatus["Paid - Rent has been paid."],
+                    });
                   }
                 }}
               >
@@ -407,7 +424,7 @@ export default function AddRentalRecords() {
                     onClick={removeLastRent}
                   />
                 )}
-                {rent.status === "paid" && (
+                {rent.status === RentStatus["Paid - Rent has been paid."] && (
                   <div className="px-1 text-xs bg-[green] text-white font-bold shadow-sm rounded absolute -bottom-2">
                     Paid
                   </div>
@@ -423,7 +440,11 @@ export default function AddRentalRecords() {
                   <FontAwesomeIcon
                     icon={faCheckCircle}
                     size={"2xl"}
-                    color={rent.status === "paid" ? "green" : "black"}
+                    color={
+                      rent.status === RentStatus["Paid - Rent has been paid."]
+                        ? "green"
+                        : "black"
+                    }
                   />
                 </div>
               </button>

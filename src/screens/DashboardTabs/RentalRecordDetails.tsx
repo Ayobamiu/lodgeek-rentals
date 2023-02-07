@@ -177,7 +177,6 @@ export default function RentalRecordDetails() {
         });
         setRents(updatedRents);
         setIsOpen(false);
-        //TODO: Send Email to landlord and tenant
       });
   };
 

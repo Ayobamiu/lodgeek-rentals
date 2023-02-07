@@ -25,20 +25,24 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   db,
   generateFirebaseId,
+  rentalRecordRef,
   RENTAL_RECORD_PATH,
   RENT_PATH,
+  transactionRef,
 } from "../firebase/config";
 import {
+  FirebaseCollections,
+  MoneyTransaction,
   Rent,
   RentalRecord,
   RentStatus,
   UpdatePaidRentsProps,
+  User,
 } from "../models";
 import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 
 const useRentalRecords = () => {
-  const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -100,7 +104,7 @@ const useRentalRecords = () => {
     getRentalRecordsForYourTenants,
   ]);
 
-  const handleAddRentalRecord = async (data: RentalRecord, rents: Rent[]) => {
+  async function handleAddRentalRecord(data: RentalRecord, rents: Rent[]) {
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
@@ -159,9 +163,9 @@ const useRentalRecords = () => {
       .finally(() => {
         setAddingRentalRecord(false);
       });
-  };
+  }
 
-  const updatePaidRents = async (props: UpdatePaidRentsProps) => {
+  async function updatePaidRents(props: UpdatePaidRentsProps) {
     const {
       owner,
       propertyTitle,
@@ -200,6 +204,51 @@ const useRentalRecords = () => {
           0
         );
 
+        const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
+          totalRentPaid
+        )} in rent for ${propertyTitle}`;
+
+        //Add transaction for tenant and landlord
+
+        const transactionForLandlordId = generateFirebaseId(RENTAL_RECORD_PATH);
+        const transactionForTenantId = generateFirebaseId(RENTAL_RECORD_PATH);
+
+        const transactionData: MoneyTransaction = {
+          id: transactionForLandlordId,
+          payer: loggedInUser?.email,
+          amount: totalRentPaid,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          currency: "NGN",
+          description: emailSubjectForLandlord,
+          payee: owner,
+          serviceFee: 0,
+          status: "success",
+          type: "plus",
+        };
+
+        await setDoc(
+          doc(transactionRef, transactionForLandlordId),
+          transactionData
+        );
+
+        await setDoc(doc(transactionRef, transactionForTenantId), {
+          ...transactionData,
+          type: "minus",
+          id: transactionForTenantId,
+        });
+
+        const ownerRef = doc(db, FirebaseCollections.users, owner);
+        const docSnap = await getDoc(ownerRef);
+        if (docSnap.exists()) {
+          const ownerDoc = docSnap.data() as User;
+          const updatedUser: User = {
+            ...ownerDoc,
+            balance: (ownerDoc.balance || 0) + totalRentPaid,
+          };
+          await updateDoc(ownerRef, updatedUser).finally(() => {});
+        }
+
         const paragraphsForLandlord = [
           "The payment details are as follows:",
           `Tenant: ${tenantName}`,
@@ -226,10 +275,6 @@ const useRentalRecords = () => {
           `Total - ${formatPrice(totalRentPaid)}`,
         ];
 
-        const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
-          totalRentPaid
-        )} in rent for ${propertyTitle}`;
-
         const emailSubjectForTenant = "Your rent payment has been confirmed.";
 
         const generatedEmailForLandlord = generateSimpleEmail({
@@ -247,6 +292,7 @@ const useRentalRecords = () => {
           paragraphs: paragraphsForTenant,
           title: emailSubjectForTenant,
         });
+
         if (tenantEmail) {
           await sendEmail(
             tenantEmail,
@@ -255,6 +301,7 @@ const useRentalRecords = () => {
             generatedEmailForTenant
           );
         }
+
         if (owner) {
           await sendEmail(
             owner,
@@ -269,9 +316,9 @@ const useRentalRecords = () => {
       .catch((error) => {
         toast.error("Error Updating Rents.");
       });
-  };
+  }
 
-  const handleUpdateRentalRecord = async (data: RentalRecord) => {
+  async function handleUpdateRentalRecord(data: RentalRecord) {
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
@@ -284,11 +331,11 @@ const useRentalRecords = () => {
         dispatch(updateRentalRecord(data));
       })
       .finally(() => {});
-  };
+  }
 
-  const getRentalRecordData = async (
+  async function getRentalRecordData(
     id: string
-  ): Promise<RentalRecord | undefined> => {
+  ): Promise<RentalRecord | undefined> {
     let rentalRecord = rentalRecords.find((i) => i.id === id);
     if (!rentalRecord) {
       const docRef = doc(db, RENTAL_RECORD_PATH, id);
@@ -300,7 +347,7 @@ const useRentalRecords = () => {
     }
 
     return rentalRecord;
-  };
+  }
 
   const rentalRecordStatuses = {
     created: "🔵 Created",

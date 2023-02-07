@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { auth, db, USER_PATH } from "../firebase/config";
 import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-import { User } from "../models";
+import { FirebaseCollections, User } from "../models";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -20,14 +20,14 @@ const useAuth = () => {
   const [signingIn, setSigningIn] = useState(false);
   const [signingUp, setSigningUp] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-  const usersRef = collection(db, "users");
+  const usersRef = collection(db, FirebaseCollections.users);
   const [currentUser, setCurrentUser] = useState<any>();
   const users = useAppSelector(selectUsers);
 
   const dispatch = useAppDispatch();
   const getLoggedInUser = useCallback(
     async (email: string) => {
-      const docRef = doc(db, "users", email);
+      const docRef = doc(db, FirebaseCollections.users, email);
       const docSnap = await getDoc(docRef);
       const user = docSnap.data() as User;
       dispatch(updateUser(user));
@@ -90,12 +90,13 @@ const useAuth = () => {
       .then(async () => {
         // Signed in
 
-        const userData = {
+        const userData: User = {
           firstName,
           lastName,
           email,
           createdDate: Date.now(),
           lastUpdated: Date.now(),
+          balance: 0,
         };
 
         await addUser(userData);

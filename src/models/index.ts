@@ -6,6 +6,7 @@ export type User = {
   createdDate: number;
   photoURL?: string;
   lastUpdated: number;
+  balance: number;
 };
 export type RentType = "month" | "year";
 
@@ -74,6 +75,7 @@ export enum FirebaseCollections {
   mail = "mail",
   rents = "rents",
   users = "users",
+  transaction = "transaction",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -82,4 +84,33 @@ export type UpdatePaidRentsProps = {
   propertyTitle: string;
   tenantName: string;
   tenantEmail: string;
+};
+export type PayStackBank = {
+  id: number;
+  name: string;
+  slug: string;
+  code: string;
+  longcode: string;
+  gateway: string;
+  pay_with_bank: boolean;
+  active: boolean;
+  country: string;
+  currency: string;
+  type: string;
+  is_deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type MoneyTransaction = {
+  id: string;
+  description: string;
+  amount: number;
+  currency: string;
+  createdAt: number;
+  updatedAt: number;
+  status: "success" | "failed" | "pending";
+  type: "minus" | "plus";
+  serviceFee: number;
+  payer: string;
+  payee: string;
 };

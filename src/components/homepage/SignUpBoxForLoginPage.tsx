@@ -1,8 +1,19 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
+import useQuery from "../../hooks/useQuery";
+import { Link } from "react-router-dom";
 
-export default function SignUpBox() {
+export default function SignUpBoxForLoginPage() {
+  let query = useQuery();
+  const emailFromQuery = query.get("email") as string;
+
+  useEffect(() => {
+    if (emailFromQuery) {
+      setEmail(emailFromQuery);
+    }
+  }, [emailFromQuery]);
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -22,15 +33,17 @@ export default function SignUpBox() {
   };
 
   return (
-    <div className="w-full lg:w-1/2">
+    <div className="w-full lg:w-1/2 ">
       {tab === "signUp" && (
-        <div className="flex flex-col items-center p-10 xl:px-24 xl:pb-12 bg-white lg:max-w-xl lg:ml-auto rounded-4xl shadow-2xl">
-          <FlexUIGreenLight className="relative -top-2 -mt-16 mb-6 h-16" />
+        <div className="flex flex-col items-center p-10 xl:px-24 xl:pb-12 bg-white lg:max-w-xl lg:mx-auto rounded-4xl shadow-2xl">
+          <Link to={"/"}>
+            <FlexUIGreenLight className="relative -top-2 -mt-16 mb-6 h-16 lg:w-auto w-24" />
+          </Link>
           <h2 className="mb-4 text-2xl md:text-3xl text-coolGray-900 font-bold text-center">
             Create an Account
           </h2>
           <h3 className="mb-7 text-base md:text-lg text-coolGray-500 font-medium text-center">
-            Sign Up
+            Sign up to get started.
           </h3>
 
           <form action="" onSubmit={onSubmit}>
@@ -147,15 +160,16 @@ export default function SignUpBox() {
         </div>
       )}
       {tab === "signIn" && (
-        <div className="flex flex-col items-center p-10 xl:px-24 xl:pb-12 bg-white lg:max-w-xl lg:ml-auto rounded-4xl shadow-2xl">
-          <FlexUIGreenLight className="relative -top-2 -mt-16 mb-6 h-16" />
+        <div className="flex flex-col items-center p-10 xl:px-24 xl:pb-12 bg-white lg:max-w-xl lg:mx-auto rounded-4xl shadow-2xl">
+          <Link to={"/"}>
+            <FlexUIGreenLight className="relative -top-2 -mt-16 mb-6 h-16 lg:w-auto w-24" />
+          </Link>{" "}
           <h2 className="mb-4 text-2xl md:text-3xl text-coolGray-900 font-bold text-center">
             Sign in to your Account
           </h2>
           <h3 className="mb-7 text-base md:text-lg text-coolGray-500 font-medium text-center">
-            Sign In
+            Sign in to get started.
           </h3>
-
           <form action="" onSubmit={onSubmitSignIn} className="w-full">
             <span className="mb-1 text-coolGray-800 font-medium">Email</span>
             <div className="mb-4 flex p-4 py-3 px-3 leading-5 w-full text-coolGray-400 font-normal border border-coolGray-200 outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-lg shadow-sm">
@@ -188,8 +202,8 @@ export default function SignUpBox() {
               <input
                 className="w-full outline-none leading-5 text-coolGray-400 font-normal"
                 type="password"
-                placeholder="Enter your password"
                 autoComplete="current-password"
+                placeholder="Enter your password"
                 required
                 defaultValue={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -230,7 +244,6 @@ export default function SignUpBox() {
               </button>
             </div>
           </form>
-
           <p className="text-sm text-coolGray-400 font-medium text-center">
             <span>Don't have an account?</span>{" "}
             <button

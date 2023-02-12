@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
 import Dashboard from "./screens/Dashboard";
+import AuthPage from "./screens/AuthPage";
 
 function App() {
   useAuth();
@@ -15,6 +16,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/" element={<HomePage />} />
         </Routes>
       </BrowserRouter>

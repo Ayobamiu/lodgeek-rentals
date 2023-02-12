@@ -15,7 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import { RentalRecord, RentOrOwn, YesOrNo } from "../../models";
+import { AcceptableIDs, RentalRecord, RentOrOwn, YesOrNo } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 
 type AgreementAndKYCFormProps = {
@@ -33,7 +33,7 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
     acceptInvitation,
   } = props;
   const dispatch = useAppDispatch();
-  const [stage, setStage] = useState<"one" | "two">("one");
+  const [stage, setStage] = useState<"one" | "two">("two");
   const currentUserKYC = useAppSelector(selectUserKYC);
   const { saveUserKYC, loadUserKYC } = useRentalRecords();
 
@@ -72,14 +72,24 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
           className="bg-white fixed h-screen w-screen top-0 left-0 flex flex-col justify-between z-50"
         >
           <div className="h-20 w-full border-b flex justify-between items-center p-3">
-            <h1 className="text-3xl">Tenant Form</h1>
-            <button
-              disabled={submittingKYC}
-              className="text-red-500"
-              onClick={closeForm}
-            >
-              close
-            </button>
+            <h1 className="lg:text-3xl text-2xl">Tenant Form</h1>
+            <div className="flex ml-auto item-center gap-x-5">
+              <button
+                disabled={submittingKYC}
+                className="text-red-500"
+                onClick={closeForm}
+              >
+                close
+              </button>
+              <button
+                disabled={submittingKYC}
+                className="text-green-500 flex"
+                type="submit"
+              >
+                submit{" "}
+                {submittingKYC && <ActivityIndicator color="green-500" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 w-full p-6 overflow-y-scroll">
@@ -95,7 +105,11 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
                     <select
                       required
                       onChange={(e) => {
-                        dispatch(updateUserKYC({ meansOfId: e.target.value }));
+                        dispatch(
+                          updateUserKYC({
+                            idType: e.target.value as AcceptableIDs,
+                          })
+                        );
                       }}
                       defaultValue={currentUserKYC.idType}
                       className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
@@ -336,6 +350,7 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
                       className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
                       type="date"
                       id="currentResidenceMoveInDate"
+                      placeholder="Select "
                       defaultValue={
                         currentUserKYC.currentResidenceMoveInDate
                           ? new Date(currentUserKYC.currentResidenceMoveInDate)
@@ -475,7 +490,7 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
               </div>
             </div>
 
-            <h1 className="text-3xl">EMPLOYMENT DETAILS</h1>
+            <h1 className="lg:text-3xl text-2xl">EMPLOYMENT DETAILS</h1>
 
             <div className="py-6 border-b border-coolGray-100">
               <div className="w-full md:w-9/12">
@@ -561,7 +576,9 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
               </div>
             </div>
 
-            <h1 className="text-3xl">REFEREES AND EMERGENCY CONTACT</h1>
+            <h1 className="lg:text-3xl text-2xl">
+              REFEREES AND EMERGENCY CONTACT
+            </h1>
 
             <div className="py-6 border-b border-coolGray-100">
               <div className="w-full md:w-9/12">
@@ -1079,7 +1096,9 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
               </div>
             </div>
 
-            <h1 className="text-3xl">EVICTION AND OFFENSE HISTORY</h1>
+            <h1 className="lg:text-3xl text-2xl">
+              EVICTION AND OFFENSE HISTORY
+            </h1>
             <h2 className="text-2xl">EVICTION</h2>
 
             <div className="py-6 border-b border-coolGray-100">
@@ -1310,14 +1329,25 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
           className="bg-white fixed h-screen w-screen top-0 left-0 flex flex-col justify-between z-50"
         >
           <div className="h-20 w-full border-b flex justify-between items-center p-3">
-            <h1 className="text-3xl">DECLARATION</h1>
-            <button
-              disabled={submittingAgreement}
-              className="text-red-500 "
-              onClick={gotoStageOne}
-            >
-              go back
-            </button>
+            <h1 className="lg:text-3xl text-2xl">DECLARATION</h1>
+
+            <div className="flex ml-auto item-center gap-x-5">
+              <button
+                disabled={submittingAgreement}
+                className="text-red-500 "
+                onClick={gotoStageOne}
+              >
+                Go back
+              </button>
+              <button
+                disabled={submittingAgreement}
+                className="text-green-500 flex"
+                type="submit"
+              >
+                I Agree{" "}
+                {submittingAgreement && <ActivityIndicator color="green-500" />}
+              </button>
+            </div>
           </div>
 
           <div className="flex-1 w-full p-6 overflow-y-scroll lg:text-2xl lg:leading-10">

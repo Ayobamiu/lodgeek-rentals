@@ -132,7 +132,7 @@ export type YesOrNo = "yes" | "no";
 
 export type RentOrOwn = "rent" | "own";
 
-type AcceptableIDs =
+export type AcceptableIDs =
   | `Driver's License`
   | `Permanent Voter's Card`
   | `National Identification Number (NIN)`

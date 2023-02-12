@@ -57,7 +57,6 @@ export default function Wallet() {
           reference: uuidv4(),
           recipient: recipient_code,
         };
-        console.log({ transferData });
 
         await axios
           .post(`https://api.paystack.co/transfer`, transferData, {
@@ -87,13 +86,9 @@ export default function Wallet() {
             }
             toast(res.data.message, { type: "success" });
           })
-          .catch((error) => {
-            console.log({ error });
-          });
+          .catch((error) => {});
       })
       .catch((error) => {
-        console.log({ error });
-
         toast("Could not process withdrawal.", { type: "error" });
       })
       .finally(() => {

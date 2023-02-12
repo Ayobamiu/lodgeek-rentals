@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   addUser as addUserToStore,
   selectUsers,
+  setLoadingLoggedInUser,
   updateUser,
 } from "../app/features/userSlice";
 import {
@@ -39,7 +40,10 @@ const useAuth = () => {
     const observer = onAuthStateChanged(auth, (user) => {
       if (user) {
         if (user.email) {
-          getLoggedInUser(user.email);
+          dispatch(setLoadingLoggedInUser(true));
+          getLoggedInUser(user.email).finally(() => {
+            dispatch(setLoadingLoggedInUser(false));
+          });
         }
       } else {
         setCurrentUser(undefined);

@@ -19,6 +19,7 @@ import {
   addRentalRecords,
   selectRentalRecords,
   updateRentalRecord,
+  updateUserKYC,
 } from "../app/features/rentalRecordSlice";
 import { selectUser } from "../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -29,6 +30,7 @@ import {
   RENTAL_RECORD_PATH,
   RENT_PATH,
   transactionRef,
+  userKYCRef,
 } from "../firebase/config";
 import {
   FirebaseCollections,
@@ -38,6 +40,7 @@ import {
   RentStatus,
   UpdatePaidRentsProps,
   User,
+  UserKYC,
 } from "../models";
 import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
@@ -173,6 +176,8 @@ const useRentalRecords = () => {
       rents,
       tenantName,
       tenantEmail,
+      selectedAdditionalFees,
+      rentalRecord,
     } = props;
 
     if (!loggedInUser?.email) {
@@ -184,6 +189,22 @@ const useRentalRecords = () => {
     }
 
     const rentBatch = writeBatch(db);
+    if (selectedAdditionalFees.length > 0) {
+      const fees = rentalRecord.fees.map((i) => {
+        if (selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1) {
+          return { ...i, paid: true, paidOn: Date.now() };
+        } else {
+          return i;
+        }
+      });
+      const updatedRentalRecord: RentalRecord = { ...rentalRecord, fees };
+      const thisRentalRecordRef = doc(
+        db,
+        FirebaseCollections.rentalRecords,
+        updatedRentalRecord.id
+      );
+      await updateDoc(thisRentalRecordRef, updatedRentalRecord).catch(() => {});
+    }
 
     rents.forEach((rentdoc) => {
       var docRef = doc(collection(db, RENT_PATH), rentdoc.id); //automatically generate unique id
@@ -199,12 +220,15 @@ const useRentalRecords = () => {
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}`;
 
-        const totalRentPaid = rents.reduce(
-          (partialSum, a) => partialSum + a.rent,
-          0
-        );
+        const totalRentPaid = rents.reduce((p, a) => p + a.rent, 0);
+        const totalAmount =
+          totalRentPaid +
+          selectedAdditionalFees.reduce((p, a) => p + a.feeAmount, 0);
 
         const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
+          totalRentPaid
+        )} in rent for ${propertyTitle}`;
+        let transactionDescription = `${tenantName} paid ${formatPrice(
           totalRentPaid
         )} in rent for ${propertyTitle}`;
 
@@ -220,7 +244,7 @@ const useRentalRecords = () => {
           createdAt: Date.now(),
           updatedAt: Date.now(),
           currency: "NGN",
-          description: emailSubjectForLandlord,
+          description: transactionDescription,
           payee: owner,
           serviceFee: 0,
           status: "success",
@@ -259,7 +283,10 @@ const useRentalRecords = () => {
                 rent.rentPer === "month" ? "MMM YYYY" : "YYYY"
               )} - ${formatPrice(rent.rent)}`
           ),
-          `Total - ${formatPrice(totalRentPaid)}`,
+          ...selectedAdditionalFees.map(
+            (fee) => `${fee.feeTitle} - ${formatPrice(fee.feeAmount)}`
+          ),
+          `Total - ${formatPrice(totalAmount)}`,
           "Click on the link below to view rent details.",
         ];
 
@@ -272,7 +299,10 @@ const useRentalRecords = () => {
                 "MMM YYYY"
               )} - ${formatPrice(rent.rent)}`
           ),
-          `Total - ${formatPrice(totalRentPaid)}`,
+          ...selectedAdditionalFees.map(
+            (fee) => `${fee.feeTitle} - ${formatPrice(fee.feeAmount)}`
+          ),
+          `Total - ${formatPrice(totalAmount)}`,
         ];
 
         const emailSubjectForTenant = "Your rent payment has been confirmed.";
@@ -349,6 +379,48 @@ const useRentalRecords = () => {
     return rentalRecord;
   }
 
+  async function saveUserKYC(userKYC: UserKYC) {
+    if (userKYC.id) {
+      const existingKYCRef = doc(db, FirebaseCollections.userKYC, userKYC.id);
+      await updateDoc(existingKYCRef, userKYC).then(() => {
+        dispatch(updateUserKYC(userKYC));
+      });
+    } else {
+      if (!loggedInUser?.email) {
+        return toast.error(
+          "Can't resolve logged in user. Reload and try again."
+        );
+      }
+      const newUserKYCData: UserKYC = {
+        ...userKYC,
+        id: loggedInUser?.email,
+        user: loggedInUser?.email,
+      };
+      await setDoc(doc(userKYCRef, loggedInUser?.email), newUserKYCData).then(
+        () => {
+          dispatch(updateUserKYC(newUserKYCData));
+          toast.success("Saved your data for future use.");
+        }
+      );
+    }
+  }
+
+  async function loadUserKYC() {
+    if (!loggedInUser?.email) {
+      return toast.error("Can't resolve logged in user. Reload and try again.");
+    }
+    const userKYCRef = doc(
+      db,
+      FirebaseCollections.userKYC,
+      loggedInUser?.email
+    );
+    const docSnap = await getDoc(userKYCRef);
+    if (docSnap.exists()) {
+      const userKYCDoc = docSnap.data() as UserKYC;
+      dispatch(updateUserKYC(userKYCDoc));
+    }
+  }
+
   const rentalRecordStatuses = {
     created: "🔵 Created",
     inviteSent: "⌛️ Invite Sent - Pending Approval",
@@ -363,6 +435,8 @@ const useRentalRecords = () => {
     getRentalRecordData,
     handleUpdateRentalRecord,
     updatePaidRents,
+    saveUserKYC,
+    loadUserKYC,
   };
 };
 export default useRentalRecords;

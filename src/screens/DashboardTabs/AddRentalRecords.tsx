@@ -3,7 +3,7 @@ import CurrencyInput from "react-currency-input-field";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { toast } from "react-toastify";
 import Header from "../../assets/flex-ui-assets/images/headers/header.jpg";
-import { Rent, RentStatus, RentType } from "../../models";
+import { AdditionalFee, Rent, RentStatus, RentType } from "../../models";
 import { useNavigate } from "react-router-dom";
 import { selectProperties } from "../../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -23,6 +23,7 @@ import formatPrice from "../../utils/formatPrice";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import DetailsBox from "../../components/shared/DetailsBox";
 import { selectUser } from "../../app/features/userSlice";
+import AdditionalfeeForm from "../../components/shared/AdditionalfeeForm";
 
 export default function AddRentalRecords() {
   const navigate = useNavigate();
@@ -306,6 +307,39 @@ export default function AddRentalRecords() {
                   </div>
                 </div>
               </div>
+              <div className="py-6 border-b border-coolGray-100">
+                <div className="w-full md:w-9/12">
+                  <div className="flex flex-wrap -m-3">
+                    <div className="w-full md:w-1/3 p-3">
+                      <p className="text-sm text-coolGray-800 font-semibold">
+                        Rent Instruction
+                      </p>
+                    </div>
+                    <div className="w-full md:flex-1 p-3">
+                      <textarea
+                        name="rentInstruction"
+                        id="rentInstruction"
+                        cols={30}
+                        rows={10}
+                        onChange={(e) => {
+                          dispatch(
+                            updateNewRentalRecord({
+                              rentInstruction: e.target.value,
+                            })
+                          );
+                        }}
+                        className="w-full px-4 py-2.5 my-3 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                        about="Write some instructions you want the tenants to understand and or agree to."
+                        title="Write some instructions you want the tenants to understand and or agree to."
+                      ></textarea>
+                      <small className="text-coolGray-400">
+                        Write some instructions you want the tenants to
+                        understand and or agree to.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </form>
           </div>
         </section>
@@ -315,7 +349,12 @@ export default function AddRentalRecords() {
         <section className="bg-white p-8 pt-7 pb-6 container mx-auto">
           <div className="flex flex-wrap items-center justify-between pb-5 -mx-2">
             <div className="w-full md:w-1/2 px-2 mb-4 md:mb-0">
-              <h2 className="text-lg font-semibold">Rental Record Details</h2>
+              <DetailsBox
+                label="Property "
+                value={`${property?.title} - ${formatPrice(
+                  newRentalRecord?.rent || 0
+                )}/${newRentalRecord?.rentPer}`}
+              />
             </div>
             <div className="w-full md:w-1/2 px-2">
               <div className="flex flex-wrap justify-end -m-2">
@@ -347,138 +386,173 @@ export default function AddRentalRecords() {
             </div>
           </div>
 
-          <div className="border-b border-coolGray-100 my-3">
-            <DetailsBox label="Property " value={property?.title} />
-
-            <DetailsBox label="Tenant" value={newRentalRecord.tenant} />
-            <DetailsBox label="Property Location" value={property?.location} />
-            <DetailsBox label="Property Address" value={property?.address} />
-            <DetailsBox
-              label="Rent"
-              value={`${formatPrice(newRentalRecord?.rent || 0)}/${
-                newRentalRecord?.rentPer
-              }`}
-            />
+          <div className="border-b border-coolGray-500 mb-10">
+            <h1 className="text-3xl">Rents</h1>
+            <p className="text-xs font-medium text-coolGray-500 flex gap-2 items-center mb-5 flex-wrap">
+              List of Upcoming Rents starting on{" "}
+              {moment(newRentalRecord.rentStarts).format("MMM YYYY")}{" "}
+              {!showRentStarts && (
+                <button
+                  disabled={addingRentalRecord}
+                  onClick={openRentStarts}
+                  className="bg-gray-300 px-2 rounded py-1"
+                >
+                  Change
+                </button>
+              )}
+              {showRentStarts && (
+                <input
+                  type="date"
+                  name="rentStarts"
+                  id="rentStarts"
+                  defaultValue={moment(newRentalRecord.rentStarts).format(
+                    "YYYY-MM-DD"
+                  )}
+                  onBlur={closeRentStarts}
+                  onChange={(e) => {
+                    dispatch(
+                      updateNewRentalRecord({
+                        rentStarts: e.target.valueAsNumber,
+                      })
+                    );
+                  }}
+                  className="px-2  text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                />
+              )}
+            </p>
+            <div className="flex gap-5 justify-start my-5 flex-wrap">
+              {rents.map((rent, index) => (
+                <button
+                  key={index}
+                  disabled={addingRentalRecord}
+                  className="flex flex-col items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] relative"
+                  onClick={() => {
+                    if (
+                      rent.status === RentStatus["Paid - Rent has been paid."]
+                    ) {
+                      toggleRent(index, {
+                        ...rent,
+                        status:
+                          RentStatus["Upcoming - Rent is not due for payment."],
+                      });
+                    } else {
+                      toggleRent(index, {
+                        ...rent,
+                        status: RentStatus["Paid - Rent has been paid."],
+                      });
+                    }
+                  }}
+                >
+                  {index === rents.length - 1 && (
+                    <FontAwesomeIcon
+                      icon={faTimesCircle}
+                      className="absolute -right-0.5 -top-0.5"
+                      onClick={removeLastRent}
+                    />
+                  )}
+                  {rent.status === RentStatus["Paid - Rent has been paid."] && (
+                    <div className="px-1 text-xs bg-[green] text-white font-bold shadow-sm rounded absolute -bottom-2">
+                      Paid
+                    </div>
+                  )}
+                  <p
+                    key={index}
+                    className="text-xs font-medium text-coolGray-500"
+                  >
+                    {moment(rent.dueDate).format("MMM YYYY")}
+                  </p>
+                  <div className="flex">
+                    <FontAwesomeIcon
+                      icon={faCheckCircle}
+                      size={"2xl"}
+                      color={
+                        rent.status === RentStatus["Paid - Rent has been paid."]
+                          ? "green"
+                          : "black"
+                      }
+                    />
+                  </div>
+                </button>
+              ))}
+              <button
+                disabled={addingRentalRecord}
+                className="flex items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] justify-center"
+                onClick={addAnotherRent}
+              >
+                <FontAwesomeIcon icon={faPlus} size={"2xl"} />
+              </button>
+            </div>
+            <div className="my-5">
+              <p className="text-xs font-medium text-coolGray-500">
+                Instructions:
+              </p>
+              <p className="text-xs font-medium text-coolGray-500 my-2">
+                Rents can be marked as paid by clicking on them{" "}
+                <FontAwesomeIcon icon={faCheckCircle} color="black" />. Rent
+                reminders will not be sent to tenants who have already paid
+                their rent.
+              </p>
+              <p className="text-xs font-medium text-coolGray-500 my-2">
+                Click plus button{" "}
+                <FontAwesomeIcon icon={faPlus} color="black" /> to add more
+                rents.
+              </p>
+              <p className="text-xs font-medium text-coolGray-500 my-2">
+                Click remove button{" "}
+                <FontAwesomeIcon icon={faTimesCircle} className="" /> to remove
+                rents.
+              </p>
+            </div>
           </div>
 
-          <p className="text-xs font-medium text-coolGray-500 flex gap-2 items-center my-5 flex-wrap">
-            List of Upcoming Rents starting on{" "}
-            {moment(newRentalRecord.rentStarts).format("MMM YYYY")}{" "}
-            {!showRentStarts && (
-              <button
-                disabled={addingRentalRecord}
-                onClick={openRentStarts}
-                className="bg-gray-300 px-2 rounded py-1"
-              >
-                Change
-              </button>
-            )}
-            {showRentStarts && (
-              <input
-                type="date"
-                name="rentStarts"
-                id="rentStarts"
-                defaultValue={moment(newRentalRecord.rentStarts).format(
-                  "YYYY-MM-DD"
-                )}
-                onBlur={closeRentStarts}
-                onChange={(e) => {
-                  dispatch(
-                    updateNewRentalRecord({
-                      rentStarts: e.target.valueAsNumber,
-                    })
-                  );
-                }}
-                className="px-2  text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-              />
-            )}
-          </p>
+          <div className="border-b border-coolGray-500 mt-3 py-3 mb-10">
+            <h1 className="text-3xl">Additional fees</h1>
 
-          <div className="flex gap-5 justify-start my-5 flex-wrap">
-            {rents.map((rent, index) => (
-              <button
-                key={index}
-                disabled={addingRentalRecord}
-                className="flex flex-col items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] relative"
-                onClick={() => {
-                  if (
-                    rent.status === RentStatus["Paid - Rent has been paid."]
-                  ) {
-                    toggleRent(index, {
-                      ...rent,
-                      status:
-                        RentStatus["Upcoming - Rent is not due for payment."],
-                    });
-                  } else {
-                    toggleRent(index, {
-                      ...rent,
-                      status: RentStatus["Paid - Rent has been paid."],
-                    });
-                  }
-                }}
+            {newRentalRecord.fees.map((i, feeIndex) => (
+              <div
+                key={feeIndex}
+                className="flex gap-2 items-center py-2 flex-wrap border-b"
               >
-                {index === rents.length - 1 && (
-                  <FontAwesomeIcon
-                    icon={faTimesCircle}
-                    className="absolute -right-0.5 -top-0.5"
-                    onClick={removeLastRent}
-                  />
-                )}
-                {rent.status === RentStatus["Paid - Rent has been paid."] && (
-                  <div className="px-1 text-xs bg-[green] text-white font-bold shadow-sm rounded absolute -bottom-2">
-                    Paid
+                <p>{i.feeTitle}</p>
+                <p>{formatPrice(i.feeAmount)}</p>{" "}
+                {i.feeIsRequired ? (
+                  <div
+                    className="bg-green-500 text-white rounded px-2 text-xs"
+                    title="Tenant must pay this fee."
+                  >
+                    Required
+                  </div>
+                ) : (
+                  <div
+                    className="bg-gray-500 text-white rounded px-2 text-xs"
+                    title="Tenants are not required to pay this fee."
+                  >
+                    Not required
                   </div>
                 )}
+                <button
+                  type="button"
+                  className="ml-auto w-full lg:w-auto px-4 py-2 text-sm text-white font-medium bg-red-500 hover:bg-red-600 border border-red-600 rounded-md shadow-button flex items-center justify-center"
+                  onClick={() => {
+                    const updatedFees: AdditionalFee[] = [
+                      ...newRentalRecord.fees,
+                    ].filter((x) => x.id !== i.id);
 
-                <p
-                  key={index}
-                  className="text-xs font-medium text-coolGray-500"
+                    dispatch(updateNewRentalRecord({ fees: updatedFees }));
+                  }}
                 >
-                  {moment(rent.dueDate).format("MMM YYYY")}
-                </p>
-                <div className="flex">
-                  <FontAwesomeIcon
-                    icon={faCheckCircle}
-                    size={"2xl"}
-                    color={
-                      rent.status === RentStatus["Paid - Rent has been paid."]
-                        ? "green"
-                        : "black"
-                    }
-                  />
-                </div>
-              </button>
+                  Delete
+                </button>
+              </div>
             ))}
-            <button
-              disabled={addingRentalRecord}
-              className="flex items-center bg-gray-300 p-3 gap-3 rounded-xl min-w-[70px] justify-center"
-              onClick={addAnotherRent}
-            >
-              <FontAwesomeIcon icon={faPlus} size={"2xl"} />
-            </button>
+            {!newRentalRecord.fees.length && (
+              <div className="mb-3">No Additional fees</div>
+            )}
+
+            <AdditionalfeeForm />
           </div>
 
-          <div className="my-5">
-            <p className="text-xs font-medium text-coolGray-500">
-              Instructions:
-            </p>
-            <p className="text-xs font-medium text-coolGray-500 my-2">
-              Rents can be marked as paid by clicking on them{" "}
-              <FontAwesomeIcon icon={faCheckCircle} color="black" />. Rent
-              reminders will not be sent to tenants who have already paid their
-              rent.
-            </p>
-            <p className="text-xs font-medium text-coolGray-500 my-2">
-              Click plus button <FontAwesomeIcon icon={faPlus} color="black" />{" "}
-              to add more rents.
-            </p>
-            <p className="text-xs font-medium text-coolGray-500 my-2">
-              Click remove button{" "}
-              <FontAwesomeIcon icon={faTimesCircle} className="" /> to remove
-              rents.
-            </p>
-          </div>
-          <div className="w-full md:w-auto p-2">
+          <div className="w-full md:w-auto py-2 mt-10">
             <button
               onClick={addRentalRecord}
               disabled={addingRentalRecord}

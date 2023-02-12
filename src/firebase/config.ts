@@ -5,6 +5,7 @@ import "firebase/compat/auth";
 import { collection, doc, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { FirebaseCollections } from "../models";
+import "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -43,6 +44,7 @@ const RENTAL_RECORD_PATH = "rentalRecords";
 const RENT_PATH = "rents";
 const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
 const usersRef = collection(db, FirebaseCollections.users);
+const userKYCRef = collection(db, FirebaseCollections.userKYC);
 const transactionRef = collection(db, FirebaseCollections.transaction);
 
 export {
@@ -56,4 +58,5 @@ export {
   rentalRecordRef,
   usersRef,
   transactionRef,
+  userKYCRef,
 };

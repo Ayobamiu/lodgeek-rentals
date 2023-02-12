@@ -21,10 +21,19 @@ export type Property = {
   createdDate: number;
   rentPer: RentType;
 };
+export type AdditionalFee = {
+  id: string;
+  feeTitle: string;
+  feeAmount: number;
+  feeIsRequired: boolean;
+  paid: boolean;
+  paidOn: number;
+};
 export type RentalRecord = {
   id: string;
   property: string;
   tenant: string;
+  rentInstruction: string;
   owner: string;
   createdDate: number;
   rentStarts: number;
@@ -36,6 +45,8 @@ export type RentalRecord = {
     | "inviteAccepted"
     | "cancelled"
     | "inviteRejected";
+  fees: AdditionalFee[];
+  tenantAgreed: boolean;
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
@@ -75,6 +86,7 @@ export enum FirebaseCollections {
   mail = "mail",
   rents = "rents",
   users = "users",
+  userKYC = "userKYC",
   transaction = "transaction",
 }
 export type UpdatePaidRentsProps = {
@@ -84,6 +96,8 @@ export type UpdatePaidRentsProps = {
   propertyTitle: string;
   tenantName: string;
   tenantEmail: string;
+  selectedAdditionalFees: AdditionalFee[];
+  rentalRecord: RentalRecord;
 };
 export type PayStackBank = {
   id: number;
@@ -113,4 +127,59 @@ export type MoneyTransaction = {
   serviceFee: number;
   payer: string;
   payee: string;
+};
+export type YesOrNo = "yes" | "no";
+
+export type RentOrOwn = "rent" | "own";
+
+type AcceptableIDs =
+  | `Driver's License`
+  | `Permanent Voter's Card`
+  | `National Identification Number (NIN)`
+  | `International Passport.`
+  | `Residence/Work Permit (For Foreigners)`;
+
+export type UserKYC = {
+  id: string;
+  user: string;
+  idType: AcceptableIDs;
+  meansOfId: string;
+  moveInDate: number;
+  tenantPhone: string;
+  tenantCurrentAddress: string;
+  readyToLeaveCurrentAddress: YesOrNo;
+  currentResidenceType?: RentOrOwn;
+  currentResidenceMoveInDate?: number;
+  currentResidenceMoveOutDate?: number;
+  currentResidenceOwner?: string;
+  currentResidenceOwnerContact?: string;
+  reasonForLeavingcurrentResidence?: string;
+  currentEmployerName?: string;
+  currentEmploymentPosition?: string;
+  currentMonthlySalary?: number;
+  emergencyContact: string;
+  referee1Name: string;
+  referee1Relationship: string;
+  referee1Contact: string;
+  referee1Email: string;
+  referee1Occupation: string;
+  referee1Address: string;
+  referee2Name?: string;
+  referee2Relationship?: string;
+  referee2Contact?: string;
+  referee2Email?: string;
+  referee2Occupation?: string;
+  referee2Address?: string;
+  guarantorName: string;
+  guarantorRelationship: string;
+  guarantorContact: string;
+  guarantorEmail: string;
+  guarantorOccupation: string;
+  guarantorAddress: string;
+  beenEvictedBefore: YesOrNo;
+  lastEvictionDate?: number;
+  lastEvictionLocation?: string;
+  associatedWithFelonyOrMisdemeanor: YesOrNo;
+  felonyOrMisdemeanorDescription?: string;
+  felonyOrMisdemeanorDate?: number;
 };

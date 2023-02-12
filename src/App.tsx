@@ -6,12 +6,16 @@ import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
 
 import Dashboard from "./screens/Dashboard";
+import FullScreenActivityIndicator from "./components/shared/FullScreenActivityIndicator";
+import { useAppSelector } from "./app/hooks";
+import { selectLoadingloggedInUser } from "./app/features/userSlice";
 
 function App() {
   useAuth();
-
+  const loadingloggedInUser = useAppSelector(selectLoadingloggedInUser);
   return (
     <div className="">
+      {loadingloggedInUser && <FullScreenActivityIndicator />}
       <ToastContainer />
       <BrowserRouter>
         <Routes>

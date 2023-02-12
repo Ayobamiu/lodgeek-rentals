@@ -6,11 +6,13 @@ import { RootState } from "../store";
 interface UserState {
   user?: User;
   users: User[];
+  loadingloggedInUser: boolean;
 }
 
 const initialState: UserState = {
   user: undefined,
   users: [],
+  loadingloggedInUser: false,
 };
 export const userSlice = createSlice({
   name: "user",
@@ -27,12 +29,18 @@ export const userSlice = createSlice({
     setUsers: (state, action: PayloadAction<User[]>) => {
       state.users = action.payload;
     },
+    setLoadingLoggedInUser: (state, action: PayloadAction<boolean>) => {
+      state.loadingloggedInUser = action.payload;
+    },
   },
 });
 
-export const { updateUser, addUser, setUsers } = userSlice.actions;
+export const { updateUser, addUser, setUsers, setLoadingLoggedInUser } =
+  userSlice.actions;
 
 export const selectUser = (state: RootState) => state.user.user;
 export const selectUsers = (state: RootState) => state.user.users;
+export const selectLoadingloggedInUser = (state: RootState) =>
+  state.user.loadingloggedInUser;
 
 export default userSlice.reducer;

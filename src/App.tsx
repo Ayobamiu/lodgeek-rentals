@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
-
 import Dashboard from "./screens/Dashboard";
 
 function App() {

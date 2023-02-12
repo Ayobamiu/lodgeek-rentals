@@ -4,6 +4,8 @@ import { getAnalytics } from "firebase/analytics";
 import "firebase/compat/auth";
 import { collection, doc, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { FirebaseCollections } from "../models";
+import "firebase/storage";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -40,6 +42,10 @@ const USER_PATH = "users";
 const PROPERTY_PATH = "properties";
 const RENTAL_RECORD_PATH = "rentalRecords";
 const RENT_PATH = "rents";
+const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
+const usersRef = collection(db, FirebaseCollections.users);
+const userKYCRef = collection(db, FirebaseCollections.userKYC);
+const transactionRef = collection(db, FirebaseCollections.transaction);
 
 export {
   analytics,
@@ -49,4 +55,8 @@ export {
   RENTAL_RECORD_PATH,
   RENT_PATH,
   USER_PATH,
+  rentalRecordRef,
+  usersRef,
+  transactionRef,
+  userKYCRef,
 };

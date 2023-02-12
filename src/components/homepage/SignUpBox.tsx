@@ -10,7 +10,7 @@ export default function SignUpBox() {
   const { handleSignUpUser, signingUp, handleSignInUser, signingIn } =
     useAuth();
 
-  const [tab, setTab] = useState<"signUp" | "signIn">("signUp");
+  const [tab, setTab] = useState<"signUp" | "signIn">("signIn");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -165,6 +165,7 @@ export default function SignUpBox() {
                 required
                 defaultValue={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
               />
               <svg
                 className="h-6 w-6 ml-4 my-auto text-gray-300"

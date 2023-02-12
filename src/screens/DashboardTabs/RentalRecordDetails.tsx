@@ -1,7 +1,7 @@
 import { faCheckCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
@@ -13,18 +13,24 @@ import useProperties from "../../hooks/useProperties";
 import useQuery from "../../hooks/useQuery";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
-import { Property, Rent, RentalRecord, RentStatus, User } from "../../models";
+import {
+  AdditionalFee,
+  Property,
+  Rent,
+  RentalRecord,
+  RentStatus,
+  User,
+} from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Transition } from "@headlessui/react";
 import { sendEmail } from "../../api/email";
 import { PaystackButton } from "react-paystack";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
+import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
-
   const navigate = useNavigate();
-
   const {
     rentalRecordStatuses,
     getRentalRecordData,
@@ -130,6 +136,17 @@ export default function RentalRecordDetails() {
     : rentalRecordData?.tenant;
 
   const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
+  const [selectedAdditionalFees, setSelectedAdditionalFees] = useState<
+    AdditionalFee[]
+  >([]);
+
+  useEffect(() => {
+    const feesToPay = [...(rentalRecordData?.fees || [])].filter(
+      (i) => i.feeIsRequired && !i.paid
+    );
+    setSelectedAdditionalFees(feesToPay);
+  }, [rentalRecordData]);
+
   useEffect(() => {
     if (!selectedRents.length) {
       setIsOpen(false);
@@ -157,6 +174,8 @@ export default function RentalRecordDetails() {
       propertyTitle: property?.title || "",
       tenantName: `${tenant?.firstName} ${tenant?.lastName}`,
       tenantEmail: tenant?.email || "",
+      selectedAdditionalFees,
+      rentalRecord: rentalRecordData!,
     })
       .finally(() => {
         setSelectedRents([]);
@@ -175,32 +194,46 @@ export default function RentalRecordDetails() {
             return i;
           }
         });
+        const updateDfees: AdditionalFee[] =
+          rentalRecordData?.fees?.map((i) => {
+            if (selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1) {
+              return { ...i, paid: true, paidOn: Date.now() };
+            } else {
+              return i;
+            }
+          }) || [];
+        setRentalRecordData({ ...rentalRecordData!, fees: updateDfees });
         setRents(updatedRents);
         setIsOpen(false);
-        //TODO: Send Email to landlord and tenant
       });
   };
 
   const PayRentButton = () => {
+    const unpaidFees = rentalRecordData?.fees?.filter((i) => !i.paid) || [];
     return (
       <button
         onClick={payRent}
         className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
       >
-        <span>Pay Rent</span>
+        <span>
+          Pay Rent
+          {unpaidFees.length ? " and Fees" : ""}
+        </span>
       </button>
     );
   };
 
   const [acceptingInvite, setAcceptingInvite] = useState(false);
-
+  const [openAgreementForm, setOpenAgreementForm] = useState(false);
   const acceptInvitation = async () => {
     if (!rentalRecordData) return toast.error("Error Accepting Invite");
     setAcceptingInvite(true);
-    await handleUpdateRentalRecord({
+    const agreeedRecord: RentalRecord = {
       ...rentalRecordData,
       status: "inviteAccepted",
-    })
+      tenantAgreed: true,
+    };
+    await handleUpdateRentalRecord(agreeedRecord)
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
         const email = generateSimpleEmail({
@@ -215,10 +248,7 @@ export default function RentalRecordDetails() {
           `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
           email
         );
-        setRentalRecordData({
-          ...rentalRecordData,
-          status: "inviteAccepted",
-        });
+        setRentalRecordData(agreeedRecord);
         toast.success("Invite Accepted, you can now proceed to pay rents.");
       })
       .catch(() => {
@@ -232,7 +262,7 @@ export default function RentalRecordDetails() {
   const AcceptInvitationButton = () => {
     return (
       <button
-        onClick={acceptInvitation}
+        onClick={() => setOpenAgreementForm(true)}
         disabled={acceptingInvite}
         className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
       >
@@ -283,11 +313,21 @@ export default function RentalRecordDetails() {
     }
   }, [selectedRents]);
 
+  const totalAmountToPay = useMemo(
+    () =>
+      selectedRents
+        .map((i) => i.rent)
+        .reduce((partialSum, a) => partialSum + a, 0) +
+      selectedAdditionalFees
+        .map((i) => i.feeAmount)
+        .reduce((partialSum, a) => partialSum + a, 0),
+    [selectedRents, selectedAdditionalFees]
+  );
+
   const config = {
     reference: new Date().getTime().toString(),
     email: loggedInUser?.email || "",
-    amount:
-      selectedRents.reduce((partialSum, a) => partialSum + a.rent, 0) * 100,
+    amount: totalAmountToPay * 100,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
   };
 
@@ -298,6 +338,8 @@ export default function RentalRecordDetails() {
     onClose: () => {},
   };
 
+  const showAdditionalFeePayButton =
+    loggedInUser?.email === rentalRecordData?.tenant;
   return (
     <div>
       {/* Rent Invoice Table */}
@@ -322,19 +364,16 @@ export default function RentalRecordDetails() {
             <div className="p-3">
               <table
                 className="w-full table-auto border-collapse border border-slate-500  ..."
-                title="Rent Invoice"
+                title="Payment Invoice"
               >
-                <caption className="text-left mb-3">Rent Invoice</caption>
+                <caption className="text-left mb-3">Payment Invoice</caption>
                 <thead>
                   <tr>
                     <th className="p-3 border border-slate-600 text-left  ...">
-                      Rent
+                      Description
                     </th>
                     <th className="p-3 border border-slate-600 text-left  ...">
                       Amount
-                    </th>
-                    <th className="p-3 border border-slate-600 text-left  ...">
-                      Start Date
                     </th>
                   </tr>
                 </thead>
@@ -342,30 +381,37 @@ export default function RentalRecordDetails() {
                   {selectedRents.map((rent, rentIndex) => (
                     <tr key={rentIndex}>
                       <td className="p-3 border border-slate-700 ...">
-                        {moment(rent.dueDate).format("MMM YYYY")}
+                        Rent for {moment(rent.dueDate).format("MMM YYYY")}
                       </td>
                       <td className="p-3 border border-slate-700 ...">
                         {formatPrice(rent.rent)}
                       </td>
+                    </tr>
+                  ))}
+                  {selectedAdditionalFees.map((fee, feeIndex) => (
+                    <tr key={feeIndex}>
                       <td className="p-3 border border-slate-700 ...">
-                        {moment(rent.dueDate).format("ll")}
+                        fee for {fee.feeTitle}
+                      </td>
+                      <td className="p-3 border border-slate-700 ...">
+                        {formatPrice(fee.feeAmount)}
                       </td>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
                   <tr>
-                    <th
-                      className="p-3 border border-slate-600 text-left  ..."
-                      colSpan={2}
-                    >
+                    <th className="p-3 border border-slate-600 text-left  ...">
                       Total
                     </th>
                     <th className="p-3 border border-slate-600 text-left  ...">
                       {formatPrice(
                         selectedRents
                           .map((i) => i.rent)
-                          .reduce((partialSum, a) => partialSum + a, 0)
+                          .reduce((partialSum, a) => partialSum + a, 0) +
+                          selectedAdditionalFees
+                            .map((i) => i.feeAmount)
+                            .reduce((partialSum, a) => partialSum + a, 0)
                       )}
                     </th>
                   </tr>
@@ -380,6 +426,17 @@ export default function RentalRecordDetails() {
         </div>
       </Transition>
       {/* Rent Invoice Table */}
+
+      {/* KYC and Agreement form */}
+      {rentalRecordData && (
+        <AgreementAndKYCForm
+          openAgreementForm={openAgreementForm}
+          setOpenAgreementForm={setOpenAgreementForm}
+          rentalRecordData={rentalRecordData}
+          acceptInvitation={acceptInvitation}
+        />
+      )}
+      {/* KYC and Agreement form */}
 
       <section className="container mx-auto bg-white p-8 border-b">
         <div className="flex flex-wrap items-center -m-2">
@@ -511,9 +568,70 @@ export default function RentalRecordDetails() {
               : "--"
           }
         />
+        <h1 className="text-3xl">Additional fees</h1>
+        {rentalRecordData?.fees?.map((i, feeIndex) => (
+          <div
+            key={feeIndex}
+            className="flex gap-2 items-center py-2 flex-wrap border-b"
+          >
+            <p>{i.feeTitle}</p>
+            <p>{formatPrice(i.feeAmount)}</p>{" "}
+            {i.feeIsRequired ? (
+              <div
+                className="bg-green-500 text-white rounded px-2 text-xs"
+                title="Tenant must pay this fee."
+              >
+                Required
+              </div>
+            ) : (
+              <div
+                className="bg-gray-500 text-white rounded px-2 text-xs"
+                title="Tenants are not required to pay this fee."
+              >
+                Not required
+              </div>
+            )}
+            {showAdditionalFeePayButton && (
+              <button
+                type="button"
+                className={`ml-auto w-full disabled:border-gray-600 lg:w-auto p-2 text-sm text-white font-medium ${
+                  i.paid
+                    ? "disabled:bg-green-400 bg-green-500 hover:bg-green-600 border border-green-600"
+                    : "disabled:bg-gray-400 bg-gray-500 hover:bg-gray-600 border border-gray-600"
+                } rounded-md shadow-button flex items-center justify-center gap-x-2`}
+                onClick={() => {
+                  if (feeIsSelected(i)) {
+                    setSelectedAdditionalFees((v) => [
+                      ...v.filter((x) => x.id !== i.id),
+                    ]);
+                  } else {
+                    setSelectedAdditionalFees((v) => [...v, i]);
+                  }
+                }}
+                disabled={i.feeIsRequired || i.paid}
+              >
+                {i.paid ? "Paid" : `Select${feeIsSelected(i) ? "ed" : ""}`}{" "}
+                {feeIsSelected(i) && (
+                  <FontAwesomeIcon
+                    icon={faCheckCircle}
+                    color="white"
+                    className=""
+                  />
+                )}
+              </button>
+            )}
+          </div>
+        ))}
+        {!rentalRecordData?.fees?.length && (
+          <div className="mb-3">No Additional fees</div>
+        )}
       </div>
     </div>
   );
+
+  function feeIsSelected(i: AdditionalFee) {
+    return selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1;
+  }
 }
 function goBack(query: URLSearchParams, navigate: NavigateFunction) {
   const rentalRecordId = query.get("rentalRecordId");

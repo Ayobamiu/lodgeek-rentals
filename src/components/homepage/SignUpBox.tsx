@@ -165,6 +165,7 @@ export default function SignUpBox() {
                 required
                 defaultValue={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
               />
               <svg
                 className="h-6 w-6 ml-4 my-auto text-gray-300"

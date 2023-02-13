@@ -33,7 +33,7 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
     acceptInvitation,
   } = props;
   const dispatch = useAppDispatch();
-  const [stage, setStage] = useState<"one" | "two">("two");
+  const [stage, setStage] = useState<"one" | "two">("one");
   const currentUserKYC = useAppSelector(selectUserKYC);
   const { saveUserKYC, loadUserKYC } = useRentalRecords();
 

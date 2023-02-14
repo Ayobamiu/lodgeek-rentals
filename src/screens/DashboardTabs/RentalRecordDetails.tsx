@@ -27,6 +27,7 @@ import { sendEmail } from "../../api/email";
 import { PaystackButton } from "react-paystack";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
+import { RentItem } from "./RentItem";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -497,66 +498,20 @@ export default function RentalRecordDetails() {
           }`}
         />
         <p className="text-xs font-medium text-coolGray-500 mb-2">Rents</p>
-        <div className="flex gap-x-5 items-center mb-4 justify-start flex-wrap gap-2">
+        <div className="flex gap-5 items-center mb-4 justify-start flex-wrap">
           {loadingRents ? (
             <ActivityIndicator color="black" />
           ) : (
             rents
               .sort((a: Rent, b: Rent) => a.dueDate - b.dueDate)
               .map((rent, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    const rentNotClickable =
-                      !showPayRentButton || rent.status === "paid";
-                    if (rentNotClickable) return;
-                    if (rentSelected(selectedRents, rent)) {
-                      setSelectedRents((v) =>
-                        [...v].filter((i) => i.id !== rent.id)
-                      );
-                    } else {
-                      setSelectedRents((v) => [...v, rent]);
-                    }
-                  }}
-                  className="flex flex-col items-center bg-gray-300 lg:p-3 p-2 lg:gap-3 gap-2 rounded-xl lg:min-w-[70px] relative"
-                >
-                  {rent.status === "paid" && (
-                    <div className="px-1 text-xs bg-[green] text-white font-bold shadow-sm rounded absolute -bottom-2">
-                      Paid
-                    </div>
-                  )}
-                  <p
-                    key={index}
-                    className="text-xs font-medium text-coolGray-500"
-                  >
-                    {moment(rent.dueDate).format("MMM YYYY")}
-                  </p>
-                  {rent.status === "upcoming" && (
-                    <div className="px-1 text-xs bg-gray-500 text-white font-bold shadow-sm rounded">
-                      Upcoming
-                    </div>
-                  )}
-                  {rent.status === "pending" && (
-                    <div className="px-1 text-xs bg-yellow-500 text-white font-bold shadow-sm rounded">
-                      Pending
-                    </div>
-                  )}
-                  {rent.status === "late" && (
-                    <div className="px-1 text-xs bg-red-500 text-white font-bold shadow-sm rounded">
-                      Late
-                    </div>
-                  )}
-
-                  {!(!showPayRentButton || rent.status === "paid") && (
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      color={
-                        rentSelected(selectedRents, rent) ? "green" : "black"
-                      }
-                      className="absolute -right-0.5 -top-0.5"
-                    />
-                  )}
-                </button>
+                <RentItem
+                  index={index}
+                  showPayRentButton={showPayRentButton}
+                  rent={rent}
+                  selectedRents={selectedRents}
+                  setSelectedRents={setSelectedRents}
+                />
               ))
           )}
         </div>
@@ -641,6 +596,6 @@ function goBack(query: URLSearchParams, navigate: NavigateFunction) {
   return rentalRecordId;
 }
 
-function rentSelected(selectedRents: Rent[], rent: Rent) {
+export function rentSelected(selectedRents: Rent[], rent: Rent) {
   return selectedRents.findIndex((i) => i.id === rent.id) > -1;
 }

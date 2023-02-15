@@ -1,4 +1,8 @@
-import { faCheckCircle, faTimes } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCheckCircle,
+  faExternalLink,
+  faTimes,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
@@ -20,6 +24,7 @@ import {
   RentalRecord,
   RentStatus,
   User,
+  UserKYC,
 } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { Transition } from "@headlessui/react";
@@ -28,6 +33,7 @@ import { PaystackButton } from "react-paystack";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
 import { RentItem } from "./RentItem";
+import { KYCPreview } from "../../components/shared/KYCPreview";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -226,14 +232,17 @@ export default function RentalRecordDetails() {
 
   const [acceptingInvite, setAcceptingInvite] = useState(false);
   const [openAgreementForm, setOpenAgreementForm] = useState(false);
-  const acceptInvitation = async () => {
+  const acceptInvitation = async (userKYC: UserKYC) => {
+    if (!userKYC) return toast.error("You need to complete your tenancy form.");
     if (!rentalRecordData) return toast.error("Error Accepting Invite");
     setAcceptingInvite(true);
     const agreeedRecord: RentalRecord = {
       ...rentalRecordData,
       status: "inviteAccepted",
       tenantAgreed: true,
+      userKYC,
     };
+
     await handleUpdateRentalRecord(agreeedRecord)
       .then(async () => {
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
@@ -241,7 +250,7 @@ export default function RentalRecordDetails() {
           paragraphs: [
             `Click on the link below to manage your rent at ${property?.title}.`,
           ],
-          buttons: [{ text: "View payment details", link: rentalRecordLink }],
+          buttons: [{ text: "View details", link: rentalRecordLink }],
         });
         await sendEmail(
           rentalRecordData.owner,
@@ -341,6 +350,8 @@ export default function RentalRecordDetails() {
 
   const showAdditionalFeePayButton =
     loggedInUser?.email === rentalRecordData?.tenant;
+
+  const [showKYCPreview, setShowKYCPreview] = useState(false);
   return (
     <div>
       {/* Rent Invoice Table */}
@@ -439,13 +450,13 @@ export default function RentalRecordDetails() {
       )}
       {/* KYC and Agreement form */}
 
-      <section className="container mx-auto bg-white p-8 border-b">
+      <section className="container mx-auto bg-white p-8 border-b print:hidden">
         <div className="flex flex-wrap items-center -m-2">
           <div className="w-full md:w-1/2 p-2">
             <div className="flex flex-wrap items-center -m-2">
               <div className="flex-1 p-2">
                 <h2 className="font-semibold text-black text-3xl">
-                  Rental Records
+                  Rental Record
                 </h2>
               </div>
             </div>
@@ -464,8 +475,23 @@ export default function RentalRecordDetails() {
           </div>
         </div>
       </section>
-      <div className="container mx-auto p-8">
+
+      <div className="container mx-auto p-8 print:hidden">
         {loadingRentalRecord && <ActivityIndicator color="black" />}
+        {rentalRecordData?.userKYC && property && (
+          <div className="mb-5">
+            <button
+              onClick={() => {
+                setShowKYCPreview(true);
+              }}
+              className="text-blue-500 underline underline-offset-4"
+            >
+              View tenancy agreement and documents{" "}
+              <FontAwesomeIcon icon={faExternalLink} />
+            </button>
+          </div>
+        )}
+
         <DetailsBox
           label="Property"
           value={property?.title}
@@ -511,6 +537,7 @@ export default function RentalRecordDetails() {
                   rent={rent}
                   selectedRents={selectedRents}
                   setSelectedRents={setSelectedRents}
+                  key={index}
                 />
               ))
           )}
@@ -581,6 +608,18 @@ export default function RentalRecordDetails() {
           <div className="mb-3">No Additional fees</div>
         )}
       </div>
+
+      {rentalRecordData?.userKYC && property && (
+        <KYCPreview
+          openAgreementForm={showKYCPreview}
+          setOpenAgreementForm={setShowKYCPreview}
+          rentalRecordData={rentalRecordData}
+          userKYC={rentalRecordData?.userKYC}
+          tenantFullName={tenantFullName || ""}
+          property={property}
+          ownerFullName={ownerFullName || ""}
+        />
+      )}
     </div>
   );
 

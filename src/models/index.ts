@@ -47,6 +47,8 @@ export type RentalRecord = {
     | "inviteRejected";
   fees: AdditionalFee[];
   tenantAgreed: boolean;
+  tenantAgreedOn: number;
+  userKYC?: UserKYC;
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
@@ -158,6 +160,9 @@ export type UserKYC = {
   currentEmploymentPosition?: string;
   currentMonthlySalary?: number;
   emergencyContact: string;
+  emergencyContactName: string;
+  emergencyContactRelationship: string;
+  emergencyContactAddress: string;
   referee1Name: string;
   referee1Relationship: string;
   referee1Contact: string;

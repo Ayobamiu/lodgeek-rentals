@@ -22,6 +22,7 @@ const initialNewRentalRecord: RentalRecord = {
   fees: [],
   rentInstruction: "",
   tenantAgreed: false,
+  tenantAgreedOn: -1,
 };
 const initialUserKYC: UserKYC = {
   associatedWithFelonyOrMisdemeanor: "no",
@@ -47,6 +48,9 @@ const initialUserKYC: UserKYC = {
   tenantCurrentAddress: "",
   tenantPhone: "",
   user: "",
+  emergencyContactAddress: "",
+  emergencyContactName: "",
+  emergencyContactRelationship: "",
 };
 const initialState: PropertyState = {
   rentalRecords: [],

@@ -22,11 +22,12 @@ export default function Dashboard() {
   const loggedInUser = useAppSelector(selectUser);
   const { signingOut, handleSignOutUser } = useAuth();
   const redirectFromQuery = query.get("redirect") as string;
+  const emailFromQuery = query.get("email") as string;
 
   useEffect(() => {
     if (!loggedInUser?.email) {
       if (redirectFromQuery) {
-        navigate(`/auth?redirect=${redirectFromQuery}`);
+        navigate(`/auth?redirect=${redirectFromQuery}&email=${emailFromQuery}`);
       } else {
         navigate("/auth");
       }

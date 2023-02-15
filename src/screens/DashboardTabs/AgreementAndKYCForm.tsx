@@ -15,14 +15,20 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import { AcceptableIDs, RentalRecord, RentOrOwn, YesOrNo } from "../../models";
+import {
+  AcceptableIDs,
+  RentalRecord,
+  RentOrOwn,
+  UserKYC,
+  YesOrNo,
+} from "../../models";
 import formatPrice from "../../utils/formatPrice";
 
 type AgreementAndKYCFormProps = {
   openAgreementForm: boolean;
   setOpenAgreementForm: React.Dispatch<React.SetStateAction<boolean>>;
   rentalRecordData: RentalRecord;
-  acceptInvitation: () => Promise<Id | undefined>;
+  acceptInvitation: (userKYC: UserKYC) => Promise<Id | undefined>;
 };
 
 export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
@@ -576,16 +582,96 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
               </div>
             </div>
 
-            <h1 className="lg:text-3xl text-2xl">
-              REFEREES AND EMERGENCY CONTACT
-            </h1>
+            <h1 className="lg:text-3xl text-2xl">EMERGENCY CONTACT</h1>
 
             <div className="py-6 border-b border-coolGray-100">
               <div className="w-full md:w-9/12">
                 <div className="flex flex-wrap -m-3">
                   <div className="w-full md:w-1/3 p-3">
                     <p className="text-sm text-coolGray-800 font-semibold">
-                      EMERGENCY CONTACT *
+                      EMERGENCY CONTACT NAME *
+                    </p>
+                  </div>
+                  <div className="w-full md:flex-1 p-3">
+                    <input
+                      required
+                      className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                      type="text"
+                      id="emergencyContactName"
+                      defaultValue={currentUserKYC.emergencyContactName}
+                      onChange={(e) => {
+                        dispatch(
+                          updateUserKYC({
+                            emergencyContactName: e.target.value,
+                          })
+                        );
+                      }}
+                      autoComplete="name"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="py-6 border-b border-coolGray-100">
+              <div className="w-full md:w-9/12">
+                <div className="flex flex-wrap -m-3">
+                  <div className="w-full md:w-1/3 p-3">
+                    <p className="text-sm text-coolGray-800 font-semibold">
+                      EMERGENCY CONTACT RELATIONSHIP *
+                    </p>
+                  </div>
+                  <div className="w-full md:flex-1 p-3">
+                    <input
+                      required
+                      className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                      type="text"
+                      id="emergencyContactRelationship"
+                      defaultValue={currentUserKYC.emergencyContactRelationship}
+                      onChange={(e) => {
+                        dispatch(
+                          updateUserKYC({
+                            emergencyContactRelationship: e.target.value,
+                          })
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="py-6 border-b border-coolGray-100">
+              <div className="w-full md:w-9/12">
+                <div className="flex flex-wrap -m-3">
+                  <div className="w-full md:w-1/3 p-3">
+                    <p className="text-sm text-coolGray-800 font-semibold">
+                      EMERGENCY CONTACT ADDRESS *
+                    </p>
+                  </div>
+                  <div className="w-full md:flex-1 p-3">
+                    <input
+                      required
+                      className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                      type="text"
+                      id="emergencyContactAddress"
+                      defaultValue={currentUserKYC.emergencyContactAddress}
+                      onChange={(e) => {
+                        dispatch(
+                          updateUserKYC({
+                            emergencyContactAddress: e.target.value,
+                          })
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="py-6 border-b border-coolGray-100">
+              <div className="w-full md:w-9/12">
+                <div className="flex flex-wrap -m-3">
+                  <div className="w-full md:w-1/3 p-3">
+                    <p className="text-sm text-coolGray-800 font-semibold">
+                      EMERGENCY CONTACT TELEPHONE *
                     </p>
                   </div>
                   <div className="w-full md:flex-1 p-3">
@@ -1401,7 +1487,7 @@ export function AgreementAndKYCForm(props: AgreementAndKYCFormProps) {
     return async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setSubmittingAgreement(true);
-      await acceptInvitation()
+      await acceptInvitation(currentUserKYC)
         .finally(() => {
           setSubmittingAgreement(false);
         })

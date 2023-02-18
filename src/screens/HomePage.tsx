@@ -24,7 +24,7 @@ export default function HomePage() {
         <HomepageHeader />
         {/* <LogoClouds /> */}
         <Features />
-        {/* <Pricing /> */}
+        <Pricing />
         <HomePageCTA />
         <Footer />
       </div>

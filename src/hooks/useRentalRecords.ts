@@ -45,6 +45,7 @@ import {
 import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 import base64 from "base-64";
+import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionAndAmount";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -187,8 +188,8 @@ const useRentalRecords = () => {
       return toast.error("Error getting user details.");
     }
 
-    if (!rents.length) {
-      return toast.error("Error getting rents details.");
+    if (!rents.length && !selectedAdditionalFees.length) {
+      return toast.error("Error getting rents or fees details.");
     }
 
     const rentBatch = writeBatch(db);
@@ -210,10 +211,11 @@ const useRentalRecords = () => {
     }
 
     rents.forEach((rentdoc) => {
-      var docRef = doc(collection(db, RENT_PATH), rentdoc.id); //automatically generate unique id
+      var docRef = doc(collection(db, RENT_PATH), rentdoc.id);
       const rentData: Rent = {
         ...rentdoc,
         status: RentStatus["Paid - Rent has been paid."],
+        paidOn: Date.now(),
       };
       rentBatch.update(docRef, rentData);
     });
@@ -225,17 +227,13 @@ const useRentalRecords = () => {
         const encodedRedirectUrl = base64.encode(redirectURL);
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}&redirect=${encodedRedirectUrl}&email=${owner}`;
 
-        const totalRentPaid = rents.reduce((p, a) => p + a.rent, 0);
-        const totalAmount =
-          totalRentPaid +
-          selectedAdditionalFees.reduce((p, a) => p + a.feeAmount, 0);
-
-        const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
-          totalRentPaid
-        )} in rent for ${propertyTitle}`;
-        let transactionDescription = `${tenantName} paid ${formatPrice(
-          totalRentPaid
-        )} in rent for ${propertyTitle}`;
+        var { transactionDescription, totalAmount } =
+          getTransactionDescriptionAndAmount(
+            rents,
+            selectedAdditionalFees,
+            tenantName,
+            propertyTitle
+          );
 
         //Add transaction for tenant and landlord
 
@@ -245,7 +243,7 @@ const useRentalRecords = () => {
         const transactionData: MoneyTransaction = {
           id: transactionForLandlordId,
           payer: loggedInUser?.email,
-          amount: totalRentPaid,
+          amount: totalAmount,
           createdAt: Date.now(),
           updatedAt: Date.now(),
           currency: "NGN",
@@ -273,7 +271,7 @@ const useRentalRecords = () => {
           const ownerDoc = docSnap.data() as User;
           const updatedUser: User = {
             ...ownerDoc,
-            balance: (ownerDoc.balance || 0) + totalRentPaid,
+            balance: (ownerDoc.balance || 0) + totalAmount,
           };
           await updateDoc(ownerRef, updatedUser).finally(() => {});
         }
@@ -320,7 +318,7 @@ const useRentalRecords = () => {
               text: "View details",
             },
           ],
-          title: emailSubjectForLandlord,
+          title: transactionDescription,
         });
 
         const generatedEmailForTenant = generateSimpleEmail({
@@ -340,7 +338,7 @@ const useRentalRecords = () => {
         if (owner) {
           await sendEmail(
             owner,
-            emailSubjectForLandlord,
+            transactionDescription,
             paragraphsForLandlord.join(" \n"),
             generatedEmailForLandlord
           ).then(() => {

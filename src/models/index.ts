@@ -71,6 +71,7 @@ export type Rent = {
   sentFirstFailedRent?: boolean;
   sentSecondFailedRent?: boolean;
   sentThirdFailedRent?: boolean;
+  paidOn: number;
 };
 export type SimpleEmailProps = {
   title?: string;

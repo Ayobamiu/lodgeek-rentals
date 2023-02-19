@@ -38,6 +38,7 @@ import {
   Rent,
   RentalRecord,
   RentStatus,
+  TenantInviteProps,
   UpdatePaidRentsProps,
   User,
   UserKYC,
@@ -45,6 +46,7 @@ import {
 import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 import base64 from "base-64";
+import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionAndAmount";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -143,23 +145,12 @@ const useRentalRecords = () => {
         });
 
         rentBatch.commit().then(async () => {
-          const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
-          const encodedRedirectUrl = base64.encode(redirectURL);
-          const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}&redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
-          const email = generateSimpleEmail({
-            paragraphs: [
-              `Click on the link below to manage your rent at ${property?.title}.`,
-            ],
-            buttons: [{ text: "Manage rent", link: rentalRecordLink }],
+          await sendEmailInvitationToTenant({
+            rentalRecordData,
+            property,
+            loggedInUser,
           });
-          await sendEmail(
-            rentalRecordData.tenant,
-            `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
-            `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
-            email
-          );
           dispatch(addRentalRecord(rentalRecordData));
-          toast.success(`Invite sent to ${rentalRecordData.tenant}`);
         });
       })
       .catch((error) => {
@@ -187,8 +178,8 @@ const useRentalRecords = () => {
       return toast.error("Error getting user details.");
     }
 
-    if (!rents.length) {
-      return toast.error("Error getting rents details.");
+    if (!rents.length && !selectedAdditionalFees.length) {
+      return toast.error("Error getting rents or fees details.");
     }
 
     const rentBatch = writeBatch(db);
@@ -210,10 +201,11 @@ const useRentalRecords = () => {
     }
 
     rents.forEach((rentdoc) => {
-      var docRef = doc(collection(db, RENT_PATH), rentdoc.id); //automatically generate unique id
+      var docRef = doc(collection(db, RENT_PATH), rentdoc.id);
       const rentData: Rent = {
         ...rentdoc,
         status: RentStatus["Paid - Rent has been paid."],
+        paidOn: Date.now(),
       };
       rentBatch.update(docRef, rentData);
     });
@@ -225,17 +217,13 @@ const useRentalRecords = () => {
         const encodedRedirectUrl = base64.encode(redirectURL);
         const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}&redirect=${encodedRedirectUrl}&email=${owner}`;
 
-        const totalRentPaid = rents.reduce((p, a) => p + a.rent, 0);
-        const totalAmount =
-          totalRentPaid +
-          selectedAdditionalFees.reduce((p, a) => p + a.feeAmount, 0);
-
-        const emailSubjectForLandlord = `${tenantName} paid ${formatPrice(
-          totalRentPaid
-        )} in rent for ${propertyTitle}`;
-        let transactionDescription = `${tenantName} paid ${formatPrice(
-          totalRentPaid
-        )} in rent for ${propertyTitle}`;
+        var { transactionDescription, totalAmount } =
+          getTransactionDescriptionAndAmount(
+            rents,
+            selectedAdditionalFees,
+            tenantName,
+            propertyTitle
+          );
 
         //Add transaction for tenant and landlord
 
@@ -245,7 +233,7 @@ const useRentalRecords = () => {
         const transactionData: MoneyTransaction = {
           id: transactionForLandlordId,
           payer: loggedInUser?.email,
-          amount: totalRentPaid,
+          amount: totalAmount,
           createdAt: Date.now(),
           updatedAt: Date.now(),
           currency: "NGN",
@@ -273,7 +261,7 @@ const useRentalRecords = () => {
           const ownerDoc = docSnap.data() as User;
           const updatedUser: User = {
             ...ownerDoc,
-            balance: (ownerDoc.balance || 0) + totalRentPaid,
+            balance: (ownerDoc.balance || 0) + totalAmount,
           };
           await updateDoc(ownerRef, updatedUser).finally(() => {});
         }
@@ -320,7 +308,7 @@ const useRentalRecords = () => {
               text: "View details",
             },
           ],
-          title: emailSubjectForLandlord,
+          title: transactionDescription,
         });
 
         const generatedEmailForTenant = generateSimpleEmail({
@@ -340,7 +328,7 @@ const useRentalRecords = () => {
         if (owner) {
           await sendEmail(
             owner,
-            emailSubjectForLandlord,
+            transactionDescription,
             paragraphsForLandlord.join(" \n"),
             generatedEmailForLandlord
           ).then(() => {
@@ -426,6 +414,25 @@ const useRentalRecords = () => {
     }
   }
 
+  async function sendEmailInvitationToTenant(props: TenantInviteProps) {
+    const { rentalRecordData, property, loggedInUser } = props;
+    const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
+    const encodedRedirectUrl = base64.encode(redirectURL);
+    const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}&redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
+    const email = generateSimpleEmail({
+      paragraphs: [
+        `Click on the link below to manage your rent at ${property?.title}.`,
+      ],
+      buttons: [{ text: "Manage rent", link: rentalRecordLink }],
+    });
+    await sendEmail(
+      rentalRecordData.tenant,
+      `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
+      `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
+      email
+    );
+    toast.success(`Invite sent to ${rentalRecordData.tenant}`);
+  }
   const rentalRecordStatuses = {
     created: "🔵 Created",
     inviteSent: "⌛️ Invite Sent - Pending Approval",
@@ -442,6 +449,7 @@ const useRentalRecords = () => {
     updatePaidRents,
     saveUserKYC,
     loadUserKYC,
+    sendEmailInvitationToTenant,
   };
 };
 export default useRentalRecords;

@@ -99,6 +99,7 @@ export default function AddRentalRecords() {
         status: RentStatus["Upcoming - Rent is not due for payment."],
         owner: loggedInUser?.email || "",
         tenant: newRentalRecord.tenant,
+        paidOn: -1,
       },
     ];
     for (let index = 1; index < 5; index++) {
@@ -115,6 +116,7 @@ export default function AddRentalRecords() {
         status: RentStatus["Upcoming - Rent is not due for payment."],
         owner: loggedInUser?.email || "",
         tenant: newRentalRecord.tenant,
+        paidOn: -1,
       });
     }
     setRents(r);
@@ -153,6 +155,7 @@ export default function AddRentalRecords() {
       status: RentStatus["Upcoming - Rent is not due for payment."],
       owner: loggedInUser?.email || "",
       tenant: newRentalRecord.tenant,
+      paidOn: -1,
     });
     setRents(currentRents);
   };

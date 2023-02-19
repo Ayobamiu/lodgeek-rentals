@@ -34,6 +34,7 @@ import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
 import { RentItem } from "./RentItem";
 import { KYCPreview } from "../../components/shared/KYCPreview";
+import { getRentsAndFees } from "./getRentsAndFees";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -43,6 +44,7 @@ export default function RentalRecordDetails() {
     getRentalRecordData,
     handleUpdateRentalRecord,
     updatePaidRents,
+    sendEmailInvitationToTenant,
   } = useRentalRecords();
   const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
   const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
@@ -163,7 +165,8 @@ export default function RentalRecordDetails() {
   const [isOpen, setIsOpen] = useState(false);
 
   const payRent = () => {
-    if (!selectedRents.length) return toast.warn("Select Rents to pay for.");
+    if (!selectedRents.length && !selectedAdditionalFees.length)
+      return toast.warn("Select Rents or Fee to pay for.");
 
     setIsOpen(true);
   };
@@ -296,10 +299,25 @@ export default function RentalRecordDetails() {
     );
   };
 
+  const [resendingInvite, setResendingInvite] = useState(false);
   const ResendInviteButton = () => {
     return (
-      <button className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button">
-        <span>Resend Invite</span>
+      <button
+        onClick={async () => {
+          if (loggedInUser && rentalRecordData) {
+            setResendingInvite(true);
+            await sendEmailInvitationToTenant({
+              loggedInUser,
+              rentalRecordData,
+              property,
+            }).finally(() => {
+              setResendingInvite(false);
+            });
+          }
+        }}
+        className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
+      >
+        {resendingInvite ? <ActivityIndicator /> : <span>Resend Invite</span>}
       </button>
     );
   };
@@ -323,16 +341,13 @@ export default function RentalRecordDetails() {
     }
   }, [selectedRents]);
 
-  const totalAmountToPay = useMemo(
-    () =>
-      selectedRents
-        .map((i) => i.rent)
-        .reduce((partialSum, a) => partialSum + a, 0) +
+  const totalAmountToPay = useMemo(() => {
+    const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
+      selectedRents,
       selectedAdditionalFees
-        .map((i) => i.feeAmount)
-        .reduce((partialSum, a) => partialSum + a, 0),
-    [selectedRents, selectedAdditionalFees]
-  );
+    );
+    return transactionFee + totalFeeMinusTransactionFee;
+  }, [selectedRents, selectedAdditionalFees]);
 
   const config = {
     reference: new Date().getTime().toString(),
@@ -352,6 +367,10 @@ export default function RentalRecordDetails() {
     loggedInUser?.email === rentalRecordData?.tenant;
 
   const [showKYCPreview, setShowKYCPreview] = useState(false);
+  const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
+    selectedRents,
+    selectedAdditionalFees
+  );
   return (
     <div>
       {/* Rent Invoice Table */}
@@ -364,8 +383,8 @@ export default function RentalRecordDetails() {
         leaveFrom="opacity-100"
         leaveTo="opacity-0"
       >
-        <div className="bg-black bg-opacity-50 absolute h-full w-full top-0 left-0 flex items-center justify-center z-50">
-          <div className="lg:w-[600px]  bg-white rounded-3xl p-6 relative">
+        <div className="bg-black bg-opacity-50 fixed h-full w-full top-0 left-0 flex items-center justify-center z-50">
+          <div className="lg:w-[600px] w-full lg:h-auto h-screen overflow-y-scroll bg-white lg:rounded-3xl p-6 relative">
             <FontAwesomeIcon
               icon={faTimes}
               className="absolute right-4 top-3 cursor-pointer"
@@ -410,6 +429,14 @@ export default function RentalRecordDetails() {
                       </td>
                     </tr>
                   ))}
+                  <tr>
+                    <td className="p-3 border border-slate-700 ...">
+                      Transaction fee
+                    </td>
+                    <td className="p-3 border border-slate-700 ...">
+                      {formatPrice(transactionFee)}
+                    </td>
+                  </tr>
                 </tbody>
                 <tfoot>
                   <tr>
@@ -418,12 +445,7 @@ export default function RentalRecordDetails() {
                     </th>
                     <th className="p-3 border border-slate-600 text-left  ...">
                       {formatPrice(
-                        selectedRents
-                          .map((i) => i.rent)
-                          .reduce((partialSum, a) => partialSum + a, 0) +
-                          selectedAdditionalFees
-                            .map((i) => i.feeAmount)
-                            .reduce((partialSum, a) => partialSum + a, 0)
+                        totalFeeMinusTransactionFee + transactionFee
                       )}
                     </th>
                   </tr>

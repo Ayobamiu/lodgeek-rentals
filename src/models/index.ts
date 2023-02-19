@@ -71,6 +71,7 @@ export type Rent = {
   sentFirstFailedRent?: boolean;
   sentSecondFailedRent?: boolean;
   sentThirdFailedRent?: boolean;
+  paidOn: number;
 };
 export type SimpleEmailProps = {
   title?: string;
@@ -90,6 +91,7 @@ export enum FirebaseCollections {
   users = "users",
   userKYC = "userKYC",
   transaction = "transaction",
+  bankReord = "bankReord",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -187,4 +189,29 @@ export type UserKYC = {
   associatedWithFelonyOrMisdemeanor: YesOrNo;
   felonyOrMisdemeanorDescription?: string;
   felonyOrMisdemeanorDate?: number;
+};
+
+export interface Bank {
+  Code?: string;
+  Id?: number;
+  IsMicroFinanceBank?: boolean;
+  IsMobileVerified?: boolean;
+  Name: string;
+  SwiftCode?: string;
+  branches?: any;
+}
+export interface BankRecord {
+  bank: PayStackBank;
+  id: string;
+  accountNumber: string;
+  bankName: string;
+  accountName: string;
+  user: string;
+  createdAt: number;
+  updatedAt: number;
+}
+export type TenantInviteProps = {
+  rentalRecordData: RentalRecord;
+  property?: Property;
+  loggedInUser: User;
 };

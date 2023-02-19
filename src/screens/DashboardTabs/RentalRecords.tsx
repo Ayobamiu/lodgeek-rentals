@@ -1,13 +1,22 @@
-import React from "react";
 import RentalRecordItem from "../../components/shared/RentalRecordItem";
 import { useNavigate } from "react-router-dom";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import { useAppSelector } from "../../app/hooks";
 import { selectRentalRecords } from "../../app/features/rentalRecordSlice";
+import useBanks from "../../hooks/useBanks";
+import { selectBankRecords } from "../../app/features/bankRecordSlice";
+import { toast } from "react-toastify";
 
 export default function RentalRecords() {
   const navigate = useNavigate();
+  useBanks();
+  const bankRecords = useAppSelector(selectBankRecords);
+
   const gotoAddRentalRecords = () => {
+    if (!bankRecords.length) {
+      toast.info("Add payment details first.");
+      return navigate("/dashboard?tab=bankRecords&redirect=addRentalRecords");
+    }
     navigate("/dashboard?tab=addRentalRecords");
   };
 

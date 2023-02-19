@@ -38,6 +38,7 @@ import {
   Rent,
   RentalRecord,
   RentStatus,
+  TenantInviteProps,
   UpdatePaidRentsProps,
   User,
   UserKYC,
@@ -144,23 +145,12 @@ const useRentalRecords = () => {
         });
 
         rentBatch.commit().then(async () => {
-          const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
-          const encodedRedirectUrl = base64.encode(redirectURL);
-          const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}&redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
-          const email = generateSimpleEmail({
-            paragraphs: [
-              `Click on the link below to manage your rent at ${property?.title}.`,
-            ],
-            buttons: [{ text: "Manage rent", link: rentalRecordLink }],
+          await sendEmailInvitationToTenant({
+            rentalRecordData,
+            property,
+            loggedInUser,
           });
-          await sendEmail(
-            rentalRecordData.tenant,
-            `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
-            `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
-            email
-          );
           dispatch(addRentalRecord(rentalRecordData));
-          toast.success(`Invite sent to ${rentalRecordData.tenant}`);
         });
       })
       .catch((error) => {
@@ -424,6 +414,25 @@ const useRentalRecords = () => {
     }
   }
 
+  async function sendEmailInvitationToTenant(props: TenantInviteProps) {
+    const { rentalRecordData, property, loggedInUser } = props;
+    const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
+    const encodedRedirectUrl = base64.encode(redirectURL);
+    const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}&redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
+    const email = generateSimpleEmail({
+      paragraphs: [
+        `Click on the link below to manage your rent at ${property?.title}.`,
+      ],
+      buttons: [{ text: "Manage rent", link: rentalRecordLink }],
+    });
+    await sendEmail(
+      rentalRecordData.tenant,
+      `${loggedInUser.firstName} ${loggedInUser.lastName} is inviting you to manage rent for ${property?.title}`,
+      `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
+      email
+    );
+    toast.success(`Invite sent to ${rentalRecordData.tenant}`);
+  }
   const rentalRecordStatuses = {
     created: "🔵 Created",
     inviteSent: "⌛️ Invite Sent - Pending Approval",
@@ -440,6 +449,7 @@ const useRentalRecords = () => {
     updatePaidRents,
     saveUserKYC,
     loadUserKYC,
+    sendEmailInvitationToTenant,
   };
 };
 export default useRentalRecords;

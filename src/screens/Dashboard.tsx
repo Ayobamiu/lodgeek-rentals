@@ -14,7 +14,7 @@ import AddProperty from "./DashboardTabs/AddProperty";
 import { useNavigate } from "react-router-dom";
 import RentalRecordDetails from "./DashboardTabs/RentalRecordDetails";
 import { ReactComponent as FlexUIGreenLight } from "../assets/logo-no-background.svg";
-import Wallet from "./DashboardTabs/Wallet";
+import BankRecords from "./DashboardTabs/BankRecords";
 
 export default function Dashboard() {
   let query = useQuery();
@@ -119,9 +119,9 @@ export default function Dashboard() {
                   <li className="mr-8">
                     <Link
                       className={`${styleActiveTab(
-                        "wallet"
+                        "bankRecords"
                       )} flex flex-wrap items-center py-8 text-base font-medium text-coolGray-500 hover:text-green-500 border-b-2 border-transparent hover:border-green-500`}
-                      to="/dashboard?tab=wallet"
+                      to="/dashboard?tab=bankRecords"
                     >
                       <svg
                         fill="currentColor"
@@ -484,9 +484,9 @@ export default function Dashboard() {
                   <li className="mr-8">
                     <Link
                       className={`${styleActiveTab(
-                        "wallet"
+                        "bankRecords"
                       )} flex flex-wrap items-center py-4 p-3 text-base font-medium text-coolGray-500 hover:text-green-500 border-b-2 border-transparent hover:border-green-500`}
-                      to="/dashboard?tab=wallet"
+                      to="/dashboard?tab=bankRecords"
                     >
                       <svg
                         fill="currentColor"
@@ -799,7 +799,7 @@ export default function Dashboard() {
       {query.get("tab") === "paymentHistory" && <PaymentHistory />}
       {query.get("tab") === "properties" && <Properties />}
       {query.get("tab") === "rents" && <Rents />}
-      {query.get("tab") === "wallet" && <Wallet />}
+      {query.get("tab") === "bankRecords" && <BankRecords />}
     </div>
   );
 }

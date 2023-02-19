@@ -46,6 +46,7 @@ const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
 const usersRef = collection(db, FirebaseCollections.users);
 const userKYCRef = collection(db, FirebaseCollections.userKYC);
 const transactionRef = collection(db, FirebaseCollections.transaction);
+const bankRecordRef = collection(db, FirebaseCollections.bankReord);
 
 export {
   analytics,
@@ -59,4 +60,5 @@ export {
   usersRef,
   transactionRef,
   userKYCRef,
+  bankRecordRef,
 };

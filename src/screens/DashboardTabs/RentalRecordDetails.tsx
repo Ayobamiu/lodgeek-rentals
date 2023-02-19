@@ -44,6 +44,7 @@ export default function RentalRecordDetails() {
     getRentalRecordData,
     handleUpdateRentalRecord,
     updatePaidRents,
+    sendEmailInvitationToTenant,
   } = useRentalRecords();
   const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
   const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
@@ -298,10 +299,25 @@ export default function RentalRecordDetails() {
     );
   };
 
+  const [resendingInvite, setResendingInvite] = useState(false);
   const ResendInviteButton = () => {
     return (
-      <button className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button">
-        <span>Resend Invite</span>
+      <button
+        onClick={async () => {
+          if (loggedInUser && rentalRecordData) {
+            setResendingInvite(true);
+            await sendEmailInvitationToTenant({
+              loggedInUser,
+              rentalRecordData,
+              property,
+            }).finally(() => {
+              setResendingInvite(false);
+            });
+          }
+        }}
+        className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
+      >
+        {resendingInvite ? <ActivityIndicator /> : <span>Resend Invite</span>}
       </button>
     );
   };

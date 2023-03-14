@@ -96,7 +96,7 @@ export default function BankRecords() {
           </div>
           <p className="text-xs font-medium text-coolGray-500 lg:text-center text-justify my-2">
             Funds deposited into your account will be transferred to your
-            preferred bank account by the end of the week.
+            preferred bank account by the end of the day.
           </p>
         </div>
       </section>

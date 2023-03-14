@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import RentalRecordDetails from "./DashboardTabs/RentalRecordDetails";
 import { ReactComponent as FlexUIGreenLight } from "../assets/logo-no-background.svg";
 import BankRecords from "./DashboardTabs/BankRecords";
+import Wallet from "./DashboardTabs/Wallet";
 
 export default function Dashboard() {
   let query = useQuery();
@@ -800,6 +801,7 @@ export default function Dashboard() {
       {query.get("tab") === "properties" && <Properties />}
       {query.get("tab") === "rents" && <Rents />}
       {query.get("tab") === "bankRecords" && <BankRecords />}
+      {query.get("tab") === "withdraw" && <Wallet />}
     </div>
   );
 }

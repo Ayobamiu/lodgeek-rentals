@@ -223,6 +223,7 @@ export default function Wallet() {
                       placeholder="Doe"
                       defaultValue={bankCode}
                       onChange={(e) => {
+                        setAccountName("");
                         setBankCode(e.currentTarget.value);
                       }}
                       disabled={processingWithdrawal}

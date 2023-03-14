@@ -1,4 +1,3 @@
-import React from "react";
 import { Property } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 
@@ -13,7 +12,9 @@ export default function PropertyItem({ property }: { property: Property }) {
           {formatPrice(property.rent)}/{property.rentPer}
         </p>
       </div>
-
+      <p className="text-xs font-medium text-coolGray-500 ">
+        {property.description}
+      </p>
       <div className="w-auto py-2">
         <div className="flex flex-wrap items-center">
           <div className="w-auto mr-1">

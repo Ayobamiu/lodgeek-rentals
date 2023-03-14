@@ -7,6 +7,7 @@ export type User = {
   photoURL?: string;
   lastUpdated: number;
   balance: number;
+  directRemitance?: boolean;
 };
 export type RentType = "month" | "year";
 

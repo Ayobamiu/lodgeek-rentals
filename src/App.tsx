@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
 import Dashboard from "./screens/Dashboard";
 import AuthPage from "./screens/AuthPage";
+import "react-confirm-alert/src/react-confirm-alert.css";
+import NotificationModal from "./components/shared/NotificationModal";
 
 function App() {
   useAuth();
@@ -13,6 +15,7 @@ function App() {
   return (
     <div className="">
       <ToastContainer />
+      <NotificationModal />
       <BrowserRouter>
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />

@@ -5,17 +5,17 @@ import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
 import { generateFirebaseId } from "../../firebase/config";
+import useBanks from "../../hooks/useBanks";
 import { BankRecord, FirebaseCollections, PayStackBank } from "../../models";
 import ActivityIndicator from "../shared/ActivityIndicator";
 
 type AddBankRecordProps = {
   openModal: boolean;
   setOpenModal: React.Dispatch<React.SetStateAction<boolean>>;
-  addBank: (data: BankRecord) => Promise<void>;
 };
 
 export function AddBankRecordModal(props: AddBankRecordProps) {
-  const { openModal, setOpenModal, addBank } = props;
+  const { openModal, setOpenModal } = props;
   const [bankCode, setBankCode] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [accountName, setAccountName] = useState("");
@@ -23,6 +23,7 @@ export function AddBankRecordModal(props: AddBankRecordProps) {
   const [banks, setBanks] = useState<PayStackBank[]>([]);
   const [bank, setBank] = useState<PayStackBank>();
   const loggedInUser = useAppSelector(selectUser);
+  const { addBank } = useBanks();
 
   useEffect(() => {
     verifyBank();
@@ -159,6 +160,7 @@ export function AddBankRecordModal(props: AddBankRecordProps) {
                           }}
                           disabled={verifyingAccount || addingBankRecord}
                         >
+                          <option value="">-</option>
                           {banks.map((i, bankIndex) => (
                             <option key={bankIndex} value={i.code}>
                               {i.name}

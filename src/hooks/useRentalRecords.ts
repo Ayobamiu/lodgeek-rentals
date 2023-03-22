@@ -47,15 +47,16 @@ import formatPrice from "../utils/formatPrice";
 import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 import base64 from "base-64";
 import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionAndAmount";
+import useBanks from "./useBanks";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
-
   const dispatch = useAppDispatch();
   const rentalRecords = useAppSelector(selectRentalRecords);
   const loggedInUser = useAppSelector(selectUser);
   const properties = useAppSelector(selectProperties);
 
+  const { processWithdrawal } = useBanks();
   const getUsersRentalRecords = useCallback(async () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
     const q = query(
@@ -71,7 +72,7 @@ const useRentalRecords = () => {
 
         dispatch(addRentalRecords(rentalRecordsList));
       })
-      .catch((error) => {
+      .catch(() => {
         toast.error("Error Loading Rental Records");
       })
       .finally(() => {});
@@ -92,7 +93,7 @@ const useRentalRecords = () => {
 
         dispatch(addRentalRecords(rentalRecordsList));
       })
-      .catch((error) => {
+      .catch(() => {
         toast.error("Error Loading Rental Records");
       })
       .finally(() => {});
@@ -126,7 +127,7 @@ const useRentalRecords = () => {
       status: "inviteSent",
     };
     await setDoc(doc(rentalRecordRef, rentalRecordId), rentalRecordData)
-      .then((c) => {
+      .then(() => {
         const rentBatch = writeBatch(db);
         rents.forEach((rentdoc) => {
           var docRef = doc(collection(db, RENT_PATH)); //automatically generate unique id
@@ -138,7 +139,6 @@ const useRentalRecords = () => {
             rent: rentalRecordData.rent,
             rentPer: rentalRecordData.rentPer,
             property: rentalRecordData.property,
-            status: RentStatus["Upcoming - Rent is not due for payment."],
             tenant: data.tenant,
           };
           rentBatch.set(docRef, rentData);
@@ -153,7 +153,7 @@ const useRentalRecords = () => {
           dispatch(addRentalRecord(rentalRecordData));
         });
       })
-      .catch((error) => {
+      .catch(() => {
         toast.error("Error Adding Rental Record");
         return null;
       })
@@ -227,8 +227,12 @@ const useRentalRecords = () => {
 
         //Add transaction for tenant and landlord
 
-        const transactionForLandlordId = generateFirebaseId(RENTAL_RECORD_PATH);
-        const transactionForTenantId = generateFirebaseId(RENTAL_RECORD_PATH);
+        const transactionForLandlordId = generateFirebaseId(
+          FirebaseCollections.transaction
+        );
+        const transactionForTenantId = generateFirebaseId(
+          FirebaseCollections.transaction
+        );
 
         const transactionData: MoneyTransaction = {
           id: transactionForLandlordId,
@@ -254,6 +258,7 @@ const useRentalRecords = () => {
           type: "minus",
           id: transactionForTenantId,
         });
+        //Add transaction for tenant and landlord
 
         const ownerRef = doc(db, FirebaseCollections.users, owner);
         const docSnap = await getDoc(ownerRef);
@@ -264,6 +269,27 @@ const useRentalRecords = () => {
             balance: (ownerDoc.balance || 0) + totalAmount,
           };
           await updateDoc(ownerRef, updatedUser).finally(() => {});
+
+          /* Process Direct Remittance */
+          //If there is a remitance specified for this rental record, send it there here, else send to the owner's default.
+          if (rentalRecord.remittanceAccount) {
+            await processWithdrawal({
+              amount: totalAmount,
+              type: "fromLodgeekToRemittanceAccount",
+              remittanceAccount: rentalRecord.remittanceAccount,
+              senderUserEmail: ownerDoc.email,
+            });
+          } else {
+            if (ownerDoc.directRemitance) {
+              await processWithdrawal({
+                amount: totalAmount,
+                type: "fromLodgeekToRemittanceAccount",
+                remittanceAccount: ownerDoc.remittanceAccount,
+                senderUserEmail: ownerDoc.email,
+              });
+            }
+          }
+          /* Process Direct Remittance */
         }
 
         const paragraphsForLandlord = [
@@ -336,7 +362,7 @@ const useRentalRecords = () => {
           });
         }
       })
-      .catch((error) => {
+      .catch(() => {
         toast.error("Error Updating Rents.");
       });
   }
@@ -350,7 +376,7 @@ const useRentalRecords = () => {
     }
 
     await updateDoc(doc(rentalRecordRef, data.id), data)
-      .then((c) => {
+      .then(() => {
         dispatch(updateRentalRecord(data));
       })
       .finally(() => {});

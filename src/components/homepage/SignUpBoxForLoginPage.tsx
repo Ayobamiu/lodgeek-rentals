@@ -111,7 +111,7 @@ export default function SignUpBoxForLoginPage() {
                 defaultValue={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button>
+              <button type="button">
                 <svg
                   className="h-6 w-6 ml-4 my-auto text-gray-300"
                   xmlns="http://www.w3.org/2000/svg"
@@ -208,7 +208,7 @@ export default function SignUpBoxForLoginPage() {
                 defaultValue={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <button>
+              <button type="button">
                 <svg
                   className="h-6 w-6 ml-4 my-auto text-gray-300"
                   xmlns="http://www.w3.org/2000/svg"

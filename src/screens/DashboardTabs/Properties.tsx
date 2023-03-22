@@ -1,9 +1,10 @@
-import React from "react";
+import { useState } from "react";
 import PropertyItem from "../../components/shared/PropertyItem";
 import { useNavigate } from "react-router-dom";
 import { selectProperties } from "../../app/features/propertySlice";
 import { useAppSelector } from "../../app/hooks";
 import useProperties from "../../hooks/useProperties";
+import FuzzySearch from "fuzzy-search";
 
 export default function Properties() {
   const navigate = useNavigate();
@@ -12,6 +13,19 @@ export default function Properties() {
   };
   useProperties();
   const properties = useAppSelector(selectProperties);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searcher = new FuzzySearch(
+    properties,
+    ["title", "description", "address", "location", "rent"],
+    {
+      caseSensitive: false,
+    }
+  );
+  let searchResults = properties;
+
+  if (searchQuery) {
+    searchResults = searcher.search(searchQuery);
+  }
 
   return (
     <div>
@@ -50,7 +64,16 @@ export default function Properties() {
                   <span>Add Property</span>
                 </button>
               </div>
-              <div className="w-full md:w-auto p-2"></div>
+              <div className="w-full md:w-auto p-2">
+                <input
+                  type="search"
+                  name="searchProperties"
+                  id="searchProperties"
+                  className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                  placeholder="Search Properties"
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -60,10 +83,10 @@ export default function Properties() {
         <div className="container px-4 mx-auto">
           <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
             <div className="flex flex-wrap -m-2">
-              {properties.map((property, index) => (
+              {searchResults.map((property, index) => (
                 <PropertyItem key={index} property={property} />
               ))}
-              {!properties.length && (
+              {!searchResults.length && (
                 <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">
                   No properties found
                 </div>

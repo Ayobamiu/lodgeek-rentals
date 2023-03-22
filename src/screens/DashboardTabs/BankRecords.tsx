@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUser, updateUser } from "../../app/features/userSlice";
 import BankRecordItem from "../../components/shared/BankRecordItem";
 import { selectBankRecords } from "../../app/features/bankRecordSlice";
-import useBanks from "../../hooks/useBanks";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import useQuery from "../../hooks/useQuery";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
@@ -13,6 +12,7 @@ import { db } from "../../firebase/config";
 import { FirebaseCollections, User } from "../../models";
 import { toast } from "react-toastify";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
+import useAuth from "../../hooks/useAuth";
 
 export default function BankRecords() {
   const [openAddRecordModal, setOpenAddRecordModal] = useState(false);
@@ -21,9 +21,15 @@ export default function BankRecords() {
   const redirectToAddRentalRecords = query.get("redirect");
   const loggedInUser = useAppSelector(selectUser);
   const bankRecords = useAppSelector(selectBankRecords);
-  const { addBank } = useBanks();
   const [updatingDirectRemittance, setUpdatingDirectRemittance] =
     useState(false);
+  const { updateDefaultRemittanceAccount } = useAuth();
+  useEffect(() => {
+    if (!loggedInUser?.remittanceAccount && bankRecords.length > 0) {
+      const firstRecord = bankRecords[0];
+      updateDefaultRemittanceAccount(firstRecord.id);
+    }
+  }, [loggedInUser, bankRecords]);
 
   const updateDirectRemittance = async (activate: boolean) => {
     const ownerRef = doc(
@@ -57,7 +63,6 @@ export default function BankRecords() {
       <AddBankRecordModal
         openModal={openAddRecordModal}
         setOpenModal={setOpenAddRecordModal}
-        addBank={addBank}
       />
       <section className="bg-white py-4">
         <div className="container px-4 mx-auto">
@@ -88,12 +93,7 @@ export default function BankRecords() {
                         to="/dashboard?tab=withdraw"
                         className="w-full md:w-auto p-1.5"
                       >
-                        <button
-                          className="flex flex-wrap justify-center w-full px-4 py-2 bg-green-500 hover:bg-green-600 font-medium text-sm text-white border border-green-500 rounded-md shadow-button"
-                          onClick={() => {
-                            setOpenAddRecordModal(true);
-                          }}
-                        >
+                        <button className="flex flex-wrap justify-center w-full px-4 py-2 bg-green-500 hover:bg-green-600 font-medium text-sm text-white border border-green-500 rounded-md shadow-button">
                           <p>Withdraw</p>
                         </button>
                       </Link>

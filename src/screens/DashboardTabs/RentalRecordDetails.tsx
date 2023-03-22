@@ -35,6 +35,7 @@ import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
 import { RentItem } from "./RentItem";
 import { KYCPreview } from "../../components/shared/KYCPreview";
 import { getRentsAndFees } from "./getRentsAndFees";
+import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
@@ -46,6 +47,7 @@ export default function RentalRecordDetails() {
     updatePaidRents,
     sendEmailInvitationToTenant,
   } = useRentalRecords();
+
   const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
   const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
   const loggedInUser = useAppSelector(selectUser);
@@ -373,6 +375,7 @@ export default function RentalRecordDetails() {
   );
   return (
     <div>
+      {updatingRents && <FullScreenActivityIndicator />}
       {/* Rent Invoice Table */}
       <Transition
         show={isOpen}

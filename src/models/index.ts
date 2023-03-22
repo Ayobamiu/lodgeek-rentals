@@ -8,6 +8,7 @@ export type User = {
   lastUpdated: number;
   balance: number;
   directRemitance?: boolean;
+  remittanceAccount?: string;
 };
 export type RentType = "month" | "year";
 
@@ -50,6 +51,7 @@ export type RentalRecord = {
   tenantAgreed: boolean;
   tenantAgreedOn: number;
   userKYC?: UserKYC;
+  remittanceAccount?: string; //id of bank record
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
@@ -63,7 +65,13 @@ export type Rent = {
   rentalRecord: string;
   dueDate: number;
   status: RentStatus;
+  /**
+   * Amount to pay per month or per year.
+   */
   rent: number;
+  /**
+   * Frequency of the rent; "month" for monthly and "year" for yearly payment.
+   */
   rentPer: RentType;
   tenant: string;
   owner: string;
@@ -215,4 +223,15 @@ export type TenantInviteProps = {
   rentalRecordData: RentalRecord;
   property?: Property;
   loggedInUser: User;
+};
+export type LodgeekNotification = {
+  title?: string;
+  description?: string;
+  type: "info" | "success" | "warning" | "error" | "default";
+  buttons?: {
+    text: string;
+    onClick?: () => void;
+    type?: "button" | "link";
+    link?: string;
+  }[];
 };

@@ -22,11 +22,13 @@
     "firebase-tools": "^11.19.0",
     "firebaseui": "^6.0.2",
     "font-awesome": "^4.7.0",
+    "fuzzy-search": "^3.2.1",
     "global": "^4.4.0",
     "html-to-pdf-js": "^0.9.3",
     "medium-editor": "^5.23.3",
     "moment": "^2.29.4",
     "react": "^18.2.0",
+    "react-confirm-alert": "^3.0.6",
     "react-currency-input-field": "^3.6.9",
     "react-dom": "^18.2.0",
     "react-google-autocomplete": "^2.7.1",
@@ -67,6 +69,7 @@
     ]
   },
   "devDependencies": {
+    "@types/fuzzy-search": "^2.1.2",
     "autoprefixer": "^10.4.13",
     "eslint-config-google": "^0.14.0",
     "postcss": "^8.4.20",

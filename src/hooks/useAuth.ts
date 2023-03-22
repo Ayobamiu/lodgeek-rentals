@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { auth, db, USER_PATH } from "../firebase/config";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { FirebaseCollections, User } from "../models";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   addUser as addUserToStore,
+  selectUser,
   selectUsers,
   setLoadingLoggedInUser,
   updateUser,
@@ -24,6 +25,7 @@ const useAuth = () => {
   const usersRef = collection(db, FirebaseCollections.users);
   const [currentUser, setCurrentUser] = useState<any>();
   const users = useAppSelector(selectUsers);
+  const loggedInUser = useAppSelector(selectUser);
 
   const dispatch = useAppDispatch();
   const getLoggedInUser = useCallback(
@@ -151,6 +153,27 @@ const useAuth = () => {
     return user;
   };
 
+  const updateDefaultRemittanceAccount = async (id: string) => {
+    const ownerRef = doc(
+      db,
+      FirebaseCollections.users,
+      loggedInUser?.email || ""
+    );
+    const docSnap = await getDoc(ownerRef);
+    if (docSnap.exists()) {
+      const ownerDoc = docSnap.data() as User;
+      const updatedUser: User = {
+        ...ownerDoc,
+        remittanceAccount: id,
+      };
+      await updateDoc(ownerRef, updatedUser)
+        .then((c) => {
+          dispatch(updateUser(updatedUser));
+        })
+        .finally(() => {});
+    }
+  };
+
   return {
     signingIn,
     signingUp,
@@ -160,6 +183,7 @@ const useAuth = () => {
     handleSignOutUser,
     signingOut,
     getUserData,
+    updateDefaultRemittanceAccount,
   };
 };
 export default useAuth;

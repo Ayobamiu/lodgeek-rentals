@@ -3,6 +3,10 @@ import useAuth from "../../hooks/useAuth";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 import useQuery from "../../hooks/useQuery";
 import { Link } from "react-router-dom";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { sendToken, verifyToken } from "../../api/phone";
+import { toast } from "react-toastify";
 
 export default function SignUpBoxForLoginPage() {
   let query = useQuery();
@@ -17,21 +21,56 @@ export default function SignUpBoxForLoginPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [verifyingPhone, setVerifyingPhone] = useState(false);
+  const [sendingVerificationCode, setSendingVerificationCode] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [openVerificationPanel, setOpenVerificationPanel] = useState(false);
   const [password, setPassword] = useState("");
+
   const { handleSignUpUser, signingUp, handleSignInUser, signingIn } =
     useAuth();
 
-  const [tab, setTab] = useState<"signUp" | "signIn">("signIn");
+  const [tab, setTab] = useState<"signUp" | "signIn">("signUp");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSignUpUser(email, password, firstName, lastName);
+
+    if (!phoneVerified) {
+      return toast("Verify your phone number!", { type: "info" });
+    }
+    handleSignUpUser(email, password, firstName, lastName, phone);
   };
+
   const onSubmitSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSignInUser(email, password);
   };
 
+  const onClickVerifyPhone = async () => {
+    setSendingVerificationCode(true);
+    await sendToken(phone)
+      .finally(() => {
+        setSendingVerificationCode(false);
+      })
+      .then(() => {
+        setOpenVerificationPanel(true);
+      });
+  };
+
+  const onClickVerifyToken = async () => {
+    setPhoneVerified(false);
+    setVerifyingPhone(true);
+    await verifyToken(verificationCode)
+      .finally(() => {
+        setVerifyingPhone(false);
+      })
+      .then(() => {
+        setPhoneVerified(true);
+        setOpenVerificationPanel(false);
+      });
+  };
   return (
     <div className="w-full lg:w-1/2 ">
       {tab === "signUp" && (
@@ -100,6 +139,73 @@ export default function SignUpBoxForLoginPage() {
                 ></path>
               </svg>
             </div>
+            <span className="mb-1 text-coolGray-800 font-medium">Phone</span>
+            <div className="mb-4 flex items-stretch leading-5 w-full text-coolGray-400 font-normal border border-coolGray-200 outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-lg shadow-sm">
+              <PhoneInput
+                country={"ng"}
+                onlyCountries={["ng"]}
+                containerClass="border-none "
+                inputClass="h-full custom-phone-input"
+                countryCodeEditable={false}
+                autoFormat
+                value={phone}
+                onChange={(value, _data, _e, _formatedValue) => {
+                  setPhoneVerified(false);
+                  setPhone(value);
+                }}
+              />
+
+              <button
+                type="button"
+                onClick={onClickVerifyPhone}
+                disabled={
+                  phoneVerified || sendingVerificationCode || verifyingPhone
+                }
+                className="flex rounded-l-none justify-center py-3 px-7  w-[100px] leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 disabled:bg-gray-400 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
+              >
+                {sendingVerificationCode ? (
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 rounded-full border-t-2 border-r-2 border-white ml-2"
+                    viewBox="0 0 24 24"
+                  ></svg>
+                ) : phoneVerified ? (
+                  "Verified"
+                ) : (
+                  "Verify"
+                )}
+              </button>
+            </div>
+            {openVerificationPanel && (
+              <div className="flex bg-gray-100 p-5 gap-5  rounded-lg">
+                <input
+                  className="w-full outline-none leading-5 text-coolGray-400 font-normal border bg-transparent rounded-lg  p-4 py-3 px-3 "
+                  type="text"
+                  typeof="text"
+                  placeholder="Verification code"
+                  defaultValue={verificationCode}
+                  onChange={(e) => {
+                    setVerificationCode(e.target.value);
+                  }}
+                  datatype="text"
+                  inputMode="numeric"
+                />
+
+                <button
+                  type="button"
+                  onClick={onClickVerifyToken}
+                  className="flex  justify-center py-3 px-7  w-[100px] leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
+                >
+                  {verifyingPhone ? (
+                    <svg
+                      className="animate-spin h-5 w-5 mr-3 rounded-full border-t-2 border-r-2 border-white ml-2"
+                      viewBox="0 0 24 24"
+                    ></svg>
+                  ) : (
+                    "Confirm"
+                  )}
+                </button>
+              </div>
+            )}
             <span className="mb-1 text-coolGray-800 font-medium">Password</span>
             <div className="mb-4 flex p-4 py-3 px-3 leading-5 w-full text-coolGray-400 font-normal border border-coolGray-200 outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-lg shadow-sm">
               <input

@@ -40,3 +40,17 @@
   background-image: url('./assets/flex-ui-assets/elements/pattern-white.svg');
   background-position: center;
 }
+
+.custom-phone-input {
+  height: 100% !important;
+  border-radius: 0 !important;
+  width: auto !important;
+
+}
+@media only screen and (max-width: 61284px) {
+  .custom-phone-input {
+
+    width: 100% !important;
+  
+  }
+}

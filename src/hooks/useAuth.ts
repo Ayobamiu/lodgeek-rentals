@@ -88,7 +88,8 @@ const useAuth = () => {
     email: string,
     password: string,
     firstName: string,
-    lastName: string
+    lastName: string,
+    phone: string
   ) => {
     setSigningUp(true);
 
@@ -100,6 +101,7 @@ const useAuth = () => {
           firstName,
           lastName,
           email,
+          phone,
           createdDate: Date.now(),
           lastUpdated: Date.now(),
           balance: 0,

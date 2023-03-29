@@ -10,7 +10,6 @@ import { db } from "./rentReminders";
  *
  *@param { Rent } rent The late rent.
  */
-
 export async function fetchDataAndSendALateRentNotice(
   rent: Rent
 ): Promise<void> {
@@ -28,9 +27,8 @@ export async function fetchDataAndSendALateRentNotice(
         rent.dueDate
       ).format("ll")}, and late
           if paid after ${moment(rent.dueDate).format(
-            "MMM YYYY"
-          )}. To date, we have not received your full ${
-        rent.rentPer === "month" ? "monthly" : "yearly"
+        "MMM YYYY"
+      )}. To date, we have not received your full ${rent.rentPer === "month" ? "monthly" : "yearly"
       } rent payment.`,
       `Please understand that failure to pay rent is the most frequent cause for tenants to lose their
         housing, and we are concerned about the balance due from you.`,

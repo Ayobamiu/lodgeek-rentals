@@ -22,10 +22,10 @@ export const sendEmail = async (
       to: email,
       message: { subject, text, html },
     })
-    .then((c) => {
+    .then(() => {
       console.log("Queued email for delivery!");
     })
-    .catch((error) => {
+    .catch(() => {
       return null;
     });
 };

@@ -1,3 +1,4 @@
+import "reactjs-popup/dist/index.css";
 import RentalRecordItem from "../../components/shared/RentalRecordItem";
 import { useNavigate } from "react-router-dom";
 import useRentalRecords from "../../hooks/useRentalRecords";
@@ -6,9 +7,17 @@ import { selectRentalRecords } from "../../app/features/rentalRecordSlice";
 import useBanks from "../../hooks/useBanks";
 import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { toast } from "react-toastify";
+import Button from "../../components/shared/button/Button";
+import { useRef, useState } from "react";
+import RentalRecordShare from "../../components/homepage/RentalRecordShare";
+import useOnClickOutside from "../../hooks/useOnClickOutsideHook";
 
 export default function RentalRecords() {
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const closeModal = () => setOpen(false);
+  useOnClickOutside(dropdownRef, () => setOpen(false));
   useBanks();
   const bankRecords = useAppSelector(selectBankRecords);
 
@@ -25,7 +34,7 @@ export default function RentalRecords() {
 
   return (
     <div>
-      <section className="bg-white p-8">
+      <section className="bg-white py-8 md:px-8 px-6">
         <div className="flex flex-wrap items-center -m-2">
           <div className="w-full md:w-1/2 p-2">
             <div className="flex flex-wrap items-center -m-2">
@@ -36,13 +45,13 @@ export default function RentalRecords() {
               </div>
             </div>
           </div>
-          <div className="w-full md:w-1/2 p-2">
+          <div className="w-full md:w-1/2 p-2  relative">
             <div className="flex flex-wrap justify-end -m-2">
               <div className="w-full md:w-auto p-2"></div>
-              <div className="w-full md:w-auto p-2">
+              <div className="w-full md:w-auto p-2 flex flex-row">
                 <button
                   onClick={gotoAddRentalRecords}
-                  className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
+                  className="flex flex-row items-center justify-center h-[45px] px-4 w-full text-sm text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
                 >
                   <svg
                     className="mr-2"
@@ -59,6 +68,13 @@ export default function RentalRecords() {
                   </svg>
                   <span>Add Rental record</span>
                 </button>
+                {/* <Button
+                  title="Share Records"
+                  className="ml-5"
+                  onClick={() => setOpen((e) => !e)}
+                /> */}
+                {open && <RentalRecordShare divRef={dropdownRef} />}
+                {/* <RentalRecordShare divRef={dropdownRef} /> */}
               </div>
               <div className="w-full md:w-auto p-2"></div>
             </div>

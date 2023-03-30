@@ -3,9 +3,10 @@ import {
   faExternalLink,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
+import { MdSettings } from "react-icons/md";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
@@ -36,9 +37,13 @@ import { RentItem } from "./RentItem";
 import { KYCPreview } from "../../components/shared/KYCPreview";
 import { getRentsAndFees } from "./getRentsAndFees";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
+import RentalRecordSettings from "../../components/lib/rental/RentalRecordSettings";
+import useOnClickOutside from "../../hooks/useOnClickOutsideHook";
+import RentalRecordShare from "../../components/homepage/RentalRecordShare";
 
 export default function RentalRecordDetails() {
   let query = useQuery();
+  // const routeQuery = useRoutes({});
   const navigate = useNavigate();
   const {
     rentalRecordStatuses,
@@ -47,6 +52,11 @@ export default function RentalRecordDetails() {
     updatePaidRents,
     sendEmailInvitationToTenant,
   } = useRentalRecords();
+
+  // Settings Requirements
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  useOnClickOutside(dropdownRef, () => setOpen(false));
 
   const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
   const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
@@ -67,6 +77,8 @@ export default function RentalRecordDetails() {
 
     loadRelatedRentalRecord();
   }, [query]);
+
+  // console.log(routeQuery, "Query");
 
   const { getPropertyData } = useProperties();
   const { getRentsForARentalRecord } = useRents();
@@ -125,6 +137,8 @@ export default function RentalRecordDetails() {
     };
     loadRelatedTenant();
   }, [rentalRecordData?.tenant]);
+
+  console.log(owner, "Owner", tenant, "Tenant", rentalRecordData?.tenant);
 
   const [rents, setRents] = useState<Rent[]>([]);
   const [loadingRents, setLoadingRents] = useState(false);
@@ -486,14 +500,17 @@ export default function RentalRecordDetails() {
               </div>
             </div>
           </div>
-          <div className="w-full md:w-1/2 p-2">
-            <div className="flex flex-wrap justify-end -m-2">
+          <div className="w-full md:w-1/2 p-2 relative">
+            <div className="flex flex-wrap justify-end -m-2 ">
               <div className="w-full md:w-auto p-2"></div>
-              <div className="w-full md:w-auto p-2">
+              <div className="w-full md:w-auto p-2 flex flex-row items-center">
                 {showPayRentButton && <PayRentButton />}
                 {showAcceptInvitationButton && <AcceptInvitationButton />}
                 {showEmailTenantButton && <EmailTenantButton />}
                 {showResendInviteButton && <ResendInviteButton />}
+                <RentalRecordSettings onClick={() => setOpen((e) => !e)} />
+                {open && <RentalRecordShare divRef={dropdownRef} />}
+                {/* <RentalRecordShare divRef={dropdownRef} /> */}
               </div>
               <div className="w-full md:w-auto p-2"></div>
             </div>

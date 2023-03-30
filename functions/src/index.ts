@@ -12,8 +12,8 @@ import { sendRemindersForFents } from "./events/rentReminders";
 // // https://firebase.google.com/docs/functions/typescript
 //
 export const triggerSchedule = functions.pubsub
-  .schedule("0 0 * * * *") //This will be run every day at 12:00 AM
-  .onRun((context) => {
+  .schedule("0 0 * * *") // This will be run every day at 12:00 AM
+  .onRun(() => {
     sendRemindersForFents();
     return null;
   });

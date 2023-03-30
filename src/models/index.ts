@@ -1,3 +1,8 @@
+export enum UserType {
+  "individual" = "individual",
+  "company" = "company",
+}
+
 export type User = {
   firstName: string;
   lastName: string;
@@ -9,6 +14,7 @@ export type User = {
   balance: number;
   directRemitance?: boolean;
   remittanceAccount?: string;
+  userType?: UserType;
 };
 export type RentType = "month" | "year";
 
@@ -101,6 +107,7 @@ export enum FirebaseCollections {
   userKYC = "userKYC",
   transaction = "transaction",
   bankReord = "bankReord",
+  companies = "companies",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -140,6 +147,7 @@ export type MoneyTransaction = {
   serviceFee: number;
   payer: string;
   payee: string;
+  receiptNumber: string;
 };
 export type YesOrNo = "yes" | "no";
 
@@ -234,4 +242,41 @@ export type LodgeekNotification = {
     type?: "button" | "link";
     link?: string;
   }[];
+};
+
+/** 
+  * 
+  * 1. Company Owners:
+  Primary Owners can assign Company Owners. They have the same level of permissions as the Primary Owner, except they can’t delete or transfer ownership of a Company.
+  2. Company Admins:
+  Company Owners can assign Company Admins. They help manage members and can perform other administrative tasks.
+  3. Regular members
+  Members have access to use features in Lodgeek, except for those that are limited to only owners and admins.
+*/
+type CompanyRole = "owner" | "admin" | "regular";
+type CompanyMember = {
+  email: string;
+  role: CompanyRole;
+  dateJoined: number;
+};
+
+export type Company = {
+  id: string;
+  name: string;
+  registrationNumber: string;
+  address: string;
+  phone: string;
+  email: string;
+  size: string;
+  logo: string;
+  createdBy: string;
+  /**
+   * Company Primary Owner:
+    A Lodgeek Company has a single Primary Owner. Only this person can delete the Company or transfer ownership to someone else.
+   */
+  primaryOwner: string;
+  createdAt: number;
+  updatedAt: number;
+  team: string[];
+  members: CompanyMember[];
 };

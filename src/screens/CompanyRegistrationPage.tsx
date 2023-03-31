@@ -126,7 +126,7 @@ function CompanyRegistrationPage() {
             const decodedRedirectUrl = base64.decode(redirectFromQuery);
             navigate(decodedRedirectUrl);
           } else {
-            navigate("/dashboard?tab=rentalRecords");
+            navigate("/dashboard/rentalRecords");
           }
         })
         .finally(() => {

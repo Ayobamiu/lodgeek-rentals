@@ -76,7 +76,7 @@ export const generateSimpleEmail = (props: SimpleEmailProps): string => {
           </div>
           <div class="p-10">
             <div class="flex">
-              <a href="https://lodgeek-rentals.vercel.app/"
+              <a href="${process.env.REACT_APP_BASE_URL}"
                 ><small class="grey">Lodgeek Inc.</small></a
               >
             </div>

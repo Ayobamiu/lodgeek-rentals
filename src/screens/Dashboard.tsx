@@ -16,6 +16,7 @@ import RentalRecordDetails from "./DashboardTabs/RentalRecordDetails";
 import { ReactComponent as FlexUIGreenLight } from "../assets/logo-no-background.svg";
 import BankRecords from "./DashboardTabs/BankRecords";
 import Wallet from "./DashboardTabs/Wallet";
+import { manageRedirectAndUserCompanies } from "../firebase/apis/manageRedirectAndUserCompanies";
 
 export default function Dashboard() {
   let query = useQuery();
@@ -26,13 +27,12 @@ export default function Dashboard() {
   const emailFromQuery = query.get("email") as string;
 
   useEffect(() => {
-    if (!loggedInUser?.email) {
-      if (redirectFromQuery) {
-        navigate(`/auth?redirect=${redirectFromQuery}&email=${emailFromQuery}`);
-      } else {
-        navigate("/auth");
-      }
-    }
+    manageRedirectAndUserCompanies(
+      loggedInUser,
+      redirectFromQuery,
+      navigate,
+      emailFromQuery
+    )();
   }, [loggedInUser, navigate]);
 
   useEffect(() => {
@@ -60,6 +60,7 @@ export default function Dashboard() {
       </div>
     );
   }
+
   return (
     <div className="">
       <section className="overflow-hidden">

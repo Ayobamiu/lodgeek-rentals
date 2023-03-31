@@ -256,7 +256,7 @@ function useBanks() {
 
             toast(res.data.message, { type: "success" });
             if (type === "fromUserAccountToAccountNumber") {
-              navigate("/dashboard?tab=bankRecords");
+              navigate("/dashboard/bankRecords");
             }
           })
           .catch((error) => {

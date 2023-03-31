@@ -62,7 +62,7 @@ const CompanySelector = () => {
               <button
                 onClick={() => {
                   dispatch(setSelectedCompany(company));
-                  navigate(`/dashboard?tab=rentalRecords`);
+                  navigate(`/dashboard/rentalRecords`);
                 }}
                 key={company.id}
                 className="w-full h-20 flex p-10 items-center shadow-lg rounded bg-gray-300 justify-between mb-5"

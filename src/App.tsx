@@ -11,6 +11,10 @@ import NotificationModal from "./components/shared/NotificationModal";
 import SupportFab from "./components/shared/button/SupportFab";
 import { useState } from "react";
 import SupportChannelModal from "./components/homepage/SupportChannelModal";
+import RegistrationPage from "./screens/RegistrationPage";
+import CompanyRegistrationPage from "./screens/CompanyRegistrationPage";
+import CompanySelector from "./screens/CompanySelector";
+import IndividualRegistrationPage from "./screens/IndividualRegistrationPage";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -24,6 +28,16 @@ function App() {
       <NotificationModal />
       <BrowserRouter>
         <Routes>
+          <Route
+            path="/individual-registration"
+            element={<IndividualRegistrationPage />}
+          />
+          <Route
+            path="/company-registration"
+            element={<CompanyRegistrationPage />}
+          />
+          <Route path="/select-accounts" element={<CompanySelector />} />
+          <Route path="/get-started" element={<RegistrationPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/" element={<HomePage />} />

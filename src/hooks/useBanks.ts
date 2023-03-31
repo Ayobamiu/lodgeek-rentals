@@ -237,6 +237,7 @@ function useBanks() {
                       serviceFee: 0,
                       status: "success",
                       type: "minus",
+                      receiptNumber: uuidv4(),
                     };
 
                     await setDoc(

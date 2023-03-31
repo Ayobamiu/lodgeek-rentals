@@ -48,6 +48,7 @@ import { generateSimpleEmail } from "../utils/generateSimpleEmail";
 import base64 from "base-64";
 import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionAndAmount";
 import useBanks from "./useBanks";
+import { v4 as uuidv4 } from "uuid";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -246,6 +247,7 @@ const useRentalRecords = () => {
           serviceFee: 0,
           status: "success",
           type: "plus",
+          receiptNumber: uuidv4(),
         };
 
         await setDoc(

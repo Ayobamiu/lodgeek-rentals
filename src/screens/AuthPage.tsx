@@ -5,20 +5,30 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import { selectUser } from "../app/features/userSlice";
 import base64 from "base-64";
+import { getUserCompanies } from "../firebase/apis/company";
+import { selectCompanies } from "../app/features/companySlice";
+import { useDispatch } from "react-redux";
+import { manageUserWithDefaultCompany } from "../firebase/apis/manageUserWithDefaultCompany";
 
 export default function AuthPage() {
   let queryS = useQuery();
   const loggedInUser = useAppSelector(selectUser);
   const navigate = useNavigate();
   const redirectFromQuery = queryS.get("redirect") as string;
-
+  const companies = useAppSelector(selectCompanies);
+  const dispatch = useDispatch();
   useEffect(() => {
     if (loggedInUser?.email) {
       if (redirectFromQuery) {
         const decodedRedirectUrl = base64.decode(redirectFromQuery);
         navigate(decodedRedirectUrl);
       } else {
-        navigate("/select-accounts");
+        manageUserWithDefaultCompany(
+          loggedInUser,
+          companies,
+          dispatch,
+          navigate
+        );
       }
     }
   }, [loggedInUser, navigate]);

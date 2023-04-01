@@ -23,6 +23,7 @@ const initialNewRentalRecord: RentalRecord = {
   rentInstruction: "",
   tenantAgreed: false,
   tenantAgreedOn: -1,
+  company: "",
 };
 const initialUserKYC: UserKYC = {
   associatedWithFelonyOrMisdemeanor: "no",

@@ -214,9 +214,9 @@ const useRentalRecords = () => {
     rentBatch
       .commit()
       .then(async () => {
-        const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}`;
+        const redirectURL = `/dashboard/rentalRecords/${rentalRecordId}`;
         const encodedRedirectUrl = base64.encode(redirectURL);
-        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordId}&redirect=${encodedRedirectUrl}&email=${owner}`;
+        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${rentalRecordId}?redirect=${encodedRedirectUrl}&email=${owner}`;
 
         var { transactionDescription, totalAmount } =
           getTransactionDescriptionAndAmount(
@@ -444,9 +444,9 @@ const useRentalRecords = () => {
 
   async function sendEmailInvitationToTenant(props: TenantInviteProps) {
     const { rentalRecordData, property, loggedInUser } = props;
-    const redirectURL = `/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`;
+    const redirectURL = `/dashboard/rentalRecords/${rentalRecordData.id}`;
     const encodedRedirectUrl = base64.encode(redirectURL);
-    const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}&redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
+    const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard/rentalRecords/${rentalRecordData.id}?redirect=${encodedRedirectUrl}&email=${rentalRecordData.tenant}`;
     const email = generateSimpleEmail({
       paragraphs: [
         `Click on the link below to manage your rent at ${property?.title}.`,

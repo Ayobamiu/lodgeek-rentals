@@ -29,22 +29,26 @@ export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
             <small>{company?.email}</small>
           </div>
         </div>
-        <Link
-          to="/dashboard/invites"
-          className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
-        >
-          <div className="text-white">
-            <small>Invite people to {company?.name}</small>
-          </div>
-        </Link>
-        <Link
-          to="/dashboard/settings"
-          className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
-        >
-          <div className="text-white">
-            <small>Settings & Administration</small>
-          </div>
-        </Link>
+        {company && (
+          <Link
+            to={`/dashboard/${company.id}/invites`}
+            className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
+          >
+            <div className="text-white">
+              <small>Invite people to {company.name}</small>
+            </div>
+          </Link>
+        )}
+        {company && (
+          <Link
+            to={`/dashboard/${company.id}/settings`}
+            className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
+          >
+            <div className="text-white">
+              <small>Settings & Administration</small>
+            </div>
+          </Link>
+        )}
         <Link
           to="/dashboard"
           className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"

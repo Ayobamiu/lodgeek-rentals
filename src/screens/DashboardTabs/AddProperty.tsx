@@ -8,6 +8,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/features/userSlice";
 import { generateFirebaseId, PROPERTY_PATH } from "../../firebase/config";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function AddProperty() {
   const [rent, setRent] = useState(0);
@@ -19,6 +20,7 @@ export default function AddProperty() {
   const navigate = useNavigate();
   const { addProperty, addingProperty } = useProperties();
   const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const submitStageOne = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,6 +40,7 @@ export default function AddProperty() {
       description,
       owner: loggedInUser?.email,
       id: generateFirebaseId(PROPERTY_PATH),
+      company: selectedCompany?.id || "",
     };
 
     await addProperty(data).then(() => {
@@ -47,8 +50,9 @@ export default function AddProperty() {
       addPropertyForm && addPropertyForm.reset();
     });
   };
+
   const gotoProperties = () => {
-    navigate("/dashboard/properties");
+    navigate(`/dashboard/${selectedCompany?.id}/properties`);
   };
 
   return (

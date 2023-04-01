@@ -35,6 +35,7 @@ import formatPrice from "../utils/formatPrice";
 import { setNotification } from "../app/features/notificationSlice";
 import { sendEmail } from "../api/email";
 import { useNavigate } from "react-router-dom";
+import { selectSelectedCompany } from "../app/features/companySlice";
 type ProcessItProps = {
   data: {
     type: string;
@@ -66,6 +67,7 @@ function useBanks() {
 
   const loggedInUser = useAppSelector(selectUser);
   const bankRecords = useAppSelector(selectBankRecords);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const [processingWithdrawal, setProcessingWithdrawal] = useState(false);
 
   const getUsersBankRecords = useCallback(async () => {
@@ -256,7 +258,7 @@ function useBanks() {
 
             toast(res.data.message, { type: "success" });
             if (type === "fromUserAccountToAccountNumber") {
-              navigate("/dashboard/bankRecords");
+              navigate(`/dashboard/${selectedCompany?.id}/bankRecords`);
             }
           })
           .catch((error) => {

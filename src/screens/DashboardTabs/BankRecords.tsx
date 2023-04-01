@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useAuth from "../../hooks/useAuth";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function BankRecords() {
   const [openAddRecordModal, setOpenAddRecordModal] = useState(false);
@@ -22,6 +23,7 @@ export default function BankRecords() {
   const redirectToAddRentalRecords = query.get("redirect");
   const loggedInUser = useAppSelector(selectUser);
   const bankRecords = useAppSelector(selectBankRecords);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const [updatingDirectRemittance, setUpdatingDirectRemittance] =
     useState(false);
   const { updateDefaultRemittanceAccount } = useAuth();
@@ -95,7 +97,7 @@ export default function BankRecords() {
                         </div>
                       ) : (
                         <Link
-                          to="/dashboard/withdraw"
+                          to={`/dashboard/${selectedCompany?.id}/withdraw`}
                           className="w-full md:w-auto p-1.5"
                         >
                           <button className="flex flex-wrap justify-center w-full px-4 py-2 bg-green-500 hover:bg-green-600 font-medium text-sm text-white border border-green-500 rounded-md shadow-button">
@@ -105,7 +107,7 @@ export default function BankRecords() {
                       )}
                       {redirectToAddRentalRecords === "addRentalRecords" && (
                         <Link
-                          to="/dashboard/rentalRecords/new"
+                          to={`/dashboard/${selectedCompany?.id}/rentalRecords/new`}
                           className="w-full md:w-auto p-1.5"
                         >
                           <button

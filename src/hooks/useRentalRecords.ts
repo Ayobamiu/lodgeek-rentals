@@ -49,6 +49,7 @@ import base64 from "base-64";
 import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionAndAmount";
 import useBanks from "./useBanks";
 import { v4 as uuidv4 } from "uuid";
+import { selectSelectedCompany } from "../app/features/companySlice";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -56,6 +57,7 @@ const useRentalRecords = () => {
   const rentalRecords = useAppSelector(selectRentalRecords);
   const loggedInUser = useAppSelector(selectUser);
   const properties = useAppSelector(selectProperties);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const { processWithdrawal } = useBanks();
   const getUsersRentalRecords = useCallback(async () => {
@@ -83,7 +85,7 @@ const useRentalRecords = () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
     const q = query(
       rentalRecordsCol,
-      where("owner", "==", loggedInUser?.email)
+      where("company", "==", selectedCompany?.id)
     );
 
     await getDocs(q)
@@ -98,7 +100,7 @@ const useRentalRecords = () => {
         toast.error("Error Loading Rental Records");
       })
       .finally(() => {});
-  }, [loggedInUser?.email, dispatch]);
+  }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
     if (!rentalRecords.length) {
@@ -110,6 +112,7 @@ const useRentalRecords = () => {
     rentalRecords.length,
     getUsersRentalRecords,
     getRentalRecordsForYourTenants,
+    selectedCompany,
   ]);
 
   async function handleAddRentalRecord(data: RentalRecord, rents: Rent[]) {

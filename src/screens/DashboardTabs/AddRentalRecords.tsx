@@ -169,14 +169,14 @@ export default function AddRentalRecords() {
   };
 
   useEffect(() => {
-    if (loggedInUser?.remittanceAccount) {
+    if (selectedCompany?.remittanceAccount) {
       dispatch(
         updateNewRentalRecord({
-          remittanceAccount: loggedInUser?.remittanceAccount,
+          remittanceAccount: selectedCompany?.remittanceAccount,
         })
       );
     }
-  }, [loggedInUser?.remittanceAccount]);
+  }, [selectedCompany?.remittanceAccount]);
 
   const addRentalRecord = async () => {
     await handleAddRentalRecord(newRentalRecord, rents).then(gotoRentalRecords);
@@ -344,7 +344,7 @@ export default function AddRentalRecords() {
                           className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
                           placeholder="Doe"
                           value={newRentalRecord.remittanceAccount}
-                          defaultValue={loggedInUser?.remittanceAccount}
+                          defaultValue={selectedCompany?.remittanceAccount}
                           onChange={(e) =>
                             dispatch(
                               updateNewRentalRecord({
@@ -357,8 +357,8 @@ export default function AddRentalRecords() {
                             <option value={record.id}>
                               {record.accountNumber} - {record.bankName} -{" "}
                               {record.accountName}{" "}
-                              {loggedInUser?.remittanceAccount === record.id &&
-                                "(default account)"}
+                              {selectedCompany?.remittanceAccount ===
+                                record.id && "(default account)"}
                             </option>
                           ))}
                         </select>

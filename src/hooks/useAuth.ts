@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { auth, db, USER_PATH } from "../firebase/config";
 import { collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import { FirebaseCollections, User } from "../models";
+import { Company, FirebaseCollections, User } from "../models";
 import { toast } from "react-toastify";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   addUser as addUserToStore,
-  selectUser,
   selectUsers,
   setLoadingLoggedInUser,
   updateUser,
@@ -17,6 +16,11 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
+import {
+  selectSelectedCompany,
+  setSelectedCompany,
+  updateCompany,
+} from "../app/features/companySlice";
 
 const useAuth = () => {
   const [signingIn, setSigningIn] = useState(false);
@@ -25,7 +29,7 @@ const useAuth = () => {
   const usersRef = collection(db, FirebaseCollections.users);
   const [currentUser, setCurrentUser] = useState<any>();
   const users = useAppSelector(selectUsers);
-  const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const dispatch = useAppDispatch();
   const getLoggedInUser = useCallback(
@@ -59,10 +63,10 @@ const useAuth = () => {
 
   const addUser = async (data: User) => {
     await setDoc(doc(usersRef, data.email), data)
-      .then((c) => {
+      .then(() => {
         return data;
       })
-      .catch((error) => {
+      .catch(() => {
         return null;
       });
   };
@@ -122,7 +126,6 @@ const useAuth = () => {
   };
 
   const handleSignOutUser = () => {
-    let text = "Are you sure to Log out?";
     // if (window.confirm(text) == true) {
     setSigningOut(true);
     signOut(auth)
@@ -130,7 +133,7 @@ const useAuth = () => {
         // Sign-out successful.
         dispatch(updateUser(undefined));
       })
-      .catch((error) => {
+      .catch(() => {
         // An error happened.
       })
       .finally(() => {
@@ -156,21 +159,22 @@ const useAuth = () => {
   };
 
   const updateDefaultRemittanceAccount = async (id: string) => {
-    const ownerRef = doc(
+    const selectedCompanyRef = doc(
       db,
-      FirebaseCollections.users,
-      loggedInUser?.email || ""
+      FirebaseCollections.companies,
+      selectedCompany?.id || ""
     );
-    const docSnap = await getDoc(ownerRef);
+    const docSnap = await getDoc(selectedCompanyRef);
     if (docSnap.exists()) {
-      const ownerDoc = docSnap.data() as User;
-      const updatedUser: User = {
-        ...ownerDoc,
+      const selectedCompanyDoc = docSnap.data() as Company;
+      const updatedCompany: Company = {
+        ...selectedCompanyDoc,
         remittanceAccount: id,
       };
-      await updateDoc(ownerRef, updatedUser)
-        .then((c) => {
-          dispatch(updateUser(updatedUser));
+      await updateDoc(selectedCompanyRef, updatedCompany)
+        .then(() => {
+          dispatch(updateCompany(updatedCompany));
+          dispatch(setSelectedCompany(updatedCompany));
         })
         .finally(() => {});
     }

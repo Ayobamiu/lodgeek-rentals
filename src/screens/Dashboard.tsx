@@ -7,11 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { manageRedirectAndUserCompanies } from "../firebase/apis/manageRedirectAndUserCompanies";
 import DashboardWrapper from "../components/dashboard/DashboardWrapper";
 import CompanySelector from "./CompanySelector";
+import { selectSelectedCompany } from "../app/features/companySlice";
 
 export default function Dashboard() {
   let query = useQuery();
   const navigate = useNavigate();
   const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const redirectFromQuery = query.get("redirect") as string;
   const emailFromQuery = query.get("email") as string;
 

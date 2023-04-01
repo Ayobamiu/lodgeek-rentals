@@ -18,7 +18,11 @@ export default function AuthPage() {
         const decodedRedirectUrl = base64.decode(redirectFromQuery);
         navigate(decodedRedirectUrl);
       } else {
-        navigate("/select-accounts");
+        if (loggedInUser.defaultCompany) {
+          navigate(`/dashboard/${loggedInUser.defaultCompany}/rentalRecords`);
+        } else {
+          navigate("/select-accounts");
+        }
       }
     }
   }, [loggedInUser, navigate]);

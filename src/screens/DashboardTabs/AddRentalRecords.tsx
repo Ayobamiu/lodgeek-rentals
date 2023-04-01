@@ -27,6 +27,7 @@ import AdditionalfeeForm from "../../components/shared/AdditionalfeeForm";
 import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function AddRentalRecords() {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ export default function AddRentalRecords() {
   const properties = useAppSelector(selectProperties);
   const newRentalRecord = useAppSelector(selectNewRentalRecord);
   const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const submitStageOne = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,7 +57,7 @@ export default function AddRentalRecords() {
 
   function gotoRentalRecords() {
     dispatch(resetNewRentalRecord());
-    navigate("/dashboard/rentalRecords");
+    navigate(`/dashboard/${selectedCompany?.id}/rentalRecords`);
   }
 
   const goBack = () => {
@@ -103,6 +105,7 @@ export default function AddRentalRecords() {
         owner: loggedInUser?.email || "",
         tenant: newRentalRecord.tenant,
         paidOn: -1,
+        company: selectedCompany?.id || "",
       },
     ];
     for (let index = 1; index < 5; index++) {
@@ -120,6 +123,7 @@ export default function AddRentalRecords() {
         owner: loggedInUser?.email || "",
         tenant: newRentalRecord.tenant,
         paidOn: -1,
+        company: selectedCompany?.id || "",
       });
     }
     setRents(r);
@@ -159,6 +163,7 @@ export default function AddRentalRecords() {
       owner: loggedInUser?.email || "",
       tenant: newRentalRecord.tenant,
       paidOn: -1,
+      company: selectedCompany?.id || "",
     });
     setRents(currentRents);
   };

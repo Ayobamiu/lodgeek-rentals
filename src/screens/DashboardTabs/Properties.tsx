@@ -6,14 +6,13 @@ import { useAppSelector } from "../../app/hooks";
 import useProperties from "../../hooks/useProperties";
 import FuzzySearch from "fuzzy-search";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function Properties() {
   const navigate = useNavigate();
-  const gotoAddNewProperty = () => {
-    navigate("/dashboard/properties/new");
-  };
   useProperties();
   const properties = useAppSelector(selectProperties);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const [searchQuery, setSearchQuery] = useState("");
   const searcher = new FuzzySearch(
     properties,
@@ -27,6 +26,9 @@ export default function Properties() {
   if (searchQuery) {
     searchResults = searcher.search(searchQuery);
   }
+  const gotoAddNewProperty = () => {
+    navigate(`/dashboard/${selectedCompany?.id}/properties/new`);
+  };
 
   return (
     <DashboardWrapper>

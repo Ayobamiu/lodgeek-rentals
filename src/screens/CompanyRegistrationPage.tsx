@@ -126,7 +126,7 @@ function CompanyRegistrationPage() {
             const decodedRedirectUrl = base64.decode(redirectFromQuery);
             navigate(decodedRedirectUrl);
           } else {
-            navigate("/dashboard/rentalRecords");
+            navigate(`/dashboard/${companyData.id}/rentalRecords`);
           }
         })
         .finally(() => {
@@ -137,10 +137,12 @@ function CompanyRegistrationPage() {
         });
     }
   };
+
   const onReset = (e: any) => {
     e.preventDefault();
     navigate(`/get-started?redirect=${redirectFromQuery || ""}`);
   };
+
   return (
     <div className="lg:min-h-screen lg:w-screen lg:flex pt-20 justify-center items-center">
       <div className="w-full lg:w-1/2 flex flex-col items-center p-10 xl:px-24 xl:pb-12 bg-white lg:max-w-xl lg:mx-auto rounded-4xl shadow-2xl">

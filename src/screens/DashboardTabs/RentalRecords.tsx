@@ -7,18 +7,22 @@ import useBanks from "../../hooks/useBanks";
 import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { toast } from "react-toastify";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function RentalRecords() {
   const navigate = useNavigate();
   useBanks();
   const bankRecords = useAppSelector(selectBankRecords);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const gotoAddRentalRecords = () => {
     if (!bankRecords.length) {
       toast.info("Add payment details first.");
-      return navigate("/dashboard/bankRecords?redirect=addRentalRecords");
+      return navigate(
+        `/dashboard/${selectedCompany?.id}/bankRecords?redirect=addRentalRecords`
+      );
     }
-    navigate("/dashboard/rentalRecords/new");
+    navigate(`/dashboard/${selectedCompany?.id}/rentalRecords/new`);
   };
 
   useRentalRecords();

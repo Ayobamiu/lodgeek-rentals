@@ -14,7 +14,11 @@ export default function HomePage() {
   const navigate = useNavigate();
   useEffect(() => {
     if (loggedInUser?.email) {
-      navigate("/dashboard/rentalRecords");
+      if (loggedInUser.defaultCompany) {
+        navigate(`/dashboard/${loggedInUser.defaultCompany}/rentalRecords`);
+      } else {
+        navigate("/dashboard");
+      }
     }
   }, [loggedInUser, navigate]);
 

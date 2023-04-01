@@ -9,9 +9,11 @@ import { useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/features/userSlice";
 import useBanks from "../../hooks/useBanks";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 
 export default function Wallet() {
   const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const navigate = useNavigate();
   const { processWithdrawal, processingWithdrawal } = useBanks();
 
@@ -41,7 +43,7 @@ export default function Wallet() {
   }
 
   function gotoProperties() {
-    navigate("/dashboard/properties");
+    navigate(`/dashboard/${selectedCompany?.id}/properties`);
   }
 
   useEffect(() => {

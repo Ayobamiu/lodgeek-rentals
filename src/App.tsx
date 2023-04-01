@@ -48,23 +48,44 @@ function App() {
             <Route path="new" element={<NewPost />} /> {/*A nested route!*/}
             <Route path=":postId" element={<Post />} /> {/*A nested route!*/}
           </Route>
-          <Route path="dashboard/rentalRecords" element={<RentalRecords />} />
+          <Route
+            path="dashboard/:companyId/rentalRecords"
+            element={<RentalRecords />}
+          />
           <Route
             path="dashboard/rentalRecords/:id"
             element={<RentalRecordDetails />}
           />
           <Route
-            path="dashboard/rentalRecords/new"
+            path="dashboard/:companyId/rentalRecords/new"
             element={<AddRentalRecords />}
           />
-          <Route path="dashboard/paymentHistory" element={<PaymentHistory />} />
-          <Route path="dashboard/properties" element={<Properties />} />
-          <Route path="dashboard/properties/new" element={<AddProperty />} />
-          <Route path="dashboard/rents" element={<Rents />} />
-          <Route path="dashboard/bankRecords" element={<BankRecords />} />
-          <Route path="dashboard/withdraw" element={<Wallet />} />
-          <Route path="dashboard/settings" element={<SettingsPage />} />
-          <Route path="dashboard/invites" element={<InviteTeamMembersPage />} />
+          <Route
+            path="dashboard/:companyId/paymentHistory"
+            element={<PaymentHistory />}
+          />
+          <Route
+            path="dashboard/:companyId/properties"
+            element={<Properties />}
+          />
+          <Route
+            path="dashboard/:companyId/properties/new"
+            element={<AddProperty />}
+          />
+          <Route path="dashboard/:companyId/rents" element={<Rents />} />
+          <Route
+            path="dashboard/:companyId/bankRecords"
+            element={<BankRecords />}
+          />
+          <Route path="dashboard/:companyId/withdraw" element={<Wallet />} />
+          <Route
+            path="dashboard/:companyId/settings"
+            element={<SettingsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/invites"
+            element={<InviteTeamMembersPage />}
+          />
           <Route path="auth" element={<AuthPage />} />
         </Routes>
       </BrowserRouter>

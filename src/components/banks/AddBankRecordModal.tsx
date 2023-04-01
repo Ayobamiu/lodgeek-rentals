@@ -2,6 +2,7 @@ import { Transition } from "@headlessui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
 import { generateFirebaseId } from "../../firebase/config";
@@ -23,6 +24,8 @@ export function AddBankRecordModal(props: AddBankRecordProps) {
   const [banks, setBanks] = useState<PayStackBank[]>([]);
   const [bank, setBank] = useState<PayStackBank>();
   const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
+
   const { addBank } = useBanks();
 
   useEffect(() => {
@@ -87,6 +90,7 @@ export function AddBankRecordModal(props: AddBankRecordProps) {
       id: generateFirebaseId(FirebaseCollections.bankReord),
       updatedAt: Date.now(),
       user: loggedInUser?.email,
+      company: selectedCompany?.id || "",
     };
     setAddingBankRecord(true);
     await addBank(data)

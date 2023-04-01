@@ -230,6 +230,7 @@ export interface BankRecord {
   user: string;
   createdAt: number;
   updatedAt: number;
+  company: string;
 }
 export type TenantInviteProps = {
   rentalRecordData: RentalRecord;
@@ -283,4 +284,5 @@ export type Company = {
   updatedAt: number;
   team: string[];
   members: CompanyMember[];
+  remittanceAccount?: string;
 };

@@ -15,8 +15,10 @@ import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useAuth from "../../hooks/useAuth";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
+import useBanks from "../../hooks/useBanks";
 
 export default function BankRecords() {
+  useBanks();
   const [openAddRecordModal, setOpenAddRecordModal] = useState(false);
   let query = useQuery();
   const dispatch = useAppDispatch();
@@ -28,7 +30,7 @@ export default function BankRecords() {
     useState(false);
   const { updateDefaultRemittanceAccount } = useAuth();
   useEffect(() => {
-    if (!loggedInUser?.remittanceAccount && bankRecords.length > 0) {
+    if (!selectedCompany?.remittanceAccount && bankRecords.length > 0) {
       const firstRecord = bankRecords[0];
       updateDefaultRemittanceAccount(firstRecord.id);
     }
@@ -127,7 +129,9 @@ export default function BankRecords() {
               <section className="bg-coolGray-50 py-4">
                 <div className="container px-4 mx-auto">
                   <div className="mb-5 flex justify-between flex-wrap">
-                    <small>Your preferred bank account</small>
+                    <small className="text-green-500">
+                      Click on a bank record to set it as default
+                    </small>
                   </div>
                   <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
                     <div className="flex flex-wrap -m-2">

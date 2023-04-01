@@ -20,13 +20,16 @@ export default function RentalRecords() {
   useOnClickOutside(dropdownRef, () => setOpen(false));
   useBanks();
   const bankRecords = useAppSelector(selectBankRecords);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const gotoAddRentalRecords = () => {
     if (!bankRecords.length) {
       toast.info("Add payment details first.");
-      return navigate("/dashboard?tab=bankRecords&redirect=addRentalRecords");
+      return navigate(
+        `/dashboard/${selectedCompany?.id}/bankRecords?redirect=addRentalRecords`
+      );
     }
-    navigate("/dashboard?tab=addRentalRecords");
+    navigate(`/dashboard/${selectedCompany?.id}/rentalRecords/new`);
   };
 
   useRentalRecords();
@@ -76,28 +79,29 @@ export default function RentalRecords() {
                 {open && <RentalRecordShare divRef={dropdownRef} />}
                 {/* <RentalRecordShare divRef={dropdownRef} /> */}
               </div>
-              <div className="w-full md:w-auto p-2"></div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-coolGray-50 py-4">
-        <div className="container px-4 mx-auto">
-          <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
-            <div className="flex flex-wrap -m-2">
-              {rentalRecords.map((rentalRecord, index) => (
-                <RentalRecordItem rentalRecordData={rentalRecord} key={index} />
-              ))}
-              {!rentalRecords.length && (
-                <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">
-                  No rental records
-                </div>
-              )}
+        </section>
+        <section className="bg-coolGray-50 py-4">
+          <div className="container px-4 mx-auto">
+            <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
+              <div className="flex flex-wrap -m-2">
+                {rentalRecords.map((rentalRecord, index) => (
+                  <RentalRecordItem
+                    rentalRecordData={rentalRecord}
+                    key={index}
+                  />
+                ))}
+                {!rentalRecords.length && (
+                  <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">
+                    No rental records
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </DashboardWrapper>
   );
 }

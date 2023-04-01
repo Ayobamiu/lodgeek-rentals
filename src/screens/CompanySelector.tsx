@@ -114,7 +114,7 @@ const CompanySelector = () => {
                     {company.team.length > 1 ? "s" : ""}
                   </p>
                 </div>
-                {updatingUser && (
+                {updatingUser && selectedCompany?.id === company.id && (
                   <div className="absolute top-1 right-1">
                     <ActivityIndicator />
                   </div>

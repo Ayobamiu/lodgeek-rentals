@@ -286,3 +286,9 @@ export type Company = {
   members: CompanyMember[];
   remittanceAccount?: string;
 };
+
+export enum SettingsTab {
+  profile = "profile",
+  team = "team",
+  billing = "billing",
+}

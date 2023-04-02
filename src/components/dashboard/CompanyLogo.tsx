@@ -50,7 +50,7 @@ export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
           </Link>
         )}
         <Link
-          to="/dashboard"
+          to="/select-accounts"
           className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
         >
           <div className="text-white">

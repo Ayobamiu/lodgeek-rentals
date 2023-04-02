@@ -24,8 +24,11 @@ import Properties from "./screens/DashboardTabs/Properties";
 import Rents from "./screens/DashboardTabs/Rents";
 import BankRecords from "./screens/DashboardTabs/BankRecords";
 import Wallet from "./screens/DashboardTabs/Wallet";
-import SettingsPage from "./screens/SettingsPage";
+import CompanyProfileSettingsPage from "./screens/SettingsPages/CompanyProfileSettingsPage";
 import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
+import CompanyProfileEditPage from "./screens/SettingsPages/CompanyProfileEditPage";
+import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSettingsPage";
+import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -86,7 +89,19 @@ function App() {
           <Route path="dashboard/:companyId/withdraw" element={<Wallet />} />
           <Route
             path="dashboard/:companyId/settings"
-            element={<SettingsPage />}
+            element={<CompanyProfileSettingsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/profile"
+            element={<CompanyProfileEditPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/billing"
+            element={<CompanyBillingSettingsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/team"
+            element={<TeamCollaboration />}
           />
           <Route
             path="dashboard/:companyId/invites"

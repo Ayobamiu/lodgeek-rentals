@@ -23,6 +23,8 @@
     "firebase": "^9.15.0",
     "firebase-tools": "^11.19.0",
     "firebaseui": "^6.0.2",
+    "flowbite": "^1.6.4",
+    "flowbite-react": "^0.4.2",
     "font-awesome": "^4.7.0",
     "fuzzy-search": "^3.2.1",
     "global": "^4.4.0",

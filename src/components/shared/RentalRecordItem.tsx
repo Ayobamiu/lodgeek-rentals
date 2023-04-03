@@ -75,7 +75,7 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
       : "bg-gray-200 text-coolGray-500";
   return (
     <Link
-      to={`/dashboard?tab=rentalRecordDetails&rentalRecordId=${rentalRecordData.id}`}
+      to={`/dashboard/rentalRecords/${rentalRecordData.id}`}
       className="w-full p-2 hover:shadow-lg border-b border-coolGray-400"
     >
       <h3 className="mb-1 font-medium text-lg text-coolGray-900">

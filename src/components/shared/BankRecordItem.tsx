@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { confirmAlert } from "react-confirm-alert";
-import { selectUser } from "../../app/features/userSlice";
+import { selectSelectedCompany } from "../../app/features/companySlice";
 import { useAppSelector } from "../../app/hooks";
 import useAuth from "../../hooks/useAuth";
 import { BankRecord } from "../../models";
@@ -11,14 +11,14 @@ type RentalRecordItemProp = {
 };
 
 export default function BankRecordItem(props: RentalRecordItemProp) {
-  const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
   const { bankRecordData } = props;
   const { updateDefaultRemittanceAccount } = useAuth();
   const [updatingDefault, setUpdatingDefault] = useState(false);
   const onClickRecord = () => {
-    if (loggedInUser?.remittanceAccount === bankRecordData.id) return;
+    if (selectedCompany?.remittanceAccount === bankRecordData.id) return;
     confirmAlert({
-      title: `Change default account to ${bankRecordData.accountNumber} - ${bankRecordData.bankName} - ${bankRecordData.accountName}`,
+      title: `Set default account to ${bankRecordData.accountNumber} - ${bankRecordData.bankName} - ${bankRecordData.accountName}`,
       message: "",
       buttons: [
         {
@@ -44,7 +44,7 @@ export default function BankRecordItem(props: RentalRecordItemProp) {
       className="w-full p-2 hover:shadow-lg border-b border-coolGray-400 cursor-pointer"
       onClick={onClickRecord}
     >
-      {loggedInUser?.remittanceAccount === bankRecordData.id && (
+      {selectedCompany?.remittanceAccount === bankRecordData.id && (
         <small className="bg-green-500 p-1 text-white rounded">
           Default account
         </small>

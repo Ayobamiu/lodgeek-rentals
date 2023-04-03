@@ -9,12 +9,12 @@ import {
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { selectSelectedCompany } from "../app/features/companySlice";
 import {
   addProperty,
   selectProperties,
   setProperties,
 } from "../app/features/propertySlice";
-import { selectUser } from "../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { db, PROPERTY_PATH } from "../firebase/config";
 import { Property } from "../models";
@@ -24,11 +24,11 @@ const useProperties = () => {
   const [addingProperty, setAddingProperty] = useState(false);
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
-  const loggedInUser = useAppSelector(selectUser);
+  const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const getUsersProperties = useCallback(async () => {
     const propertiesCol = collection(db, PROPERTY_PATH);
-    const q = query(propertiesCol, where("owner", "==", loggedInUser?.email));
+    const q = query(propertiesCol, where("company", "==", selectedCompany?.id));
 
     await getDocs(q)
       .then((propertiesSnapshot) => {
@@ -42,13 +42,13 @@ const useProperties = () => {
         toast.error("Error Loading Properties");
       })
       .finally(() => {});
-  }, [loggedInUser?.email, dispatch]);
+  }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
     if (!properties.length) {
       getUsersProperties();
     }
-  }, [loggedInUser?.email, properties.length, getUsersProperties]);
+  }, [selectedCompany?.id, properties.length, getUsersProperties]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);

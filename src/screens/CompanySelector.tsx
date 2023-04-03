@@ -3,15 +3,21 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   selectCompanies,
   selectSelectedCompany,
   setCompanies,
   setSelectedCompany,
 } from "../app/features/companySlice";
-import { selectUser } from "../app/features/userSlice";
+import { selectUser, updateUser } from "../app/features/userSlice";
 import { useAppSelector } from "../app/hooks";
+import ActivityIndicator from "../components/shared/ActivityIndicator";
 import { getUserCompanies } from "../firebase/apis/company";
+import { manageRedirectAndUserCompanies } from "../firebase/apis/manageRedirectAndUserCompanies";
+import { updateUserInDatabase } from "../firebase/apis/user";
+import useQuery from "../hooks/useQuery";
+import { User } from "../models";
 
 const CompanySelector = () => {
   const companies = useAppSelector(selectCompanies);
@@ -19,7 +25,21 @@ const CompanySelector = () => {
   const loggedInUser = useAppSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  let query = useQuery();
+  const redirectFromQuery = query.get("redirect") as string;
+  const emailFromQuery = query.get("email") as string;
+
   const [loading, setLoading] = useState(false);
+  const [updatingUser, setUpdatingUser] = useState(false);
+
+  useEffect(() => {
+    manageRedirectAndUserCompanies(
+      loggedInUser,
+      redirectFromQuery,
+      navigate,
+      emailFromQuery
+    )();
+  }, [loggedInUser]);
 
   useEffect(() => {
     (async () => {
@@ -60,12 +80,32 @@ const CompanySelector = () => {
           <div className="pt-10 w-full ">
             {companies.map((company) => (
               <button
-                onClick={() => {
-                  dispatch(setSelectedCompany(company));
-                  navigate(`/dashboard?tab=rentalRecords`);
+                onClick={async () => {
+                  if (loggedInUser) {
+                    const updatedUser: User = {
+                      ...loggedInUser,
+                      defaultCompany: company.id,
+                    };
+                    setUpdatingUser(true);
+                    await updateUserInDatabase(updatedUser)
+                      .then(() => {
+                        dispatch(updateUser(updatedUser));
+                        dispatch(setSelectedCompany(company));
+                        navigate(`/dashboard/${company.id}/rentalRecords`);
+                      })
+                      .catch(() => {
+                        toast(
+                          "Error, try again! Contact Admin if error persists."
+                        );
+                      })
+                      .finally(() => {
+                        setUpdatingUser(false);
+                      });
+                  }
                 }}
+                disabled={updatingUser}
                 key={company.id}
-                className="w-full h-20 flex p-10 items-center shadow-lg rounded bg-gray-300 justify-between mb-5"
+                className="w-full h-20 flex p-10 items-center shadow-lg rounded bg-gray-300 justify-between mb-5 relative"
               >
                 <div className="text-left">
                   <span className="text-xl font-bold">{company.name}</span>
@@ -74,6 +114,11 @@ const CompanySelector = () => {
                     {company.team.length > 1 ? "s" : ""}
                   </p>
                 </div>
+                {updatingUser && (
+                  <div className="absolute top-1 right-1">
+                    <ActivityIndicator />
+                  </div>
+                )}
                 <FontAwesomeIcon
                   icon={faCheckCircle}
                   size="2x"

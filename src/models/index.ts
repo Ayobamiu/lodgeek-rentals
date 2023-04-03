@@ -14,6 +14,7 @@ export type User = {
   balance: number;
   directRemitance?: boolean;
   remittanceAccount?: string;
+  defaultCompany?: string;
   userType?: UserType;
 };
 export type RentType = "month" | "year";
@@ -21,6 +22,7 @@ export type RentType = "month" | "year";
 export type Property = {
   id: string;
   owner: string;
+  company: string;
   title: string;
   description: string;
   address: string;
@@ -43,6 +45,7 @@ export type RentalRecord = {
   tenant: string;
   rentInstruction: string;
   owner: string;
+  company: string;
   createdDate: number;
   rentStarts: number;
   rent: number;
@@ -81,6 +84,7 @@ export type Rent = {
   rentPer: RentType;
   tenant: string;
   owner: string;
+  company: string;
   sentAWeekReminder?: boolean;
   sentADayReminder?: boolean;
   sentFirstFailedRent?: boolean;
@@ -226,6 +230,7 @@ export interface BankRecord {
   user: string;
   createdAt: number;
   updatedAt: number;
+  company: string;
 }
 export type TenantInviteProps = {
   rentalRecordData: RentalRecord;
@@ -279,4 +284,5 @@ export type Company = {
   updatedAt: number;
   team: string[];
   members: CompanyMember[];
+  remittanceAccount?: string;
 };

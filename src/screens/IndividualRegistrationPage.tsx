@@ -76,7 +76,7 @@ function IndividualRegistrationPage() {
                     const decodedRedirectUrl = base64.decode(redirectFromQuery);
                     navigate(decodedRedirectUrl);
                   } else {
-                    navigate(`/dashboard?tab=rentalRecords`);
+                    navigate(`/dashboard/${companyData.id}/rentalRecords`);
                   }
                 })
                 .finally(() => {

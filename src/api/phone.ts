@@ -7,7 +7,7 @@ const sendToken = async (phone: string) => {
     api_key: process.env.REACT_APP_TERMII_API_KEY,
     message_type: "NUMERIC",
     to: phone,
-    from: "Usman",
+    from: "Lodgeek",
     channel: "generic",
     pin_attempts: 10,
     pin_time_to_live: 5,

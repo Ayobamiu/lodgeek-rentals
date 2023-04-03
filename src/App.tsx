@@ -29,6 +29,8 @@ import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
 import CompanyProfileEditPage from "./screens/SettingsPages/CompanyProfileEditPage";
 import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSettingsPage";
 import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
+import { SubscriptionNotification } from "./components/homepage/SubscriptionNotification";
+import SelectPlans from "./screens/SelectPlans";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -41,8 +43,10 @@ function App() {
       <SupportChannelModal open={modal} onCancel={() => setModal(false)} />
       <NotificationModal />
       <BrowserRouter>
+        <SubscriptionNotification closable />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="select-plans" element={<SelectPlans />} />
           <Route
             path="individual-registration"
             element={<IndividualRegistrationPage />}

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { selectCompanies, setCompanies } from "../app/features/companySlice";
@@ -23,6 +23,8 @@ const CompanySelector = () => {
   const redirectFromQuery = query.get("redirect") as string;
   const emailFromQuery = query.get("email") as string;
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     manageRedirectAndUserCompanies(
       loggedInUser,
@@ -35,9 +37,12 @@ const CompanySelector = () => {
   useEffect(() => {
     (async () => {
       if (loggedInUser) {
+        setLoading(true);
         const userCompanies = await getUserCompanies(
           loggedInUser.email
-        ).finally(() => {});
+        ).finally(() => {
+          setLoading(false);
+        });
 
         if (userCompanies) {
           dispatch(setCompanies(userCompanies));
@@ -69,6 +74,7 @@ const CompanySelector = () => {
           associated with it.
         </p>
         <div className="flow-root">
+          {loading && <ActivityIndicator />}
           <ul
             role="list"
             className="divide-y divide-gray-200 dark:divide-gray-700"

@@ -285,6 +285,9 @@ export type Company = {
   team: string[];
   members: CompanyMember[];
   remittanceAccount?: string;
+  planCode?: string;
+  subscriptionCode?: string;
+  nextPaymentDate?: string;
 };
 
 export enum SettingsTab {
@@ -292,3 +295,91 @@ export enum SettingsTab {
   team = "team",
   billing = "billing",
 }
+
+type PayStackAuthorization = {
+  account_name: string;
+  authorization_code: string;
+  bank: string;
+  bin: string;
+  brand: string;
+  card_type: string;
+  channel: string;
+  country_code: string;
+  exp_month: string;
+  exp_year: string;
+  last4: string;
+  receiver_bank: string;
+  receiver_bank_account_number: string;
+  reusable: boolean;
+  signature: string;
+};
+
+type PayStackPlan = {
+  domain: string;
+  name: string;
+  plan_code: string;
+  description: null;
+  amount: number;
+  interval: string;
+  send_invoices: boolean;
+  send_sms: boolean;
+  hosted_page: false;
+  hosted_page_url: null;
+  hosted_page_summary: null;
+  currency: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type PayStackCustomer = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: null;
+  metadata: {
+    photos: {
+      type: string;
+      typeId: string;
+      typeName: string;
+      url: string;
+      isPrimary: false;
+    }[];
+  };
+  domain: string;
+  customer_code: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PayStackSubscription = {
+  invoices: any[];
+  customer: PayStackCustomer;
+  plan: PayStackPlan;
+  integration: number;
+  authorization: PayStackAuthorization;
+  domain: string;
+  start: number;
+  /**1. active: The subscription is currently active, and will be charged on the next payment date.
+   * 2. non-renewing: The subscription is currently active, but we won't be charging it on the next payment date. This occurs when a subscription is about to be complete, or has been cancelled (but we haven't reached the next payment date yet).
+   * 3. attention: The subscription is still active, but there was an issue while trying to charge the customer's card. The issue can be an expired card, insufficient funds, etc. We'll attempt charging the card again on the next payment date.
+   * 4. completed: The subscription is complete, and will no longer be charged.
+   * 5. cancelled: The subscription has been cancelled, and we'll no longer attempt to charge the card on the subscription.
+   */
+  status: "active" | "non-renewing" | "attention" | "completed" | "cancelled";
+  quantity: 1;
+  amount: number;
+  subscription_code: string;
+  email_token: string;
+  easy_cron_id: null;
+  cron_expression: string;
+  next_payment_date: string;
+  open_invoice: null;
+  id: number;
+  cancelledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};

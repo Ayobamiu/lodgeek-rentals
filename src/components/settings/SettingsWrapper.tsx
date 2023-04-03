@@ -20,9 +20,10 @@ const SettingsWrapper = ({ children }: { children: React.ReactNode }) => {
     <DashboardWrapper>
       <div className="max-w-5xl mx-auto py-10 px-5 xl:px-24 xl:pb-12">
         <h2 className="font-semibold text-black text-3xl">Settings</h2>
-        <p className="text-black">
+        <p className="text-black mb-5">
           Adjust workspace-wide settings and preferences here for{" "}
-          {selectedCompany?.name}. You can also manage members and roles.
+          <strong>{selectedCompany?.name}</strong>. You can also manage members
+          and roles.
         </p>
 
         <div className="mb-4 border-b border-gray-200 dark:border-gray-700">

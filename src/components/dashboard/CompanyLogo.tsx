@@ -31,7 +31,7 @@ export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
         </div>
         {company && (
           <Link
-            to={`/dashboard/${company.id}/invites`}
+            to={`/dashboard/${company.id}/settings/team`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
             <div className="text-white">
@@ -41,7 +41,7 @@ export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
         )}
         {company && (
           <Link
-            to={`/dashboard/${company.id}/settings`}
+            to={`/dashboard/${company.id}/settings/profile`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
             <div className="text-white">

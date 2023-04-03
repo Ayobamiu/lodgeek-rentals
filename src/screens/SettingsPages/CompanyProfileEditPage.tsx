@@ -2,33 +2,22 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
-  addCompany,
   selectSelectedCompany,
   setSelectedCompany,
+  updateCompany,
 } from "../../app/features/companySlice";
-import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
 import AppInput from "../../components/shared/AppInput";
-import { createCompany } from "../../firebase/apis/company";
-import { generateFirebaseId } from "../../firebase/config";
+import { updateCompanyInDatabase } from "../../firebase/apis/company";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
-import useQuery from "../../hooks/useQuery";
-import { Company, FirebaseCollections } from "../../models";
-import PhoneInput from "react-phone-input-2";
-import { sendToken, verifyToken } from "../../api/phone";
-import base64 from "base-64";
+import { Company } from "../../models";
 import SettingsWrapper from "../../components/settings/SettingsWrapper";
+import ActivityIndicator from "../../components/shared/ActivityIndicator";
 
 function CompanyProfileEditPage() {
-  const navigate = useNavigate();
-  let query = useQuery();
-  const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
-  console.log({ selectedCompany });
-
   const dispatch = useDispatch();
 
   const [name, setName] = useState(selectedCompany?.name || "");
@@ -39,14 +28,8 @@ function CompanyProfileEditPage() {
     selectedCompany?.registrationNumber || ""
   );
   const [logo, setLogo] = useState(selectedCompany?.logo || "");
-  const [size, setSize] = useState(selectedCompany?.size || "");
-
-  const [phoneVerified, setPhoneVerified] = useState(false);
-
-  const [signingIn, setSigningIn] = useState(false);
+  const [updatingCompany, setUpdatingCompany] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
-
-  const redirectFromQuery = query.get("redirect") as string;
 
   const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
@@ -72,50 +55,30 @@ function CompanyProfileEditPage() {
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
-    if (!phoneVerified) {
-      return toast("Verify your phone number!", { type: "info" });
-    }
 
-    if (loggedInUser) {
-      const companyData: Company = {
-        address,
-        createdAt: Date.now(),
-        createdBy: loggedInUser?.email,
-        email,
-        id: generateFirebaseId(FirebaseCollections.companies),
-        logo,
-        members: [
-          {
-            dateJoined: Date.now(),
-            email: loggedInUser.email,
-            role: "owner",
-          },
-        ],
-        name,
-        phone,
-        primaryOwner: loggedInUser.email,
-        registrationNumber,
-        size,
-        team: [loggedInUser.email],
+    if (selectedCompany) {
+      const updatedCompanyData: Company = {
+        ...selectedCompany,
         updatedAt: Date.now(),
+        logo,
+        name,
+        email,
+        phone,
+        address,
+        registrationNumber,
       };
-      setSigningIn(true);
-      await createCompany(companyData)
+      setUpdatingCompany(true);
+      await updateCompanyInDatabase(updatedCompanyData)
         .then(() => {
-          dispatch(addCompany(companyData));
-          dispatch(setSelectedCompany(companyData));
-          if (redirectFromQuery) {
-            const decodedRedirectUrl = base64.decode(redirectFromQuery);
-            navigate(decodedRedirectUrl);
-          } else {
-            navigate(`/dashboard/${companyData.id}/rentalRecords`);
-          }
+          dispatch(updateCompany(updatedCompanyData));
+          dispatch(setSelectedCompany(updatedCompanyData));
+          toast("Account updated.", { type: "success" });
         })
         .finally(() => {
-          setSigningIn(false);
+          setUpdatingCompany(false);
         })
         .catch(() => {
-          toast("Error creating company.", { type: "error" });
+          toast("Error updating account.", { type: "error" });
         });
     }
   };
@@ -128,7 +91,7 @@ function CompanyProfileEditPage() {
         </h2>
 
         <form onSubmit={onSubmit} className="w-full">
-          <label htmlFor="logo" className="cursor-pointer">
+          <label htmlFor="logo" className="cursor-pointer  inline-block w-auto">
             {logo ? (
               <img
                 src={logo}
@@ -148,13 +111,9 @@ function CompanyProfileEditPage() {
               disabled={uploadingLogo}
               onChange={handleUploadLogo}
             />
-            {uploadingLogo && (
-              <svg
-                className=" absolute animate-spin h-5 w-5 rounded-full border-t-2 border-r-2 border-green-500 "
-                viewBox="0 0 24 24"
-              ></svg>
-            )}
+            {uploadingLogo && <ActivityIndicator />}
           </label>
+          <br />
           <label className="mb-1 text-coolGray-800 font-medium" htmlFor="name">
             Account Name:
           </label>
@@ -222,14 +181,7 @@ function CompanyProfileEditPage() {
             type="submit"
             className="mb-4 flex justify-center py-3 px-7 w-full leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
           >
-            {signingIn ? (
-              <svg
-                className="animate-spin h-5 w-5 mr-3 rounded-full border-t-2 border-r-2 border-white ml-2"
-                viewBox="0 0 24 24"
-              ></svg>
-            ) : (
-              "Update"
-            )}
+            {updatingCompany ? <ActivityIndicator /> : "Update"}
           </button>
         </form>
       </div>

@@ -3,10 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
 import SettingsWrapper from "../../components/settings/SettingsWrapper";
 
-import { Modal } from "flowbite";
-import type { ModalOptions, ModalInterface } from "flowbite";
-
-function TeamCollaboration() {
+const TeamCollaboration = () => {
   const [teamMembers, setTeamMembers] = useState([
     { id: 1, name: "John Doe", role: "Designer" },
     { id: 2, name: "Jane Smith", role: "Developer" },
@@ -26,36 +23,16 @@ function TeamCollaboration() {
     setNewMemberRole("");
   };
 
-  const $modalElement: HTMLElement = document.querySelector("#modalEl");
-
-  const modalOptions: ModalOptions = {
-    placement: "bottom-right",
-    backdrop: "dynamic",
-    backdropClasses:
-      "bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40",
-    closable: true,
-    onHide: () => {
-      console.log("modal is hidden");
-    },
-    onShow: () => {
-      console.log("modal is shown");
-    },
-    onToggle: () => {
-      console.log("modal has been toggled");
-    },
-  };
-
-  const modal: ModalInterface = new Modal($modalElement, modalOptions);
-
-  modal.show();
-
   return (
     <SettingsWrapper>
       <div className="flex flex-col max-w-5xl mx-auto">
-        <div className="mt-8 mb-4 flex items-center justify-between">
+        <div className="mt-8 mb-4 flex items-center justify-between flex-wrap gap-5">
           <h1 className="text-2xl font-bold">Team Members</h1>
-          <button className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none">
-            <FontAwesomeIcon icon={faPlus} className="h-5 w-5 mr-2" />
+          <button className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded focus:outline-none gap-x-2">
+            <FontAwesomeIcon
+              icon={faPlus}
+              className="h-5 w-5 hidden lg:block"
+            />
             Add Member
           </button>
         </div>
@@ -99,6 +76,6 @@ function TeamCollaboration() {
       </div>
     </SettingsWrapper>
   );
-}
+};
 
 export default TeamCollaboration;

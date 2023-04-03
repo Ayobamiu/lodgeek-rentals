@@ -1,6 +1,13 @@
-import { doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { Company } from "../../models";
-import { companyRef } from "../config";
+import {
+  doc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { Company, FirebaseCollections } from "../../models";
+import { companyRef, db } from "../config";
 
 export async function getUserCompanies(email: string) {
   const q = query(
@@ -22,3 +29,8 @@ export async function getUserCompanies(email: string) {
 export async function createCompany(company: Company) {
   return await setDoc(doc(companyRef, company.id), company);
 }
+
+export const updateCompanyInDatabase = async (company: Company) => {
+  const docRef = doc(db, FirebaseCollections.companies, company.id);
+  return await updateDoc(docRef, company);
+};

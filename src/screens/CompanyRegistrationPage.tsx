@@ -12,7 +12,7 @@ import { createCompany } from "../firebase/apis/company";
 import { generateFirebaseId } from "../firebase/config";
 import { UploadPhotoAsync } from "../firebase/storage_upload_blob";
 import useQuery from "../hooks/useQuery";
-import { Company, FirebaseCollections } from "../models";
+import { Company, CompanyRole, FirebaseCollections } from "../models";
 import PhoneInput from "react-phone-input-2";
 import { sendToken, verifyToken } from "../api/phone";
 import base64 from "base-64";
@@ -106,7 +106,7 @@ function CompanyRegistrationPage() {
           {
             dateJoined: Date.now(),
             email: loggedInUser.email,
-            role: "owner",
+            role: CompanyRole.owner,
           },
         ],
         name,

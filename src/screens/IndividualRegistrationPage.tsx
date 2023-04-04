@@ -9,7 +9,7 @@ import AppInput from "../components/shared/AppInput";
 import { createCompany } from "../firebase/apis/company";
 import { generateFirebaseId } from "../firebase/config";
 import useQuery from "../hooks/useQuery";
-import { Company, FirebaseCollections } from "../models";
+import { Company, CompanyRole, FirebaseCollections } from "../models";
 import base64 from "base-64";
 
 function IndividualRegistrationPage() {
@@ -56,7 +56,7 @@ function IndividualRegistrationPage() {
                   {
                     dateJoined: Date.now(),
                     email: loggedInUser.email,
-                    role: "owner",
+                    role: CompanyRole.owner,
                   },
                 ],
                 name,

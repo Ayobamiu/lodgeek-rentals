@@ -29,6 +29,8 @@ import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useProperties from "../../hooks/useProperties";
+// import { TextEncoder } from "util";
+// import TextEditor from "../../components/lib/rental/TextEditor";
 
 export default function AddRentalRecords() {
   const navigate = useNavigate();

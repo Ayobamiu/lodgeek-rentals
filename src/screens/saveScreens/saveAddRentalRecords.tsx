@@ -28,10 +28,8 @@ import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
-// import { TextEncoder } from "util";
-// import TextEditor from "../../components/lib/rental/TextEditor";
 
-export default function AddRentalRecords() {
+export default function SaveAddRentalRecords() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [stage, setStage] = useState<"one" | "two">("one");
@@ -48,15 +46,6 @@ export default function AddRentalRecords() {
   const newRentalRecord = useAppSelector(selectNewRentalRecord);
   const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
-  // Rental Agreement state
-  const [file, setFile] = useState<any>(null);
-
-  const chooseFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e?.target?.files && e.target.files[0]?.type !== "application/pdf") {
-      toast.warn("Only PDF files are allowed");
-      setFile(null);
-    }
-  };
 
   const submitStageOne = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -389,7 +378,6 @@ export default function AddRentalRecords() {
                     </div>
                   </div>
                 </div>
-                {/* Rent Instructions */}
                 <div className="py-6 border-b border-coolGray-100">
                   <div className="w-full md:w-9/12">
                     <div className="flex flex-wrap -m-3">
@@ -399,44 +387,22 @@ export default function AddRentalRecords() {
                         </p>
                       </div>
                       <div className="w-full md:flex-1 p-3">
-                        {/* Upload options */}
-                        <>
-                          <label
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-                            htmlFor="file_input"
-                          >
-                            Upload tenant agreement file
-                          </label>
-                          <input
-                            accept="application/pdf"
-                            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                            aria-describedby="file_input_help"
-                            id="file_input"
-                            type="file"
-                            // value={file?.name}
-                            onChange={(e) => {
-                              chooseFile(e);
-                            }}
-                          />
-                          <p
-                            className="mt-1 text-sm text-gray-500 dark:text-gray-300"
-                            id="file_input_help"
-                          >
-                            Only PDF file is allowed.
-                          </p>
-                        </>
-                        {/* <div className="flex flex-row items-center">
-                          <hr className="h-px my-8 bg-gray-300 border-0 w-[48%]" />
-                          <p className="text-sm font-semibold text-gray-400 px-5">
-                            OR
-                          </p>
-                          <hr className="h-px my-8 bg-gray-300 border-0 w-[48%]" />
-                        </div>
-
-                        <div className="w-full mt-5">
-                          <TextEditor />
-                        </div> */}
-
+                        <textarea
+                          name="rentInstruction"
+                          id="rentInstruction"
+                          cols={30}
+                          rows={10}
+                          onChange={(e) => {
+                            dispatch(
+                              updateNewRentalRecord({
+                                rentInstruction: e.target.value,
+                              })
+                            );
+                          }}
+                          className="w-full px-4 py-2.5 my-3 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                          about="Write some instructions you want the tenants to understand and or agree to."
+                          title="Write some instructions you want the tenants to understand and or agree to."
+                        ></textarea>
                         <small className="text-coolGray-400">
                           Write some instructions you want the tenants to
                           understand and or agree to.
@@ -445,7 +411,6 @@ export default function AddRentalRecords() {
                     </div>
                   </div>
                 </div>
-                {/* End of rent instructions */}
               </form>
             </div>
           </section>
@@ -679,23 +644,4 @@ export default function AddRentalRecords() {
       </div>
     </DashboardWrapper>
   );
-}
-
-{
-  /* <textarea
-                          name="rentInstruction"
-                          id="rentInstruction"
-                          cols={30}
-                          rows={10}
-                          onChange={(e) => {
-                            dispatch(
-                              updateNewRentalRecord({
-                                rentInstruction: e.target.value,
-                              })
-                            );
-                          }}
-                          className="w-full px-4 py-2.5 my-3 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-                          about="Write some instructions you want the tenants to understand and or agree to."
-                          title="Write some instructions you want the tenants to understand and or agree to."
-                        ></textarea> */
 }

@@ -1,16 +1,18 @@
-import React from "react";
-import { Company } from "../../models";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import { Popover } from "@headlessui/react";
 import { Link } from "react-router-dom";
+import { selectSelectedCompany } from "../../app/features/companySlice";
+import { useAppSelector } from "../../app/hooks";
 
-export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
+export function CompanyLogo(): JSX.Element {
+  const selectedCompany = useAppSelector(selectSelectedCompany);
+
   return (
     <Popover className="relative">
       <Popover.Button>
         <div className="p-2 max-w-[120px] h-10 flex justify-center items-center font-bold uppercase truncate text-white gap-x-3">
-          <p className="truncate">{company?.name}</p>{" "}
+          <p className="truncate">{selectedCompany?.name}</p>{" "}
           <FontAwesomeIcon icon={faAngleDown} />
         </div>
       </Popover.Button>
@@ -18,30 +20,40 @@ export function CompanyLogo({ company }: { company?: Company }): JSX.Element {
       <Popover.Panel className="absolute z-40 h-80 w-80 bg-[#222529] rounded-lg">
         <div className="p-4 border-b-[0.3px] flex items-center gap-3">
           <div className="rounded-lg bg-coolGray-400 w-10 h-10 flex justify-center items-center uppercase font-bold overflow-hidden">
-            {company?.logo ? (
-              <img src={company?.logo} alt="" />
+            {selectedCompany?.logo ? (
+              <img src={selectedCompany?.logo} alt="" />
             ) : (
-              company?.name?.slice(0, 2) || "-"
+              selectedCompany?.name?.slice(0, 2) || "-"
             )}
           </div>
           <div className="text-white">
-            <h1>{company?.name}</h1>
-            <small>{company?.email}</small>
+            <h1>{selectedCompany?.name}</h1>
+            <small>{selectedCompany?.email}</small>
           </div>
         </div>
-        {company && (
+        {selectedCompany && (
           <Link
-            to={`/dashboard/${company.id}/settings/team`}
+            to={`/dashboard/${selectedCompany?.id}/settings/team`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
             <div className="text-white">
-              <small>Invite people to {company.name}</small>
+              <small>Team management</small>
             </div>
           </Link>
         )}
-        {company && (
+        {selectedCompany && (
           <Link
-            to={`/dashboard/${company.id}/settings/profile`}
+            to={`/dashboard/${selectedCompany?.id}/settings/team`}
+            className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
+          >
+            <div className="text-white">
+              <small>Invite people to {selectedCompany?.name}</small>
+            </div>
+          </Link>
+        )}
+        {selectedCompany && (
+          <Link
+            to={`/dashboard/${selectedCompany?.id}/settings/profile`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
             <div className="text-white">

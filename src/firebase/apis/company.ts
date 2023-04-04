@@ -12,8 +12,7 @@ import { companyRef, db } from "../config";
 export async function getUserCompanies(email: string) {
   const q = query(
     companyRef,
-    where("primaryOwner", "==", email),
-    where("team", "array-contains", email)
+    (where("primaryOwner", "==", email), where("team", "array-contains", email))
   );
   let companiesList: Company[] = [];
 

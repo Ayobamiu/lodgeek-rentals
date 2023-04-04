@@ -1,3 +1,5 @@
+import { WhereFilterOp } from "firebase/firestore";
+
 export enum UserType {
   "individual" = "individual",
   "company" = "company",
@@ -258,11 +260,19 @@ export type LodgeekNotification = {
   3. Regular members
   Members have access to use features in Lodgeek, except for those that are limited to only owners and admins.
 */
-type CompanyRole = "owner" | "admin" | "regular";
-type CompanyMember = {
+export enum CompanyRole {
+  "owner" = "owner",
+  "admin" = "admin",
+  "regular" = "regular",
+}
+export type CompanyMember = {
   email: string;
   role: CompanyRole;
   dateJoined: number;
+};
+export type TeamMemberData = {
+  userData?: User;
+  memberData: CompanyMember;
 };
 
 export type Company = {
@@ -382,4 +392,13 @@ export type PayStackSubscription = {
   cancelledAt?: string;
   createdAt: string;
   updatedAt: string;
+};
+/**
+ * Used to filter documents.
+ * @link https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html#where
+ */
+export type WhereCriteria = {
+  field: string;
+  operation: WhereFilterOp;
+  criteria: any;
 };

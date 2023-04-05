@@ -9,16 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import DetailsBox from "../../components/shared/DetailsBox";
 import useAuth from "../../hooks/useAuth";
 import useProperties from "../../hooks/useProperties";
-import useQuery from "../../hooks/useQuery";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
 import {
   AdditionalFee,
+  Company,
   Property,
   Rent,
   RentalRecord,
@@ -37,9 +37,10 @@ import { KYCPreview } from "../../components/shared/KYCPreview";
 import { getRentsAndFees } from "./getRentsAndFees";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { getCompany } from "../../firebase/apis/company";
+import { setNotification } from "../../app/features/notificationSlice";
 
 export default function RentalRecordDetails() {
-  let query = useQuery();
   const {
     rentalRecordStatuses,
     getRentalRecordData,
@@ -47,14 +48,15 @@ export default function RentalRecordDetails() {
     updatePaidRents,
     sendEmailInvitationToTenant,
   } = useRentalRecords();
+  const dispatch = useAppDispatch();
 
-  const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
-  const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
   const loggedInUser = useAppSelector(selectUser);
   let { id } = useParams();
 
+  /* Load rental record */
+  const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
+  const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
   useEffect(() => {
-    // const id = goBack(query, navigate);
     const loadRelatedRentalRecord = async () => {
       if (!id) return;
       setLoadingRentalRecord(true);
@@ -66,6 +68,20 @@ export default function RentalRecordDetails() {
 
     loadRelatedRentalRecord();
   }, [id]);
+  /* Load rental record */
+
+  /* Load property company data */
+  const [companyData, setCompanyData] = useState<Company>();
+  useEffect(() => {
+    (async () => {
+      if (rentalRecordData?.company) {
+        const company = await getCompany(rentalRecordData?.company);
+        setCompanyData(company);
+      }
+    })();
+  }, [rentalRecordData]);
+  console.log({ companyData, rentalRecordData });
+  /* Load property company data */
 
   const { getPropertyData } = useProperties();
   const { getRentsForARentalRecord } = useRents();
@@ -73,6 +89,7 @@ export default function RentalRecordDetails() {
   const [property, setProperty] = useState<Property>();
   const [loadingProperty, setLoadingProperty] = useState(false);
 
+  /* Load related property */
   useEffect(() => {
     const loadRelatedProperty = async () => {
       setLoadingProperty(true);
@@ -87,9 +104,14 @@ export default function RentalRecordDetails() {
       loadRelatedProperty();
     }
   }, [rentalRecordData?.property]);
+  /* Load related property */
 
+  /* Load property owner */
   const [owner, setOwner] = useState<User>();
   const [loadingOwner, setLoadingOwner] = useState(false);
+  const ownerFullName = owner
+    ? `${owner?.firstName || "-"} ${owner?.lastName || "-"}`
+    : rentalRecordData?.owner;
   useEffect(() => {
     const loadRelatedOwner = async () => {
       if (!rentalRecordData?.owner) return;
@@ -99,18 +121,18 @@ export default function RentalRecordDetails() {
           setLoadingOwner(false);
         }
       );
-
       setOwner(ownerData);
     };
     loadRelatedOwner();
   }, [rentalRecordData?.owner]);
+  /* Load property owner */
 
-  const ownerFullName = owner
-    ? `${owner?.firstName || "-"} ${owner?.lastName || "-"}`
-    : rentalRecordData?.owner;
-
+  /* Load tenant details */
   const [tenant, setTenant] = useState<User>();
   const [loadingTenant, setLoadingTenant] = useState(false);
+  const tenantFullName = tenant
+    ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`
+    : rentalRecordData?.tenant;
   useEffect(() => {
     const loadRelatedTenant = async () => {
       if (!rentalRecordData?.tenant) return;
@@ -124,7 +146,9 @@ export default function RentalRecordDetails() {
     };
     loadRelatedTenant();
   }, [rentalRecordData?.tenant]);
+  /* Load tenant details */
 
+  /* Load rents */
   const [rents, setRents] = useState<Rent[]>([]);
   const [loadingRents, setLoadingRents] = useState(false);
   useEffect(() => {
@@ -140,10 +164,7 @@ export default function RentalRecordDetails() {
     };
     loadRelatedRents();
   }, [rentalRecordData?.id]);
-
-  const tenantFullName = tenant
-    ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`
-    : rentalRecordData?.tenant;
+  /* Load rents */
 
   const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
   const [selectedAdditionalFees, setSelectedAdditionalFees] = useState<
@@ -166,8 +187,32 @@ export default function RentalRecordDetails() {
   const [isOpen, setIsOpen] = useState(false);
 
   const payRent = () => {
-    if (!selectedRents.length && !selectedAdditionalFees.length)
+    if (!selectedRents.length && !selectedAdditionalFees.length) {
+      return dispatch(
+        setNotification({
+          type: "default",
+          title: `Rent and fees payment are disabled for now.`,
+          description:
+            "Contact us to enable payment. Email: contact@lodgeek.com",
+          buttons: [
+            {
+              text: "Contact Admin on WhatsApp",
+              onClick: () => {},
+              type: "link",
+              link: "https://wa.me/message/NDRVMWGUHUGVI1",
+            },
+            {
+              text: "Send Email",
+              type: "link",
+              link: "mailto:contact@lodgeek.com",
+            },
+          ],
+        })
+      );
+    }
+    if (!selectedRents.length && !selectedAdditionalFees.length) {
       return toast.warn("Select Rents or Fee to pay for.");
+    }
 
     setIsOpen(true);
   };
@@ -344,7 +389,8 @@ export default function RentalRecordDetails() {
   const totalAmountToPay = useMemo(() => {
     const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
       selectedRents,
-      selectedAdditionalFees
+      selectedAdditionalFees,
+      companyData
     );
     return transactionFee + totalFeeMinusTransactionFee;
   }, [selectedRents, selectedAdditionalFees]);
@@ -369,7 +415,8 @@ export default function RentalRecordDetails() {
   const [showKYCPreview, setShowKYCPreview] = useState(false);
   const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
     selectedRents,
-    selectedAdditionalFees
+    selectedAdditionalFees,
+    companyData
   );
   return (
     <DashboardWrapper>

@@ -116,6 +116,7 @@ function CompanyRegistrationPage() {
         size,
         team: [loggedInUser.email],
         updatedAt: Date.now(),
+        balance: 0,
       };
       setSigningIn(true);
       await createCompany(companyData)
@@ -126,7 +127,8 @@ function CompanyRegistrationPage() {
             const decodedRedirectUrl = base64.decode(redirectFromQuery);
             navigate(decodedRedirectUrl);
           } else {
-            navigate(`/dashboard/${companyData.id}/rentalRecords`);
+            // navigate(`/dashboard/${companyData.id}/rentalRecords`);
+            navigate(`/select-plans`);
           }
         })
         .finally(() => {

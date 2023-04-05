@@ -11,6 +11,7 @@ export function DashboradMobileNavigationDropDown(): JSX.Element {
   const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
   const { signingOut, handleSignOutUser } = useAuth();
+  const ownerAccess = loggedInUser?.email === selectedCompany?.primaryOwner;
 
   function ProfilePhoto({ user }: { user: User | undefined }): JSX.Element {
     const initials = `${user?.firstName[0] || "-"}${user?.lastName[0] || "-"}`;
@@ -99,7 +100,7 @@ export function DashboradMobileNavigationDropDown(): JSX.Element {
             <small className="text-white">Properties</small>
           </Link>
         )}
-        {selectedCompany && (
+        {selectedCompany && ownerAccess && (
           <Link
             to={`/dashboard/${selectedCompany?.id}/bankRecords`}
             className="p-4 flex items-center gap-3 cursor-pointer"

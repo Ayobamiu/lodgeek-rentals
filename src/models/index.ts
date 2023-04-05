@@ -154,6 +154,7 @@ export type MoneyTransaction = {
   payer: string;
   payee: string;
   receiptNumber: string;
+  company?: string;
 };
 export type YesOrNo = "yes" | "no";
 
@@ -298,6 +299,8 @@ export type Company = {
   planCode?: string;
   subscriptionCode?: string;
   nextPaymentDate?: string;
+  balance: number;
+  directRemitance?: boolean;
 };
 
 export enum SettingsTab {
@@ -402,3 +405,9 @@ export type WhereCriteria = {
   operation: WhereFilterOp;
   criteria: any;
 };
+export enum SubscriptionPlan {
+  "Free Plan" = "Free Plan",
+  "Basic Plan" = "Basic Plan",
+  "Pro Plan" = "Pro Plan",
+  "Premium Plan" = "Premium Plan",
+}

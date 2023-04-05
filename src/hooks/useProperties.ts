@@ -25,6 +25,7 @@ const useProperties = () => {
   const dispatch = useAppDispatch();
   const properties = useAppSelector(selectProperties);
   const selectedCompany = useAppSelector(selectSelectedCompany);
+  console.log({ selectedCompany });
 
   const getUsersProperties = useCallback(async () => {
     const propertiesCol = collection(db, PROPERTY_PATH);
@@ -35,6 +36,7 @@ const useProperties = () => {
         const propertiesList = propertiesSnapshot.docs.map((doc) =>
           doc.data()
         ) as Property[];
+        console.log({ propertiesList });
 
         dispatch(setProperties(propertiesList));
       })
@@ -42,13 +44,11 @@ const useProperties = () => {
         toast.error("Error Loading Properties");
       })
       .finally(() => {});
-  }, [selectedCompany?.id, dispatch]);
+  }, [selectedCompany, dispatch]);
 
   useEffect(() => {
-    if (!properties.length) {
-      getUsersProperties();
-    }
-  }, [selectedCompany?.id, properties.length, getUsersProperties]);
+    getUsersProperties();
+  }, [selectedCompany, properties.length, getUsersProperties]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);

@@ -15,9 +15,11 @@ import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import { Company } from "../../models";
 import SettingsWrapper from "../../components/settings/SettingsWrapper";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
+import { selectUser } from "../../app/features/userSlice";
 
 function CompanyProfileEditPage() {
   const selectedCompany = useAppSelector(selectSelectedCompany);
+  const loggedInUser = useAppSelector(selectUser);
   const dispatch = useDispatch();
 
   const [name, setName] = useState(selectedCompany?.name || "");
@@ -30,6 +32,9 @@ function CompanyProfileEditPage() {
   const [logo, setLogo] = useState(selectedCompany?.logo || "");
   const [updatingCompany, setUpdatingCompany] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  const userCanEditProfile =
+    loggedInUser?.email === selectedCompany?.primaryOwner;
 
   const handleUploadLogo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
@@ -91,7 +96,10 @@ function CompanyProfileEditPage() {
         </h2>
 
         <form onSubmit={onSubmit} className="w-full">
-          <label htmlFor="logo" className="cursor-pointer  inline-block w-auto">
+          <label
+            htmlFor="logo"
+            className="cursor-pointer disabled:cursor-not-allowed inline-block w-auto"
+          >
             {logo ? (
               <img
                 src={logo}
@@ -107,8 +115,8 @@ function CompanyProfileEditPage() {
               type="file"
               name="logo"
               id="logo"
-              className="w-0 h-0"
-              disabled={uploadingLogo}
+              className="w-0 h-0 disabled:cursor-not-allowed"
+              disabled={uploadingLogo || !userCanEditProfile}
               onChange={handleUploadLogo}
             />
             {uploadingLogo && <ActivityIndicator />}
@@ -120,6 +128,7 @@ function CompanyProfileEditPage() {
 
           <AppInput
             required
+            disabled={!userCanEditProfile}
             type="text"
             id="name"
             value={name}
@@ -131,6 +140,7 @@ function CompanyProfileEditPage() {
           </label>
           <AppInput
             required
+            disabled={!userCanEditProfile}
             type="email"
             id="email"
             value={email}
@@ -143,6 +153,7 @@ function CompanyProfileEditPage() {
 
           <AppInput
             required
+            disabled={!userCanEditProfile}
             type="text"
             id="phone"
             value={phone}
@@ -157,6 +168,7 @@ function CompanyProfileEditPage() {
           </label>
           <AppInput
             required
+            disabled={!userCanEditProfile}
             type="text"
             id="address"
             value={address}
@@ -171,6 +183,7 @@ function CompanyProfileEditPage() {
           </label>
           <AppInput
             required
+            disabled={!userCanEditProfile}
             type="text"
             id="registrationNumber"
             value={registrationNumber}
@@ -179,7 +192,8 @@ function CompanyProfileEditPage() {
 
           <button
             type="submit"
-            className="mb-4 flex justify-center py-3 px-7 w-full leading-6 text-green-50 font-medium text-center bg-green-500 hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
+            disabled={updatingCompany || !userCanEditProfile}
+            className="mb-4 flex justify-center py-3 px-7 w-full leading-6 text-green-50 font-medium text-center bg-green-500 disabled:bg-gray-400 disabled:cursor-not-allowed hover:bg-green-600 focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 rounded-md"
           >
             {updatingCompany ? <ActivityIndicator /> : "Update"}
           </button>

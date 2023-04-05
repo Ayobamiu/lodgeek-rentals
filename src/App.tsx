@@ -28,9 +28,10 @@ import CompanyProfileSettingsPage from "./screens/SettingsPages/CompanyProfileSe
 import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
 import CompanyProfileEditPage from "./screens/SettingsPages/CompanyProfileEditPage";
 import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSettingsPage";
-import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
 import { SubscriptionNotification } from "./components/homepage/SubscriptionNotification";
 import SelectPlans from "./screens/SelectPlans";
+import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
+import FinancialReport from "./screens/SettingsPages/FinancialReport";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -57,10 +58,11 @@ function App() {
           />
           <Route path="select-accounts" element={<CompanySelector />} />
           <Route path="get-started" element={<RegistrationPage />} />
-          <Route path="dashboard" element={<Dashboard />}>
-            <Route path="new" element={<NewPost />} /> {/*A nested route!*/}
-            <Route path=":postId" element={<Post />} /> {/*A nested route!*/}
-          </Route>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="dashboard/:companyId/settings/reports"
+            element={<FinancialReport />}
+          />
           <Route
             path="dashboard/:companyId/rentalRecords"
             element={<RentalRecords />}
@@ -119,21 +121,3 @@ function App() {
 }
 
 export default App;
-
-//NewPost.jsx, the child
-
-const NewPost = () => {
-  // const [currentUser] = useOutletContext()
-
-  return (
-    <div>
-      <h1>Welcome , write a new post!</h1>
-      <form />
-    </div>
-  );
-};
-function Post() {
-  let params = useParams();
-
-  return <h1>{params.postId}</h1>;
-}

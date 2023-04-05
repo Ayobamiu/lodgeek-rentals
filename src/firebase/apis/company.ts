@@ -1,5 +1,6 @@
 import {
   doc,
+  getDoc,
   getDocs,
   query,
   setDoc,
@@ -27,6 +28,12 @@ export async function getUserCompanies(email: string) {
 
 export async function createCompany(company: Company) {
   return await setDoc(doc(companyRef, company.id), company);
+}
+
+export async function getCompany(id: string) {
+  const docRef = doc(companyRef, id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data() as Company;
 }
 
 export const updateCompanyInDatabase = async (company: Company) => {

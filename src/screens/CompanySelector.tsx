@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { selectCompanies, setCompanies } from "../app/features/companySlice";
 import { selectUser } from "../app/features/userSlice";
 import { useAppSelector } from "../app/hooks";
@@ -60,12 +60,12 @@ const CompanySelector = () => {
             Select Account
           </h5>
 
-          <button
-            onClick={handleSignOutUser}
+          <Link
+            to="/get-started"
             className="text-sm font-medium text-blue-600 dark:text-blue-500"
           >
-            {signingOut ? <ActivityIndicator /> : "Log out"}
-          </button>
+            Add new account
+          </Link>
         </div>
         <p className="text-xs text-coolGray-500 font-medium mb-5">
           To get started, please select the account you wish to view from the
@@ -90,6 +90,14 @@ const CompanySelector = () => {
           looking for or are having trouble accessing its data, please contact
           your Lodgeek administrator for assistance.
         </p>
+        <div className="flex w-full justify-center items-center mt-5">
+          <button
+            onClick={handleSignOutUser}
+            className="text-sm font-medium text-blue-600 dark:text-blue-500"
+          >
+            {signingOut ? <ActivityIndicator /> : "Log out"}
+          </button>
+        </div>
       </div>
     </div>
   );

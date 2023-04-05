@@ -80,7 +80,7 @@ export default function RentalRecordDetails() {
       }
     })();
   }, [rentalRecordData]);
-  console.log({ companyData, rentalRecordData });
+
   /* Load property company data */
 
   const { getPropertyData } = useProperties();

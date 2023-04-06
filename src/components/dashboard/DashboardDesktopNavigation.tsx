@@ -1,10 +1,14 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { selectSelectedCompany } from "../../app/features/companySlice";
+import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
 
 const DashboardDesktopNavigation = () => {
   const selectedCompany = useAppSelector(selectSelectedCompany);
+  const loggedInUser = useAppSelector(selectUser);
+  const ownerAccess = loggedInUser?.email === selectedCompany?.primaryOwner;
+
   const { pathname } = useLocation();
 
   const styleActiveTab = useMemo(
@@ -66,7 +70,7 @@ const DashboardDesktopNavigation = () => {
           </Link>
         </li>
       )}
-      {selectedCompany && (
+      {selectedCompany && ownerAccess && (
         <li className="mr-8">
           <Link
             className={styleActiveTab("bankRecords")}

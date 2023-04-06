@@ -7,6 +7,7 @@ import SettingsWrapper from "../../components/settings/SettingsWrapper";
 import useTeam from "../../hooks/useTeam";
 import { AddTeamMemberModal } from "./AddTeamMemberModal";
 import { CompanyMemberComponent } from "./CompanyMemberComponent";
+import { UpgradeToUseCollaborationTool } from "./UpgradeToUseCollaborationTool";
 
 const TeamCollaboration = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +16,8 @@ const TeamCollaboration = () => {
 
   return (
     <SettingsWrapper>
-      <div className="flex flex-col max-w-5xl mx-auto">
+      <div className="flex flex-col max-w-5xl mx-auto relative">
+        <UpgradeToUseCollaborationTool />
         <AddTeamMemberModal
           isOpen={isOpen}
           closeModal={() => {

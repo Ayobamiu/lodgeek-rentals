@@ -1,6 +1,9 @@
 import { RentType } from "../models";
 import { ReactComponent as FlexUIGreenLight } from "../assets/logo-no-background.svg";
 import { SubScribeButton } from "./SubScribeButton";
+import { selectSelectedCompany } from "../app/features/companySlice";
+import { useAppSelector } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
 
 const SelectPlans = () => {
   const plans = [
@@ -118,6 +121,9 @@ type LodgeekPlanProp = {
 
 function LodgeekPlan(props: LodgeekPlanProp) {
   const { amount, details, name, rentPer, planCode } = props;
+  const selectedCompany = useAppSelector(selectSelectedCompany);
+  const navigate = useNavigate();
+
   return (
     <div className="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
       <h5 className="mb-4 text-xl font-medium text-gray-500 dark:text-gray-400">
@@ -168,7 +174,18 @@ function LodgeekPlan(props: LodgeekPlanProp) {
           </li>
         ))}
       </ul>
-      {amount > 0 && <SubScribeButton amount={amount} planCode={planCode} />}
+      {amount > 0 ? (
+        <SubScribeButton amount={amount} planCode={planCode} />
+      ) : (
+        <button
+          className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
+          onClick={() => {
+            navigate(`/dashboard/${selectedCompany?.id}/rentalRecords`);
+          }}
+        >
+          Continue free
+        </button>
+      )}
     </div>
   );
 }

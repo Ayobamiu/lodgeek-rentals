@@ -4,6 +4,7 @@ import { SubScribeButton } from "./SubScribeButton";
 import { selectSelectedCompany } from "../app/features/companySlice";
 import { useAppSelector } from "../app/hooks";
 import { useNavigate } from "react-router-dom";
+import { selectUser } from "../app/features/userSlice";
 
 const SelectPlans = () => {
   const plans = [
@@ -122,6 +123,7 @@ type LodgeekPlanProp = {
 function LodgeekPlan(props: LodgeekPlanProp) {
   const { amount, details, name, rentPer, planCode } = props;
   const selectedCompany = useAppSelector(selectSelectedCompany);
+  const loggedInUser = useAppSelector(selectUser);
   const navigate = useNavigate();
 
   return (
@@ -174,17 +176,33 @@ function LodgeekPlan(props: LodgeekPlanProp) {
           </li>
         ))}
       </ul>
-      {amount > 0 ? (
-        <SubScribeButton amount={amount} planCode={planCode} />
+
+      {!loggedInUser ? (
+        <>
+          <button
+            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
+            onClick={() => {
+              navigate(`/auth`);
+            }}
+          >
+            Get started
+          </button>
+        </>
       ) : (
-        <button
-          className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
-          onClick={() => {
-            navigate(`/dashboard/${selectedCompany?.id}/rentalRecords`);
-          }}
-        >
-          Continue free
-        </button>
+        <>
+          {amount > 0 ? (
+            <SubScribeButton amount={amount} planCode={planCode} />
+          ) : (
+            <button
+              className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"
+              onClick={() => {
+                navigate(`/dashboard/${selectedCompany?.id}/rentalRecords`);
+              }}
+            >
+              Continue free
+            </button>
+          )}
+        </>
       )}
     </div>
   );

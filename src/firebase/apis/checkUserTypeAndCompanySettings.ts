@@ -20,11 +20,9 @@ export async function checkUserTypeAndCompanySettings(
     const userCompanies = await getUserCompanies(loggedInUser.email);
     if (loggedInUser.userType === UserType.company && !userCompanies.length) {
       if (redirectFromQuery && redirectFromQuery !== "null") {
-        return navigate(
-          `/company-registration?redirect=${redirectFromQuery || ""}`
-        );
+        return navigate(`/select-accounts?redirect=${redirectFromQuery || ""}`);
       } else {
-        return navigate(`/company-registration`);
+        return navigate(`/select-accounts`);
       }
     }
     //Go to company settings page.

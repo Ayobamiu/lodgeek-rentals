@@ -29,6 +29,8 @@
     "fuzzy-search": "^3.2.1",
     "global": "^4.4.0",
     "html-to-pdf-js": "^0.9.3",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
     "medium-editor": "^5.23.3",
     "moment": "^2.29.4",
     "react": "^18.2.0",

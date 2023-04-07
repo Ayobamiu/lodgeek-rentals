@@ -51,6 +51,8 @@ import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionA
 import useBanks from "./useBanks";
 import { v4 as uuidv4 } from "uuid";
 import { selectSelectedCompany } from "../app/features/companySlice";
+import { generateReciept } from "../utils/generateReciept";
+import { htmlStringToImage } from "../utils/generateInvoicePDF";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -359,12 +361,44 @@ const useRentalRecords = () => {
           title: emailSubjectForTenant,
         });
 
+        const transactionEmailHTML = generateReciept({
+          date: moment().format("LL"),
+          duePayments: [],
+          payments: [
+            ...rents.map((rent) => {
+              return {
+                description: `Rent for ${moment(rent.dueDate).format(
+                  "MMM YYYY"
+                )}`,
+                amount: formatPrice(rent.rent),
+              };
+            }),
+            ...selectedAdditionalFees.map((fee) => {
+              return {
+                description: fee.feeTitle,
+                amount: formatPrice(fee.feeAmount),
+              };
+            }),
+          ],
+          property: propertyTitle,
+          propertyCompany: propertyCompany.name,
+          receiptNumber: transactionData.receiptNumber,
+          receivedfrom: tenantName,
+          totalAmountDue: "",
+          totalPaid: formatPrice(totalAmount),
+          extraComment: "",
+          title: "",
+          propertyCompanyLogo: propertyCompany.logo,
+        });
+        let receiptUrl = await htmlStringToImage(transactionEmailHTML);
+
         if (tenantEmail) {
           await sendEmail(
             tenantEmail,
             emailSubjectForTenant,
             paragraphsForTenant.join(" \n"),
-            generatedEmailForTenant
+            transactionEmailHTML,
+            [{ filename: "receipt.png", path: receiptUrl || "" }]
           );
         }
 
@@ -373,7 +407,8 @@ const useRentalRecords = () => {
             propertyCompany.email,
             transactionDescription,
             paragraphsForLandlord.join(" \n"),
-            generatedEmailForLandlord
+            transactionEmailHTML,
+            [{ filename: "receipt.png", path: receiptUrl || "" }]
           ).then(() => {
             toast.success("Payment was successfully obtained.");
           });

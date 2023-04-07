@@ -99,6 +99,51 @@ export type SimpleEmailProps = {
   paragraphs: string[];
   buttons?: ButtonItemProps[];
 };
+export type RecieptProps = {
+  /**Title of the email. */
+  title?: string;
+  /**Customer who made payment: This can be the name of a company or tenant. */
+  receivedfrom: string;
+  /**Title of the property the fees are for. */
+  property: string;
+  /**Property manager in charge of the property: This can be the name of a company or an individual. */
+  propertyCompany: string;
+  /**Company logo. */
+  propertyCompanyLogo?: string;
+  /**Date of the transaction in this format February 19, 2023 */
+  date: string;
+  /**receiptNumber prop on the MoneyTransaction for this transaction e.g. 001234 */
+  receiptNumber: string;
+  /**List of payments made.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   */
+  payments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+  }[];
+  /**String format of the total amount paid in this format N1,000,000 */
+  totalPaid: string;
+  /**List of due payments and their due dates.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   * 3. Date: Due date of the payment in this format February 19, 2023
+   */
+  duePayments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+    /**Due date of the payment in this format February 19, 2023 */
+    dueDate: string;
+  }[];
+  /**String format of the total due amount in this format N1,000,000 */
+  totalAmountDue: string;
+  /**Salutaions at the end of the receipt. Can include information about due payments */
+  extraComment?: string;
+};
 export type ButtonItemProps = {
   text: string;
   link: string;

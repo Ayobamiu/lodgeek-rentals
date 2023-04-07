@@ -1,11 +1,13 @@
-import React from "react";
 import { ReactComponent as Circle3yellow } from "../../assets/flex-ui-assets/elements/circle3-yellow.svg";
 import { ReactComponent as Dots3blue } from "../../assets/flex-ui-assets/elements/dots3-blue.svg";
 import Stock3 from "../../assets/flex-ui-assets/images/features/stock3.png";
 
 export default function Features() {
   return (
-    <section className="py-24 md:pb-28 bg-white overflow-hidden pattern-white-bg">
+    <section
+      id="features"
+      className="py-24 md:pb-28 bg-white overflow-hidden pattern-white-bg"
+    >
       <div className="container px-4 mx-auto">
         <div className="md:max-w-4xl mx-auto mb-16 md:mb-20 text-center">
           <span className="inline-block py-px px-2 mb-4 text-xs leading-5 text-green-500 bg-green-100 font-medium uppercase rounded-full shadow-sm">

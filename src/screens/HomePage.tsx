@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import HomepageHeader from "../components/homepage/HomepageHeader";
 import Features from "../components/homepage/Features";
-import Pricing from "../components/homepage/Pricing";
 import HomePageCTA from "../components/homepage/HomePageCTA";
 import Footer from "../components/shared/Footer";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +28,7 @@ export default function HomePage() {
         <HomepageHeader />
         {/* <LogoClouds /> */}
         <Features />
-        <Pricing />
+        {/* <Pricing /> */}
         <HomePageCTA />
         <Footer />
       </div>

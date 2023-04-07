@@ -11,13 +11,28 @@ export function CompanyLogo(): JSX.Element {
   return (
     <Popover className="relative">
       <Popover.Button>
-        <div className="p-2 max-w-[120px] h-10 flex justify-center items-center text-sm truncate text-white gap-x-3">
-          <p className="truncate">{selectedCompany?.name}</p>{" "}
-          <FontAwesomeIcon icon={faAngleDown} />
+        <div className="flex ml-2 md:mr-24">
+          {selectedCompany?.logo ? (
+            <img
+              className="w-10 h-10 rounded-full mr-3"
+              src={selectedCompany.logo}
+              alt="Logo"
+            />
+          ) : (
+            <div className="relative inline-flex items-center justify-center w-10 h-10 overflow-hidden bg-gray-100 rounded-full dark:bg-gray-600 mr-3">
+              <span className="font-medium text-gray-600 dark:text-gray-300 uppercase">
+                {selectedCompany?.name?.slice(0, 2)}
+              </span>
+            </div>
+          )}
+
+          <span className="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">
+            {selectedCompany?.name}
+          </span>
         </div>
       </Popover.Button>
 
-      <Popover.Panel className="absolute z-40 w-80 bg-[#222529] rounded-lg">
+      <Popover.Panel className="absolute z-40 w-80 dark:bg-[#222529] bg-white shadow-lg rounded-lg">
         <div className="p-4 border-b-[0.3px] flex items-center gap-3">
           <div className="rounded-lg bg-coolGray-400 w-10 h-10 flex justify-center items-center uppercase font-bold overflow-hidden">
             {selectedCompany?.logo ? (
@@ -26,7 +41,7 @@ export function CompanyLogo(): JSX.Element {
               selectedCompany?.name?.slice(0, 2) || "-"
             )}
           </div>
-          <div className="text-white">
+          <div className="dark:text-white">
             <h1>{selectedCompany?.name}</h1>
             <small>{selectedCompany?.email}</small>
           </div>
@@ -36,9 +51,10 @@ export function CompanyLogo(): JSX.Element {
             to={`/dashboard/${selectedCompany?.id}/settings/reports`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
-            <div className="text-white">
+            <div className="dark:text-white">
               <small>Financial reports </small>
-              <span className="bg-transparent text-xs font-medium mx-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-blue-400 border border-white">
+
+              <span className="inline-flex items-center justify-center px-2 ml-3 text-sm font-medium text-gray-800 bg-gray-200 rounded-full dark:bg-gray-700 dark:text-gray-300">
                 Pro
               </span>
             </div>
@@ -49,7 +65,7 @@ export function CompanyLogo(): JSX.Element {
             to={`/dashboard/${selectedCompany?.id}/settings/team`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
-            <div className="text-white">
+            <div className="dark:text-white">
               <small>Team management</small>
             </div>
           </Link>
@@ -59,7 +75,7 @@ export function CompanyLogo(): JSX.Element {
             to={`/dashboard/${selectedCompany?.id}/settings/team`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
-            <div className="text-white">
+            <div className="dark:text-white">
               <small>Invite people to {selectedCompany?.name}</small>
             </div>
           </Link>
@@ -69,7 +85,7 @@ export function CompanyLogo(): JSX.Element {
             to={`/dashboard/${selectedCompany?.id}/settings/profile`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
           >
-            <div className="text-white">
+            <div className="dark:text-white">
               <small>Settings & Administration</small>
             </div>
           </Link>
@@ -78,7 +94,7 @@ export function CompanyLogo(): JSX.Element {
           to="/select-accounts"
           className="p-4 flex items-center gap-3 cursor-pointer"
         >
-          <div className="text-white">
+          <div className="dark:text-white">
             <small>Switch Workspaces</small>
           </div>
         </Link>

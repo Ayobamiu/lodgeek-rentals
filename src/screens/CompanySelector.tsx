@@ -52,7 +52,7 @@ const CompanySelector = () => {
   }, [loggedInUser]);
 
   return (
-    <div className="lg:min-h-screen lg:w-screen lg:flex pt-20 justify-center items-center px-5 lg:px-0">
+    <div className="lg:min-h-screen lg:w-screen md:flex pt-20 justify-center items-center px-5 lg:px-0">
       <div className="w-full max-w-md p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-8 dark:bg-gray-800 dark:border-gray-700">
         <FlexUIGreenLight className="relative lg:-top-2 top-1/2 -mt-16 mb-6 h-16 lg:w-auto left-1/2 -translate-x-1/2" />
         <div className="flex items-center justify-between mb-4">
@@ -90,7 +90,10 @@ const CompanySelector = () => {
           looking for or are having trouble accessing its data, please contact
           your Lodgeek administrator for assistance.
         </p>
-        <div className="flex w-full justify-center items-center mt-5">
+        <div className="flex flex-col w-full justify-center items-center mt-5">
+          <div className="text-[8px] text-center">
+            You are logged in as <strong>{loggedInUser?.email}</strong>.
+          </div>
           <button
             onClick={handleSignOutUser}
             className="text-sm font-medium text-blue-600 dark:text-blue-500"

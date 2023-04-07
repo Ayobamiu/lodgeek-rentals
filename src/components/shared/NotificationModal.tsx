@@ -1,3 +1,5 @@
+import { faTimesCircle } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   closeNotification,
   selectNotification,
@@ -23,13 +25,13 @@ const NotificationModal = () => {
   if (!notification.visible) return null;
   return (
     <div className="fixed w-screen h-screen flex justify-center items-center bg-black bg-opacity-80 z-50 ">
-      <span
-        className="absolute right-5 text-white top-5 cursor-pointer"
-        onClick={closeModal}
-      >
-        close
-      </span>
-      <div className="lg:max-w-[50vw] min-w-[30%] max-w-[90%] lg:max-h-[50vh] max-h-[70%] bg-white rounded-2xl p-10 text-center flex flex-col justify-center items-center gap-5">
+      <div className="lg:max-w-[50vw] min-w-[30%] max-w-[90%] lg:max-h-[50vh] max-h-[70%] bg-white rounded-2xl p-10 text-center flex flex-col justify-center items-center gap-5 relative">
+        <FontAwesomeIcon
+          icon={faTimesCircle}
+          className="absolute right-2 top-2 cursor-pointer"
+          onClick={closeModal}
+        />
+
         <h1 className="text-xl font-bold">{notification.title}</h1>
         <p>{notification.description}</p>
         <div className="flex flex-wrap justify-center gap-5">

@@ -187,7 +187,7 @@ export default function RentalRecordDetails() {
   const [isOpen, setIsOpen] = useState(false);
 
   const payRent = () => {
-    if (!selectedRents.length && !selectedAdditionalFees.length) {
+    if (!companyData) {
       return dispatch(
         setNotification({
           type: "default",
@@ -499,6 +499,12 @@ export default function RentalRecordDetails() {
                     </tr>
                   </tfoot>
                 </table>
+                {/* <button
+                  onClick={handlePaidRents}
+                  className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
+                >
+                  Pay
+                </button> */}
                 <PaystackButton
                   className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
                   {...componentProps}

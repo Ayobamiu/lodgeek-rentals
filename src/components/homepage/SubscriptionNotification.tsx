@@ -41,6 +41,8 @@ export function SubscriptionNotification({ closable }: { closable?: boolean }) {
         subIsCancelled)
     ) {
       setShow(true);
+    } else {
+      setShow(false);
     }
   }, [subscription, selectedCompany]);
 

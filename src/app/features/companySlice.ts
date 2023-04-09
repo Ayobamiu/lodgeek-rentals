@@ -38,7 +38,7 @@ export const companySlice = createSlice({
       state.companies = filterUniqueByKey(currentCompanies, "id");
     },
     setCompanies: (state, action: PayloadAction<Company[]>) => {
-      state.companies = action.payload;
+      state.companies = filterUniqueByKey(action.payload, "id");
     },
     setSelectedCompany: (state, action: PayloadAction<Company>) => {
       state.selectedCompany = action.payload;

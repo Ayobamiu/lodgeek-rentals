@@ -1,11 +1,19 @@
 import React from "react";
 
-export default function ActivityIndicator({ color }: { color?: string }) {
+type Props = {
+  color?: string;
+  size?: "2" | "4" | "6" | "8" | "10";
+};
+
+export default function ActivityIndicator(props: Props) {
+  const { color, size } = props;
   return (
     <div role="status" style={{ color }}>
       <svg
         aria-hidden="true"
-        className="w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-green-500"
+        className={`w-${size || "8"} h-${
+          size || "8"
+        } mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-green-500`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

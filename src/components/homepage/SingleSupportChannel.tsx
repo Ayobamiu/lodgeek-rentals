@@ -29,9 +29,7 @@ const SingleSupportChannel = ({
           setIsCopied(false);
         }, 1500);
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => {});
   };
 
   return (

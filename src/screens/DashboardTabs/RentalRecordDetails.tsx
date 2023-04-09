@@ -9,21 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import DetailsBox from "../../components/shared/DetailsBox";
-import useAuth from "../../hooks/useAuth";
-import useProperties from "../../hooks/useProperties";
-import useQuery from "../../hooks/useQuery";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
 import {
   AdditionalFee,
-  Property,
   Rent,
   RentalRecord,
   RentStatus,
-  User,
   UserKYC,
 } from "../../models";
 import formatPrice from "../../utils/formatPrice";
@@ -37,113 +32,55 @@ import { KYCPreview } from "../../components/shared/KYCPreview";
 import { getRentsAndFees } from "./getRentsAndFees";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
+import { setNotification } from "../../app/features/notificationSlice";
+import { RentalRecordCollaboration } from "../../components/dashboard/RentalRecordCollaboration";
+import {
+  selectRentalRecord,
+  setCurrentRentalRecord,
+  setCurrentRentalRecordRents,
+} from "../../app/features/rentalRecordSlice";
+import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
 
 export default function RentalRecordDetails() {
-  let query = useQuery();
   const {
     rentalRecordStatuses,
-    getRentalRecordData,
     handleUpdateRentalRecord,
     updatePaidRents,
     sendEmailInvitationToTenant,
   } = useRentalRecords();
+  const dispatch = useAppDispatch();
 
-  const [rentalRecordData, setRentalRecordData] = useState<RentalRecord>();
-  const [loadingRentalRecord, setLoadingRentalRecord] = useState(false);
   const loggedInUser = useAppSelector(selectUser);
+  const {
+    currentRentalRecord,
+    currentRentalRecordCompany,
+    currentRentalRecordProperty,
+    currentRentalRecordOwner,
+    currentRentalRecordTenant,
+    currentRentalRecordRents,
+  } = useAppSelector(selectRentalRecord);
+
   let { id } = useParams();
 
-  useEffect(() => {
-    // const id = goBack(query, navigate);
-    const loadRelatedRentalRecord = async () => {
-      if (!id) return;
-      setLoadingRentalRecord(true);
-      const rentalRecordD = await getRentalRecordData(id).finally(() => {
-        setLoadingRentalRecord(false);
-      });
-      setRentalRecordData(rentalRecordD);
-    };
+  const {
+    loadingOwner,
+    loadingProperty,
+    loadingRentalRecord,
+    loadingTenant,
+    loadingRents,
+  } = useCurrentRentalRecord();
 
-    loadRelatedRentalRecord();
-  }, [id]);
+  const ownerFullName = currentRentalRecordOwner
+    ? `${currentRentalRecordOwner?.firstName || "-"} ${
+        currentRentalRecordOwner?.lastName || "-"
+      }`
+    : currentRentalRecord?.owner;
 
-  const { getPropertyData } = useProperties();
-  const { getRentsForARentalRecord } = useRents();
-  const { getUserData } = useAuth();
-  const [property, setProperty] = useState<Property>();
-  const [loadingProperty, setLoadingProperty] = useState(false);
-
-  useEffect(() => {
-    const loadRelatedProperty = async () => {
-      setLoadingProperty(true);
-      const propertyData = await getPropertyData(
-        rentalRecordData?.property!
-      ).finally(() => {
-        setLoadingProperty(false);
-      });
-      setProperty(propertyData);
-    };
-    if (rentalRecordData?.property) {
-      loadRelatedProperty();
-    }
-  }, [rentalRecordData?.property]);
-
-  const [owner, setOwner] = useState<User>();
-  const [loadingOwner, setLoadingOwner] = useState(false);
-  useEffect(() => {
-    const loadRelatedOwner = async () => {
-      if (!rentalRecordData?.owner) return;
-      setLoadingOwner(true);
-      const ownerData = await getUserData(rentalRecordData?.owner).finally(
-        () => {
-          setLoadingOwner(false);
-        }
-      );
-
-      setOwner(ownerData);
-    };
-    loadRelatedOwner();
-  }, [rentalRecordData?.owner]);
-
-  const ownerFullName = owner
-    ? `${owner?.firstName || "-"} ${owner?.lastName || "-"}`
-    : rentalRecordData?.owner;
-
-  const [tenant, setTenant] = useState<User>();
-  const [loadingTenant, setLoadingTenant] = useState(false);
-  useEffect(() => {
-    const loadRelatedTenant = async () => {
-      if (!rentalRecordData?.tenant) return;
-      setLoadingTenant(true);
-      const tenantData = await getUserData(rentalRecordData?.tenant).finally(
-        () => {
-          setLoadingTenant(false);
-        }
-      );
-      setTenant(tenantData);
-    };
-    loadRelatedTenant();
-  }, [rentalRecordData?.tenant]);
-
-  const [rents, setRents] = useState<Rent[]>([]);
-  const [loadingRents, setLoadingRents] = useState(false);
-  useEffect(() => {
-    const loadRelatedRents = async () => {
-      if (!rentalRecordData?.id) return;
-      setLoadingRents(true);
-      const rentsData = await getRentsForARentalRecord(
-        rentalRecordData?.id
-      ).finally(() => {
-        setLoadingRents(false);
-      });
-      setRents(rentsData as Rent[]);
-    };
-    loadRelatedRents();
-  }, [rentalRecordData?.id]);
-
-  const tenantFullName = tenant
-    ? `${tenant?.firstName || "-"} ${tenant?.lastName || "-"}`
-    : rentalRecordData?.tenant;
+  const tenantFullName = currentRentalRecordTenant
+    ? `${currentRentalRecordTenant?.firstName || "-"} ${
+        currentRentalRecordTenant?.lastName || "-"
+      }`
+    : currentRentalRecord?.tenant;
 
   const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
   const [selectedAdditionalFees, setSelectedAdditionalFees] = useState<
@@ -151,11 +88,11 @@ export default function RentalRecordDetails() {
   >([]);
 
   useEffect(() => {
-    const feesToPay = [...(rentalRecordData?.fees || [])].filter(
+    const feesToPay = [...(currentRentalRecord?.fees || [])].filter(
       (i) => i.feeIsRequired && !i.paid
     );
     setSelectedAdditionalFees(feesToPay);
-  }, [rentalRecordData]);
+  }, [currentRentalRecord]);
 
   useEffect(() => {
     if (!selectedRents.length) {
@@ -166,8 +103,32 @@ export default function RentalRecordDetails() {
   const [isOpen, setIsOpen] = useState(false);
 
   const payRent = () => {
-    if (!selectedRents.length && !selectedAdditionalFees.length)
+    if (!currentRentalRecordCompany) {
+      return dispatch(
+        setNotification({
+          type: "default",
+          title: `Rent and fees payment are disabled for now.`,
+          description:
+            "Contact us to enable payment. Email: contact@lodgeek.com",
+          buttons: [
+            {
+              text: "Contact Admin on WhatsApp",
+              onClick: () => {},
+              type: "link",
+              link: "https://wa.me/message/NDRVMWGUHUGVI1",
+            },
+            {
+              text: "Send Email",
+              type: "link",
+              link: "mailto:contact@lodgeek.com",
+            },
+          ],
+        })
+      );
+    }
+    if (!selectedRents.length && !selectedAdditionalFees.length) {
       return toast.warn("Select Rents or Fee to pay for.");
+    }
 
     setIsOpen(true);
   };
@@ -180,19 +141,19 @@ export default function RentalRecordDetails() {
     await updatePaidRents({
       rents: selectedRents,
       rentalRecordId: id || "",
-      owner: owner?.email || "",
-      propertyTitle: property?.title || "",
-      tenantName: `${tenant?.firstName} ${tenant?.lastName}`,
-      tenantEmail: tenant?.email || "",
+      owner: currentRentalRecordOwner?.email || "",
+      propertyTitle: currentRentalRecordProperty?.title || "",
+      tenantName: `${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName}`,
+      tenantEmail: currentRentalRecordTenant?.email || "",
       selectedAdditionalFees,
-      rentalRecord: rentalRecordData!,
+      rentalRecord: currentRentalRecord!,
     })
       .finally(() => {
         setSelectedRents([]);
         setUpdatingRents(false);
       })
       .then(() => {
-        const updatedRents = rents.map((i) => {
+        const updatedRents = currentRentalRecordRents.map((i) => {
           const justPaid = selectedRents.findIndex((x) => x.id === i.id) > -1;
           if (justPaid) {
             const paidRent: Rent = {
@@ -205,21 +166,26 @@ export default function RentalRecordDetails() {
           }
         });
         const updateDfees: AdditionalFee[] =
-          rentalRecordData?.fees?.map((i) => {
+          currentRentalRecord?.fees?.map((i) => {
             if (selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1) {
               return { ...i, paid: true, paidOn: Date.now() };
             } else {
               return i;
             }
           }) || [];
-        setRentalRecordData({ ...rentalRecordData!, fees: updateDfees });
-        setRents(updatedRents);
+        const updatedRentalRecord = {
+          ...currentRentalRecord!,
+          fees: updateDfees,
+        };
+        dispatch(setCurrentRentalRecord(updatedRentalRecord));
+
+        dispatch(setCurrentRentalRecordRents(updatedRents));
         setIsOpen(false);
       });
   };
 
   const PayRentButton = () => {
-    const unpaidFees = rentalRecordData?.fees?.filter((i) => !i.paid) || [];
+    const unpaidFees = currentRentalRecord?.fees?.filter((i) => !i.paid) || [];
     return (
       <button
         onClick={payRent}
@@ -237,10 +203,10 @@ export default function RentalRecordDetails() {
   const [openAgreementForm, setOpenAgreementForm] = useState(false);
   const acceptInvitation = async (userKYC: UserKYC) => {
     if (!userKYC) return toast.error("You need to complete your tenancy form.");
-    if (!rentalRecordData) return toast.error("Error Accepting Invite");
+    if (!currentRentalRecord) return toast.error("Error Accepting Invite");
     setAcceptingInvite(true);
     const agreeedRecord: RentalRecord = {
-      ...rentalRecordData,
+      ...currentRentalRecord,
       status: "inviteAccepted",
       tenantAgreed: true,
       userKYC,
@@ -248,20 +214,21 @@ export default function RentalRecordDetails() {
 
     await handleUpdateRentalRecord(agreeedRecord)
       .then(async () => {
-        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${rentalRecordData.id}`;
+        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${currentRentalRecord.id}`;
         const email = generateSimpleEmail({
           paragraphs: [
-            `Click on the link below to manage your rent at ${property?.title}.`,
+            `Click on the link below to manage your rent at ${currentRentalRecordProperty?.title}.`,
           ],
           buttons: [{ text: "View details", link: rentalRecordLink }],
         });
         await sendEmail(
-          rentalRecordData.owner,
-          `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${property?.title}`,
-          `Click on the link below to manage your rent at ${property?.title}.\n ${rentalRecordLink}`,
+          currentRentalRecord.owner,
+          `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${currentRentalRecordProperty?.title}`,
+          `Click on the link below to manage your rent at ${currentRentalRecordProperty?.title}.\n ${rentalRecordLink}`,
           email
         );
-        setRentalRecordData(agreeedRecord);
+        dispatch(setCurrentRentalRecord(agreeedRecord));
+
         toast.success("Invite Accepted, you can now proceed to pay rents.");
       })
       .catch(() => {
@@ -291,7 +258,7 @@ export default function RentalRecordDetails() {
   const EmailTenantButton = () => {
     return (
       <a
-        href={`mailto:${rentalRecordData?.tenant}`}
+        href={`mailto:${currentRentalRecord?.tenant}`}
         className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
       >
         <span>Email Tenant</span>
@@ -304,12 +271,12 @@ export default function RentalRecordDetails() {
     return (
       <button
         onClick={async () => {
-          if (loggedInUser && rentalRecordData) {
+          if (loggedInUser && currentRentalRecord) {
             setResendingInvite(true);
             await sendEmailInvitationToTenant({
               loggedInUser,
-              rentalRecordData,
-              property,
+              rentalRecordData: currentRentalRecord,
+              property: currentRentalRecordProperty,
             }).finally(() => {
               setResendingInvite(false);
             });
@@ -323,17 +290,17 @@ export default function RentalRecordDetails() {
   };
 
   const showPayRentButton =
-    rentalRecordData?.status === "inviteAccepted" &&
-    loggedInUser?.email === rentalRecordData.tenant;
+    currentRentalRecord?.status === "inviteAccepted" &&
+    loggedInUser?.email === currentRentalRecord.tenant;
   const showAcceptInvitationButton =
-    rentalRecordData?.status === "inviteSent" &&
-    loggedInUser?.email === rentalRecordData.tenant;
+    currentRentalRecord?.status === "inviteSent" &&
+    loggedInUser?.email === currentRentalRecord.tenant;
   const showResendInviteButton =
-    rentalRecordData?.status === "inviteSent" &&
-    loggedInUser?.email === rentalRecordData.owner;
+    currentRentalRecord?.status === "inviteSent" &&
+    loggedInUser?.email === currentRentalRecord.owner;
   const showEmailTenantButton =
-    rentalRecordData?.status === "inviteAccepted" &&
-    loggedInUser?.email === rentalRecordData.owner;
+    currentRentalRecord?.status === "inviteAccepted" &&
+    loggedInUser?.email === currentRentalRecord.owner;
 
   useEffect(() => {
     if (!selectedRents.length) {
@@ -344,7 +311,8 @@ export default function RentalRecordDetails() {
   const totalAmountToPay = useMemo(() => {
     const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
       selectedRents,
-      selectedAdditionalFees
+      selectedAdditionalFees,
+      currentRentalRecordCompany
     );
     return transactionFee + totalFeeMinusTransactionFee;
   }, [selectedRents, selectedAdditionalFees]);
@@ -364,12 +332,13 @@ export default function RentalRecordDetails() {
   };
 
   const showAdditionalFeePayButton =
-    loggedInUser?.email === rentalRecordData?.tenant;
+    loggedInUser?.email === currentRentalRecord?.tenant;
 
   const [showKYCPreview, setShowKYCPreview] = useState(false);
   const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
     selectedRents,
-    selectedAdditionalFees
+    selectedAdditionalFees,
+    currentRentalRecordCompany
   );
   return (
     <DashboardWrapper>
@@ -452,6 +421,12 @@ export default function RentalRecordDetails() {
                     </tr>
                   </tfoot>
                 </table>
+                {/* <button
+                  onClick={handlePaidRents}
+                  className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
+                >
+                  Pay
+                </button> */}
                 <PaystackButton
                   className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
                   {...componentProps}
@@ -462,16 +437,16 @@ export default function RentalRecordDetails() {
         </Transition>
         {/* Rent Invoice Table */}
         {/* KYC and Agreement form */}
-        {rentalRecordData && (
+        {currentRentalRecord && (
           <AgreementAndKYCForm
             openAgreementForm={openAgreementForm}
             setOpenAgreementForm={setOpenAgreementForm}
-            rentalRecordData={rentalRecordData}
+            rentalRecordData={currentRentalRecord}
             acceptInvitation={acceptInvitation}
           />
         )}
         {/* KYC and Agreement form */}
-        <section className="container mx-auto bg-white p-8 border-b print:hidden">
+        <section className="container mx-auto bg-white p-8 border-b print:hidden relative">
           <div className="flex flex-wrap items-center -m-2">
             <div className="w-full md:w-1/2 p-2">
               <div className="flex flex-wrap items-center -m-2">
@@ -483,7 +458,7 @@ export default function RentalRecordDetails() {
               </div>
             </div>
             <div className="w-full md:w-1/2 p-2">
-              <div className="flex flex-wrap justify-end -m-2">
+              <div className="flex flex-wrap justify-end -m-2 items-center">
                 <div className="w-full md:w-auto p-2"></div>
                 <div className="w-full md:w-auto p-2">
                   {showPayRentButton && <PayRentButton />}
@@ -491,14 +466,16 @@ export default function RentalRecordDetails() {
                   {showEmailTenantButton && <EmailTenantButton />}
                   {showResendInviteButton && <ResendInviteButton />}
                 </div>
-                <div className="w-full md:w-auto p-2"></div>
+                <div className="w-full md:w-auto p-2">
+                  <RentalRecordCollaboration />
+                </div>
               </div>
             </div>
           </div>
         </section>
         <div className="container mx-auto p-8 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
-          {rentalRecordData?.userKYC && property && (
+          {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
             <div className="mb-5">
               <button
                 onClick={() => {
@@ -513,7 +490,7 @@ export default function RentalRecordDetails() {
           )}
           <DetailsBox
             label="Property"
-            value={property?.title}
+            value={currentRentalRecordProperty?.title}
             loading={loadingProperty}
           />
           <DetailsBox
@@ -528,18 +505,18 @@ export default function RentalRecordDetails() {
           />
           <DetailsBox
             label="Property Location"
-            value={property?.location}
+            value={currentRentalRecordProperty?.location}
             loading={loadingProperty}
           />
           <DetailsBox
             label="Property Address"
-            value={property?.address}
+            value={currentRentalRecordProperty?.address}
             loading={loadingProperty}
           />
           <DetailsBox
             label="Rent"
-            value={`${formatPrice(rentalRecordData?.rent || 0)}/${
-              rentalRecordData?.rentPer
+            value={`${formatPrice(currentRentalRecord?.rent || 0)}/${
+              currentRentalRecord?.rentPer
             }`}
           />
           <p className="text-xs font-medium text-coolGray-500 mb-2">Rents</p>
@@ -547,30 +524,28 @@ export default function RentalRecordDetails() {
             {loadingRents ? (
               <ActivityIndicator color="black" />
             ) : (
-              rents
-                .sort((a: Rent, b: Rent) => a.dueDate - b.dueDate)
-                .map((rent, index) => (
-                  <RentItem
-                    index={index}
-                    showPayRentButton={showPayRentButton}
-                    rent={rent}
-                    selectedRents={selectedRents}
-                    setSelectedRents={setSelectedRents}
-                    key={index}
-                  />
-                ))
+              currentRentalRecordRents.map((rent, index) => (
+                <RentItem
+                  index={index}
+                  showPayRentButton={showPayRentButton}
+                  rent={rent}
+                  selectedRents={selectedRents}
+                  setSelectedRents={setSelectedRents}
+                  key={index}
+                />
+              ))
             )}
           </div>
           <DetailsBox
             label="Status"
             value={
-              rentalRecordData?.status
-                ? rentalRecordStatuses[rentalRecordData?.status]
+              currentRentalRecord?.status
+                ? rentalRecordStatuses[currentRentalRecord?.status]
                 : "--"
             }
           />
           <h1 className="text-3xl">Additional fees</h1>
-          {rentalRecordData?.fees?.map((i, feeIndex) => (
+          {currentRentalRecord?.fees?.map((i, feeIndex) => (
             <div
               key={feeIndex}
               className="flex gap-2 items-center py-2 flex-wrap border-b"
@@ -623,18 +598,18 @@ export default function RentalRecordDetails() {
               )}
             </div>
           ))}
-          {!rentalRecordData?.fees?.length && (
+          {!currentRentalRecord?.fees?.length && (
             <div className="mb-3">No Additional fees</div>
           )}
         </div>
-        {rentalRecordData?.userKYC && property && (
+        {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
           <KYCPreview
             openAgreementForm={showKYCPreview}
             setOpenAgreementForm={setShowKYCPreview}
-            rentalRecordData={rentalRecordData}
-            userKYC={rentalRecordData?.userKYC}
+            rentalRecordData={currentRentalRecord}
+            userKYC={currentRentalRecord?.userKYC}
             tenantFullName={tenantFullName || ""}
-            property={property}
+            property={currentRentalRecordProperty}
             ownerFullName={ownerFullName || ""}
           />
         )}

@@ -42,13 +42,11 @@ const useProperties = () => {
         toast.error("Error Loading Properties");
       })
       .finally(() => {});
-  }, [selectedCompany?.id, dispatch]);
+  }, [selectedCompany, dispatch]);
 
   useEffect(() => {
-    if (!properties.length) {
-      getUsersProperties();
-    }
-  }, [selectedCompany?.id, properties.length, getUsersProperties]);
+    getUsersProperties();
+  }, [selectedCompany, properties.length, getUsersProperties]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);

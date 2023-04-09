@@ -1,16 +1,18 @@
-import { AdditionalFee, Rent } from "../../models";
+import { AdditionalFee, Company, Rent } from "../../models";
 
+const transactionFeeForFreePlan = 500;
 /* 
 Lodgeek Pricing
-1.7% Transaction Costs
-Local transaction fees are capped at 5,000 Naira, meaning that's the maximum you'll ever pay in fees per transaction.
+For each payment made by tenants, Paystack will charge a 1.5% transaction fee, capped at N2,000. 
+This fee will be passed on to the property manager, except for the free plan, which will have a fixed transaction fee of N500.
 */
-const transactionFeePercent = 0.017;
-const transactionCostsCap = 5000;
+
 export function getRentsAndFees(
   selectedRents: Rent[],
-  selectedAdditionalFees: AdditionalFee[]
+  selectedAdditionalFees: AdditionalFee[],
+  propertyCompany?: Company
 ) {
+  const isFreePlan = !propertyCompany?.subscriptionCode;
   const totalFeeMinusTransactionFee =
     selectedRents
       .map((i) => i.rent)
@@ -18,9 +20,7 @@ export function getRentsAndFees(
     selectedAdditionalFees
       .map((i) => i.feeAmount)
       .reduce((partialSum, a) => partialSum + a, 0);
-  const transactionFee =
-    totalFeeMinusTransactionFee * transactionFeePercent <= transactionCostsCap
-      ? totalFeeMinusTransactionFee * transactionFeePercent
-      : transactionCostsCap;
+
+  const transactionFee = isFreePlan ? transactionFeeForFreePlan : 0;
   return { transactionFee, totalFeeMinusTransactionFee };
 }

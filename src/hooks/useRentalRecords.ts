@@ -33,6 +33,7 @@ import {
   userKYCRef,
 } from "../firebase/config";
 import {
+  Company,
   FirebaseCollections,
   MoneyTransaction,
   Rent,
@@ -50,6 +51,8 @@ import { getTransactionDescriptionAndAmount } from "./getTransactionDescriptionA
 import useBanks from "./useBanks";
 import { v4 as uuidv4 } from "uuid";
 import { selectSelectedCompany } from "../app/features/companySlice";
+import { generateReciept } from "../utils/generateReciept";
+import { htmlStringToImage } from "../utils/generateInvoicePDF";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -103,10 +106,8 @@ const useRentalRecords = () => {
   }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
-    if (!rentalRecords.length) {
-      getUsersRentalRecords();
-      getRentalRecordsForYourTenants();
-    }
+    getUsersRentalRecords();
+    getRentalRecordsForYourTenants();
   }, [
     loggedInUser?.email,
     rentalRecords.length,
@@ -187,6 +188,8 @@ const useRentalRecords = () => {
     }
 
     const rentBatch = writeBatch(db);
+
+    //Update fees statuses to paid
     if (selectedAdditionalFees.length > 0) {
       const fees = rentalRecord.fees.map((i) => {
         if (selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1) {
@@ -204,6 +207,7 @@ const useRentalRecords = () => {
       await updateDoc(thisRentalRecordRef, updatedRentalRecord).catch(() => {});
     }
 
+    //Update rents statuses to paid
     rents.forEach((rentdoc) => {
       var docRef = doc(collection(db, RENT_PATH), rentdoc.id);
       const rentData: Rent = {
@@ -213,6 +217,14 @@ const useRentalRecords = () => {
       };
       rentBatch.update(docRef, rentData);
     });
+
+    const propertyCompanyRef = doc(
+      db,
+      FirebaseCollections.companies,
+      rentalRecord.company
+    );
+    const propertyCompanyDocSnap = await getDoc(propertyCompanyRef);
+    const propertyCompany = propertyCompanyDocSnap.data() as Company;
 
     rentBatch
       .commit()
@@ -229,8 +241,7 @@ const useRentalRecords = () => {
             propertyTitle
           );
 
-        //Add transaction for tenant and landlord
-
+        /* Start: Add transaction for tenant and property company i.e landlord */
         const transactionForLandlordId = generateFirebaseId(
           FirebaseCollections.transaction
         );
@@ -246,56 +257,59 @@ const useRentalRecords = () => {
           updatedAt: Date.now(),
           currency: "NGN",
           description: transactionDescription,
-          payee: owner,
+          payee: propertyCompany.email,
           serviceFee: 0,
           status: "success",
           type: "plus",
           receiptNumber: uuidv4(),
+          company: rentalRecord.company,
         };
 
+        //Record credit transaction for property company i.e landlord
         await setDoc(
           doc(transactionRef, transactionForLandlordId),
           transactionData
         );
 
+        //Record debit transaction for tenant
         await setDoc(doc(transactionRef, transactionForTenantId), {
           ...transactionData,
           type: "minus",
           id: transactionForTenantId,
         });
-        //Add transaction for tenant and landlord
 
-        const ownerRef = doc(db, FirebaseCollections.users, owner);
-        const docSnap = await getDoc(ownerRef);
-        if (docSnap.exists()) {
-          const ownerDoc = docSnap.data() as User;
-          const updatedUser: User = {
-            ...ownerDoc,
-            balance: (ownerDoc.balance || 0) + totalAmount,
+        /*Ends: Add transaction for tenant and property company i.e landlord */
+
+        /*Start: Process Direct Remittance */
+        if (propertyCompany) {
+          const updatedPropertyCompany: Company = {
+            ...propertyCompany,
+            balance: (propertyCompany.balance || 0) + totalAmount,
           };
-          await updateDoc(ownerRef, updatedUser).finally(() => {});
 
-          /* Process Direct Remittance */
-          //If there is a remitance specified for this rental record, send it there here, else send to the owner's default.
+          await updateDoc(propertyCompanyRef, updatedPropertyCompany);
+
+          //If there is a remitance specified for this rental record, send it there here, else send to the property company's default.
+
           if (rentalRecord.remittanceAccount) {
             await processWithdrawal({
               amount: totalAmount,
               type: "fromLodgeekToRemittanceAccount",
               remittanceAccount: rentalRecord.remittanceAccount,
-              senderUserEmail: ownerDoc.email,
+              senderUserEmail: propertyCompany.email,
             });
           } else {
-            if (ownerDoc.directRemitance) {
+            if (propertyCompany.directRemitance) {
               await processWithdrawal({
                 amount: totalAmount,
                 type: "fromLodgeekToRemittanceAccount",
-                remittanceAccount: ownerDoc.remittanceAccount,
-                senderUserEmail: ownerDoc.email,
+                remittanceAccount: propertyCompany.remittanceAccount,
+                senderUserEmail: propertyCompany.email,
               });
             }
           }
-          /* Process Direct Remittance */
         }
+        /*End: Process Direct Remittance */
 
         const paragraphsForLandlord = [
           "The payment details are as follows:",
@@ -347,21 +361,54 @@ const useRentalRecords = () => {
           title: emailSubjectForTenant,
         });
 
+        const transactionEmailHTML = generateReciept({
+          date: moment().format("LL"),
+          duePayments: [],
+          payments: [
+            ...rents.map((rent) => {
+              return {
+                description: `Rent for ${moment(rent.dueDate).format(
+                  "MMM YYYY"
+                )}`,
+                amount: formatPrice(rent.rent),
+              };
+            }),
+            ...selectedAdditionalFees.map((fee) => {
+              return {
+                description: fee.feeTitle,
+                amount: formatPrice(fee.feeAmount),
+              };
+            }),
+          ],
+          property: propertyTitle,
+          propertyCompany: propertyCompany.name,
+          receiptNumber: transactionData.receiptNumber,
+          receivedfrom: tenantName,
+          totalAmountDue: "",
+          totalPaid: formatPrice(totalAmount),
+          extraComment: "",
+          title: "",
+          propertyCompanyLogo: propertyCompany.logo,
+        });
+        let receiptUrl = await htmlStringToImage(transactionEmailHTML);
+
         if (tenantEmail) {
           await sendEmail(
             tenantEmail,
             emailSubjectForTenant,
             paragraphsForTenant.join(" \n"),
-            generatedEmailForTenant
+            transactionEmailHTML,
+            [{ filename: "receipt.png", path: receiptUrl || "" }]
           );
         }
 
-        if (owner) {
+        if (propertyCompany.email) {
           await sendEmail(
-            owner,
+            propertyCompany.email,
             transactionDescription,
             paragraphsForLandlord.join(" \n"),
-            generatedEmailForLandlord
+            transactionEmailHTML,
+            [{ filename: "receipt.png", path: receiptUrl || "" }]
           ).then(() => {
             toast.success("Payment was successfully obtained.");
           });

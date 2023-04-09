@@ -1,6 +1,6 @@
 import "./App.css";
 import HomePage from "./screens/HomePage";
-import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
@@ -24,8 +24,13 @@ import Properties from "./screens/DashboardTabs/Properties";
 import Rents from "./screens/DashboardTabs/Rents";
 import BankRecords from "./screens/DashboardTabs/BankRecords";
 import Wallet from "./screens/DashboardTabs/Wallet";
-import SettingsPage from "./screens/SettingsPage";
+import CompanyProfileSettingsPage from "./screens/SettingsPages/CompanyProfileSettingsPage";
 import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
+import CompanyProfileEditPage from "./screens/SettingsPages/CompanyProfileEditPage";
+import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSettingsPage";
+import SelectPlans from "./screens/SelectPlans";
+import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
+import FinancialReport from "./screens/SettingsPages/FinancialReport";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -40,6 +45,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="select-plans" element={<SelectPlans />} />
           <Route
             path="individual-registration"
             element={<IndividualRegistrationPage />}
@@ -50,10 +56,11 @@ function App() {
           />
           <Route path="select-accounts" element={<CompanySelector />} />
           <Route path="get-started" element={<RegistrationPage />} />
-          <Route path="dashboard" element={<Dashboard />}>
-            <Route path="new" element={<NewPost />} /> {/*A nested route!*/}
-            <Route path=":postId" element={<Post />} /> {/*A nested route!*/}
-          </Route>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route
+            path="dashboard/:companyId/settings/reports"
+            element={<FinancialReport />}
+          />
           <Route
             path="dashboard/:companyId/rentalRecords"
             element={<RentalRecords />}
@@ -86,7 +93,19 @@ function App() {
           <Route path="dashboard/:companyId/withdraw" element={<Wallet />} />
           <Route
             path="dashboard/:companyId/settings"
-            element={<SettingsPage />}
+            element={<CompanyProfileSettingsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/profile"
+            element={<CompanyProfileEditPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/billing"
+            element={<CompanyBillingSettingsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/settings/team"
+            element={<TeamCollaboration />}
           />
           <Route
             path="dashboard/:companyId/invites"
@@ -100,21 +119,3 @@ function App() {
 }
 
 export default App;
-
-//NewPost.jsx, the child
-
-const NewPost = () => {
-  // const [currentUser] = useOutletContext()
-
-  return (
-    <div>
-      <h1>Welcome , write a new post!</h1>
-      <form />
-    </div>
-  );
-};
-function Post() {
-  let params = useParams();
-
-  return <h1>{params.postId}</h1>;
-}

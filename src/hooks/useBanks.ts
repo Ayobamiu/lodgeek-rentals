@@ -92,10 +92,8 @@ function useBanks() {
   }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
-    if (!bankRecords.length) {
-      getUsersBankRecords();
-    }
-  }, [selectedCompany?.id, bankRecords.length, getUsersBankRecords]);
+    getUsersBankRecords();
+  }, [selectedCompany?.id, getUsersBankRecords]);
 
   const addBank = async (data: BankRecord) => {
     await setDoc(doc(bankRecordRef, data.id), data)

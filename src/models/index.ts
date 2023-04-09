@@ -1,3 +1,5 @@
+import { WhereFilterOp } from "firebase/firestore";
+
 export enum UserType {
   "individual" = "individual",
   "company" = "company",
@@ -61,6 +63,7 @@ export type RentalRecord = {
   tenantAgreedOn: number;
   userKYC?: UserKYC;
   remittanceAccount?: string; //id of bank record
+  members: CompanyMember[];
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
@@ -96,6 +99,51 @@ export type SimpleEmailProps = {
   title?: string;
   paragraphs: string[];
   buttons?: ButtonItemProps[];
+};
+export type RecieptProps = {
+  /**Title of the email. */
+  title?: string;
+  /**Customer who made payment: This can be the name of a company or tenant. */
+  receivedfrom: string;
+  /**Title of the property the fees are for. */
+  property: string;
+  /**Property manager in charge of the property: This can be the name of a company or an individual. */
+  propertyCompany: string;
+  /**Company logo. */
+  propertyCompanyLogo?: string;
+  /**Date of the transaction in this format February 19, 2023 */
+  date: string;
+  /**receiptNumber prop on the MoneyTransaction for this transaction e.g. 001234 */
+  receiptNumber: string;
+  /**List of payments made.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   */
+  payments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+  }[];
+  /**String format of the total amount paid in this format N1,000,000 */
+  totalPaid: string;
+  /**List of due payments and their due dates.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   * 3. Date: Due date of the payment in this format February 19, 2023
+   */
+  duePayments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+    /**Due date of the payment in this format February 19, 2023 */
+    dueDate: string;
+  }[];
+  /**String format of the total due amount in this format N1,000,000 */
+  totalAmountDue: string;
+  /**Salutaions at the end of the receipt. Can include information about due payments */
+  extraComment?: string;
 };
 export type ButtonItemProps = {
   text: string;
@@ -152,6 +200,7 @@ export type MoneyTransaction = {
   payer: string;
   payee: string;
   receiptNumber: string;
+  company?: string;
 };
 export type YesOrNo = "yes" | "no";
 
@@ -258,11 +307,19 @@ export type LodgeekNotification = {
   3. Regular members
   Members have access to use features in Lodgeek, except for those that are limited to only owners and admins.
 */
-type CompanyRole = "owner" | "admin" | "regular";
-type CompanyMember = {
+export enum CompanyRole {
+  "owner" = "owner",
+  "admin" = "admin",
+  "regular" = "regular",
+}
+export type CompanyMember = {
   email: string;
   role: CompanyRole;
   dateJoined: number;
+};
+export type TeamMemberData = {
+  userData?: User;
+  memberData: CompanyMember;
 };
 
 export type Company = {
@@ -285,4 +342,118 @@ export type Company = {
   team: string[];
   members: CompanyMember[];
   remittanceAccount?: string;
+  planCode?: string;
+  subscriptionCode?: string;
+  nextPaymentDate?: string;
+  balance: number;
+  directRemitance?: boolean;
 };
+
+export enum SettingsTab {
+  profile = "profile",
+  team = "team",
+  billing = "billing",
+}
+
+type PayStackAuthorization = {
+  account_name: string;
+  authorization_code: string;
+  bank: string;
+  bin: string;
+  brand: string;
+  card_type: string;
+  channel: string;
+  country_code: string;
+  exp_month: string;
+  exp_year: string;
+  last4: string;
+  receiver_bank: string;
+  receiver_bank_account_number: string;
+  reusable: boolean;
+  signature: string;
+};
+
+type PayStackPlan = {
+  domain: string;
+  name: string;
+  plan_code: string;
+  description: null;
+  amount: number;
+  interval: string;
+  send_invoices: boolean;
+  send_sms: boolean;
+  hosted_page: false;
+  hosted_page_url: null;
+  hosted_page_summary: null;
+  currency: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type PayStackCustomer = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: null;
+  metadata: {
+    photos: {
+      type: string;
+      typeId: string;
+      typeName: string;
+      url: string;
+      isPrimary: false;
+    }[];
+  };
+  domain: string;
+  customer_code: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PayStackSubscription = {
+  invoices: any[];
+  customer: PayStackCustomer;
+  plan: PayStackPlan;
+  integration: number;
+  authorization: PayStackAuthorization;
+  domain: string;
+  start: number;
+  /**1. active: The subscription is currently active, and will be charged on the next payment date.
+   * 2. non-renewing: The subscription is currently active, but we won't be charging it on the next payment date. This occurs when a subscription is about to be complete, or has been cancelled (but we haven't reached the next payment date yet).
+   * 3. attention: The subscription is still active, but there was an issue while trying to charge the customer's card. The issue can be an expired card, insufficient funds, etc. We'll attempt charging the card again on the next payment date.
+   * 4. completed: The subscription is complete, and will no longer be charged.
+   * 5. cancelled: The subscription has been cancelled, and we'll no longer attempt to charge the card on the subscription.
+   */
+  status: "active" | "non-renewing" | "attention" | "completed" | "cancelled";
+  quantity: 1;
+  amount: number;
+  subscription_code: string;
+  email_token: string;
+  easy_cron_id: null;
+  cron_expression: string;
+  next_payment_date: string;
+  open_invoice: null;
+  id: number;
+  cancelledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+/**
+ * Used to filter documents.
+ * @link https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html#where
+ */
+export type WhereCriteria = {
+  field: string;
+  operation: WhereFilterOp;
+  criteria: any;
+};
+export enum SubscriptionPlan {
+  "Free Plan" = "Free Plan",
+  "Basic Plan" = "Basic Plan",
+  "Pro Plan" = "Pro Plan",
+  "Premium Plan" = "Premium Plan",
+}

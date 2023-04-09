@@ -1,12 +1,19 @@
-import { doc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { Company } from "../../models";
-import { companyRef } from "../config";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import { Company, FirebaseCollections } from "../../models";
+import { companyRef, db } from "../config";
 
 export async function getUserCompanies(email: string) {
   const q = query(
     companyRef,
-    where("primaryOwner", "==", email),
-    where("team", "array-contains", email)
+    (where("primaryOwner", "==", email), where("team", "array-contains", email))
   );
   let companiesList: Company[] = [];
 
@@ -22,3 +29,14 @@ export async function getUserCompanies(email: string) {
 export async function createCompany(company: Company) {
   return await setDoc(doc(companyRef, company.id), company);
 }
+
+export async function getCompany(id: string) {
+  const docRef = doc(companyRef, id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data() as Company;
+}
+
+export const updateCompanyInDatabase = async (company: Company) => {
+  const docRef = doc(db, FirebaseCollections.companies, company.id);
+  return await updateDoc(docRef, company);
+};

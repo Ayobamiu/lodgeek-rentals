@@ -1,9 +1,18 @@
 import { Property } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 
-export default function PropertyItem({ property }: { property: Property }) {
+export default function PropertyItem({
+  property,
+  onClick,
+}: {
+  property: Property;
+  onClick: () => void;
+}) {
   return (
-    <div className="w-full p-2 hover:shadow-sm border-b border-coolGray-100">
+    <div
+      onClick={onClick}
+      className="w-full p-2 hover:shadow-sm border-b border-coolGray-100 cursor-pointer"
+    >
       <div className="flex gap-x-3 items-center">
         <h3 className="mb-1 font-medium text-lg text-coolGray-900">
           {property.title}

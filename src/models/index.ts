@@ -30,6 +30,7 @@ export type Property = {
   rent: number;
   createdDate: number;
   rentPer: RentType;
+  images?: string[];
 };
 export type AdditionalFee = {
   id: string;

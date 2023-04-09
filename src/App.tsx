@@ -26,6 +26,7 @@ import BankRecords from "./screens/DashboardTabs/BankRecords";
 import Wallet from "./screens/DashboardTabs/Wallet";
 import SettingsPage from "./screens/SettingsPage";
 import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
+import PropertyDetails from "./screens/DashboardTabs/PropertyDetails";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -73,6 +74,10 @@ function App() {
           <Route
             path="dashboard/:companyId/properties"
             element={<Properties />}
+          />
+          <Route
+            path="dashboard/:companyId/properties/:propertyId"
+            element={<PropertyDetails />}
           />
           <Route
             path="dashboard/:companyId/properties/new"

@@ -23,6 +23,8 @@ export default function Properties() {
   );
   let searchResults = properties;
 
+  console.log(searchResults);
+
   if (searchQuery) {
     searchResults = searcher.search(searchQuery);
   }
@@ -87,7 +89,15 @@ export default function Properties() {
             <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
               <div className="flex flex-wrap -m-2">
                 {searchResults.map((property, index) => (
-                  <PropertyItem key={index} property={property} />
+                  <PropertyItem
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/${property.company}/properties/${property.id}`
+                      )
+                    }
+                    key={index}
+                    property={property}
+                  />
                 ))}
                 {!searchResults.length && (
                   <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">

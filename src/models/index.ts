@@ -63,6 +63,7 @@ export type RentalRecord = {
   tenantAgreedOn: number;
   userKYC?: UserKYC;
   remittanceAccount?: string; //id of bank record
+  members: CompanyMember[];
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",

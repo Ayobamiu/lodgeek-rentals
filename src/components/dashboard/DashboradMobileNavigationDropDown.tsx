@@ -1,4 +1,3 @@
-import { User } from "../../models";
 import { Popover } from "@headlessui/react";
 import { Link } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
@@ -6,21 +5,13 @@ import { selectUser } from "../../app/features/userSlice";
 import useAuth from "../../hooks/useAuth";
 import ActivityIndicator from "../shared/ActivityIndicator";
 import { selectSelectedCompany } from "../../app/features/companySlice";
+import { ProfilePhoto } from "./ProfilePhoto";
 
 export function DashboradMobileNavigationDropDown(): JSX.Element {
   const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
   const { signingOut, handleSignOutUser } = useAuth();
   const ownerAccess = loggedInUser?.email === selectedCompany?.primaryOwner;
-
-  function ProfilePhoto({ user }: { user: User | undefined }): JSX.Element {
-    const initials = `${user?.firstName[0] || "-"}${user?.lastName[0] || "-"}`;
-    return (
-      <div className="p-2 rounded-full bg-coolGray-500 w-10 h-10 flex justify-center items-center">
-        {user?.photoURL ? <img src={user?.photoURL} alt="" /> : initials}
-      </div>
-    );
-  }
 
   return (
     <Popover className="relative">
@@ -51,7 +42,12 @@ export function DashboradMobileNavigationDropDown(): JSX.Element {
 
       <Popover.Panel className="absolute z-40 w-80 bg-[#222529] rounded-lg right-0">
         <div className="w-full border-b-[0.3px] flex flex-wrap items-center justify-between p-4">
-          <ProfilePhoto user={loggedInUser} />
+          <ProfilePhoto
+            name={`${loggedInUser?.firstName || "-"}${
+              loggedInUser?.lastName || "-"
+            }`}
+            photoURL={loggedInUser?.photoURL}
+          />
           <div className="w-auto p-2">
             <h2 className="text-sm font-semibold text-white">
               {loggedInUser?.firstName || "-"} {loggedInUser?.lastName || "-"}

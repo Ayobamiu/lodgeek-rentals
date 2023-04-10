@@ -31,6 +31,7 @@ import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSe
 import SelectPlans from "./screens/SelectPlans";
 import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
 import FinancialReport from "./screens/SettingsPages/FinancialReport";
+import RentReviewpage from "./screens/DashboardTabs/RentReviewpage";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -68,6 +69,10 @@ function App() {
           <Route
             path="dashboard/rentalRecords/:id"
             element={<RentalRecordDetails />}
+          />
+          <Route
+            path="dashboard/rentalRecords/:id/rent-review"
+            element={<RentReviewpage />}
           />
           <Route
             path="dashboard/:companyId/rentalRecords/new"

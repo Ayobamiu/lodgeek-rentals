@@ -4,7 +4,7 @@ import { MdHelpCenter } from "react-icons/md";
 const SupportFab = ({ onClick }: { onClick: () => void }) => {
   return (
     <FAB
-      className="fixed bottom-10 right-10 flex flex-row items-center justify-center animate-bounce"
+      className="fixed bottom-10 right-10 flex flex-row items-center justify-center animate-bounce z-20"
       onClick={onClick}
     >
       <MdHelpCenter className="text-white text-4xl" />

@@ -67,7 +67,9 @@ const useRentalRecords = () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
     const q = query(
       rentalRecordsCol,
-      where("tenant", "==", loggedInUser?.email)
+      (where("tenant", "==", loggedInUser?.email),
+      where("company", "==", selectedCompany?.id),
+      where("team", "array-contains", loggedInUser?.email))
     );
 
     await getDocs(q)
@@ -75,6 +77,7 @@ const useRentalRecords = () => {
         const rentalRecordsList = rentalRecordsSnapshot.docs.map((doc) =>
           doc.data()
         ) as RentalRecord[];
+        console.log({ rentalRecordsList });
 
         dispatch(addRentalRecords(rentalRecordsList));
       })
@@ -82,7 +85,7 @@ const useRentalRecords = () => {
         toast.error("Error Loading Rental Records");
       })
       .finally(() => {});
-  }, [loggedInUser?.email, dispatch]);
+  }, [loggedInUser?.email, dispatch, selectedCompany?.id]);
 
   const getRentalRecordsForYourTenants = useCallback(async () => {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
@@ -107,7 +110,7 @@ const useRentalRecords = () => {
 
   useEffect(() => {
     getUsersRentalRecords();
-    getRentalRecordsForYourTenants();
+    // getRentalRecordsForYourTenants();
   }, [
     loggedInUser?.email,
     rentalRecords.length,

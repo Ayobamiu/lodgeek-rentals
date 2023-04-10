@@ -16,6 +16,7 @@ export const initialNewRentalRecord: RentalRecord = {
   tenantAgreedOn: -1,
   company: "",
   members: [],
+  team: [],
 };
 export const initialUserKYC: UserKYC = {
   associatedWithFelonyOrMisdemeanor: "no",

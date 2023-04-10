@@ -63,7 +63,40 @@ export type RentalRecord = {
   tenantAgreedOn: number;
   userKYC?: UserKYC;
   remittanceAccount?: string; //id of bank record
+  team: string[];
   members: CompanyMember[];
+};
+
+export type RentReview = {
+  id: string;
+  property: string;
+  tenant: string;
+  owner: string;
+  company: string;
+  createdDate: number;
+  status:
+    | "opened"
+    | "reviewSent"
+    | "tenantResponded"
+    | "increaseAccepted"
+    | "increaseRejected";
+
+  responses: {
+    user: string;
+    message: string;
+    date: number;
+  }[];
+  reveiwFormDetails: {
+    address: string;
+    unitNumber: string;
+    tenantName: string;
+    currentRentAmount: number;
+    newRentAmount: number;
+    reviewDate: number;
+    reasonForReview: string;
+    notes?: string;
+  };
+  rentalRecord: string;
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",

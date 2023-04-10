@@ -6,7 +6,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -40,6 +40,7 @@ import {
   setCurrentRentalRecordRents,
 } from "../../app/features/rentalRecordSlice";
 import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
+import Button from "../../components/shared/button/Button";
 
 export default function RentalRecordDetails() {
   const {
@@ -48,6 +49,8 @@ export default function RentalRecordDetails() {
     updatePaidRents,
     sendEmailInvitationToTenant,
   } = useRentalRecords();
+  const navigate = useNavigate();
+
   const dispatch = useAppDispatch();
 
   const loggedInUser = useAppSelector(selectUser);
@@ -475,6 +478,14 @@ export default function RentalRecordDetails() {
         </section>
         <div className="container mx-auto p-8 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
+          <div className="w-60 mb-5">
+            <Button
+              title="Start Rent Review"
+              onClick={() => {
+                navigate(`/dashboard/rentalRecords/${id}/rent-review`);
+              }}
+            />
+          </div>
           {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
             <div className="mb-5">
               <button

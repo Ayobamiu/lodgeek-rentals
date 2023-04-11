@@ -53,6 +53,8 @@ import { v4 as uuidv4 } from "uuid";
 import { selectSelectedCompany } from "../app/features/companySlice";
 import { generateReciept } from "../utils/generateReciept";
 import { htmlStringToImage } from "../utils/generateInvoicePDF";
+import { getRentReviewsForRentalRecord } from "../firebase/apis/rentReview";
+import { setRentReviews } from "../app/features/rentReviewSlice";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -514,6 +516,11 @@ const useRentalRecords = () => {
     );
     toast.success(`Invite sent to ${rentalRecordData.tenant}`);
   }
+
+  async function loadRentalReviews(rentalRecord: string) {
+    const data = await getRentReviewsForRentalRecord(rentalRecord);
+    dispatch(setRentReviews(data));
+  }
   const rentalRecordStatuses = {
     created: "🔵 Created",
     inviteSent: "⌛️ Invite Sent - Pending Approval",
@@ -531,6 +538,7 @@ const useRentalRecords = () => {
     saveUserKYC,
     loadUserKYC,
     sendEmailInvitationToTenant,
+    loadRentalReviews,
   };
 };
 export default useRentalRecords;

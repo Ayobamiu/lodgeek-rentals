@@ -71,7 +71,11 @@ function App() {
             element={<RentalRecordDetails />}
           />
           <Route
-            path="dashboard/rentalRecords/:id/rent-review"
+            path="dashboard/rentalRecords/:id/rent-review/new"
+            element={<RentReviewpage />}
+          />
+          <Route
+            path="dashboard/rentalRecords/:id/rent-review/:reviewId"
             element={<RentReviewpage />}
           />
           <Route

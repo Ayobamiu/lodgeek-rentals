@@ -1,4 +1,10 @@
-import { CompanyRole, RentalRecord, UserKYC } from "../models";
+import {
+  CompanyRole,
+  RentalRecord,
+  RentReview,
+  RentReviewStatus,
+  UserKYC,
+} from "../models";
 
 export const initialNewRentalRecord: RentalRecord = {
   createdDate: Date.now(),
@@ -17,6 +23,7 @@ export const initialNewRentalRecord: RentalRecord = {
   company: "",
   members: [],
   team: [],
+  rentReviews: [],
 };
 export const initialUserKYC: UserKYC = {
   associatedWithFelonyOrMisdemeanor: "no",
@@ -45,6 +52,31 @@ export const initialUserKYC: UserKYC = {
   emergencyContactAddress: "",
   emergencyContactName: "",
   emergencyContactRelationship: "",
+};
+export const initialRentReview: RentReview = {
+  company: "",
+  createdDate: Date.now(),
+  id: "",
+  owner: "",
+  property: "",
+  rentalRecord: "",
+  responses: [],
+  reveiwFormDetails: {
+    address: "",
+    currentRentAmount: 0,
+    newRentAmount: 0,
+    reasonForReview: "",
+    reviewDate: 0,
+    tenantName: "",
+    unitNumber: "",
+    notes: "",
+  },
+  status: RentReviewStatus.opened,
+  tenant: "",
+  leaseAgreement: "",
+  rentIncreaseNotice: "",
+  acceptedOn: 0,
+  rejectedOn: 0,
 };
 
 export const roleOptions = [

@@ -41,6 +41,19 @@ export type AdditionalFee = {
   paid: boolean;
   paidOn: number;
 };
+export type RentReviewRecord = {
+  id: string;
+  dateSubmitted: number;
+  effectDate: number;
+  leaseAgreement: string;
+  rentIncreaseNotice: string;
+  currentRentAmount: number;
+  newRentAmount: number;
+  reviewDate: number;
+  reasonForReview: string;
+  notes?: string;
+};
+
 export type RentalRecord = {
   id: string;
   property: string;
@@ -65,7 +78,41 @@ export type RentalRecord = {
   remittanceAccount?: string; //id of bank record
   team: string[];
   members: CompanyMember[];
+  rentReviews: RentReviewRecord[];
 };
+
+export type ReveiwFormDetails = {
+  address: string;
+  unitNumber: string;
+  tenantName: string;
+  currentRentAmount: number;
+  newRentAmount: number;
+  reviewDate: number;
+  reasonForReview: string;
+  notes?: string;
+};
+
+export type RentReviewResponse = {
+  user: string;
+  message: string;
+  date: number;
+  id: string;
+};
+
+export enum RentReviewStatus {
+  "opened" = "Opened",
+  "reviewSent" = "Review Sent",
+  "tenantResponded" = "Tenant Responded",
+  "increaseAccepted" = "Increase Accepted",
+  "increaseRejected" = "Increase Rejected",
+}
+export enum RentReviewStatusColor {
+  "Opened" = "gray",
+  "Review Sent" = "yellow",
+  "Tenant Responded" = "blue",
+  "Increase Accepted" = "green",
+  "Increase Rejected" = "red",
+}
 
 export type RentReview = {
   id: string;
@@ -74,29 +121,14 @@ export type RentReview = {
   owner: string;
   company: string;
   createdDate: number;
-  status:
-    | "opened"
-    | "reviewSent"
-    | "tenantResponded"
-    | "increaseAccepted"
-    | "increaseRejected";
-
-  responses: {
-    user: string;
-    message: string;
-    date: number;
-  }[];
-  reveiwFormDetails: {
-    address: string;
-    unitNumber: string;
-    tenantName: string;
-    currentRentAmount: number;
-    newRentAmount: number;
-    reviewDate: number;
-    reasonForReview: string;
-    notes?: string;
-  };
+  acceptedOn: number;
+  rejectedOn: number;
+  status: RentReviewStatus;
+  responses: RentReviewResponse[];
+  reveiwFormDetails: ReveiwFormDetails;
   rentalRecord: string;
+  rentIncreaseNotice: string;
+  leaseAgreement: string;
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
@@ -188,6 +220,7 @@ export enum FirebaseCollections {
   rentalRecords = "rentalRecords",
   mail = "mail",
   rents = "rents",
+  rentReview = "rentReview",
   users = "users",
   userKYC = "userKYC",
   transaction = "transaction",

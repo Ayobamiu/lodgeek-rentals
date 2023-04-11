@@ -41,6 +41,7 @@ import {
 } from "../../app/features/rentalRecordSlice";
 import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
 import Button from "../../components/shared/button/Button";
+import { ReviewsOnRentalRecord } from "./ReviewsOnRentalRecord";
 
 export default function RentalRecordDetails() {
   const {
@@ -478,14 +479,7 @@ export default function RentalRecordDetails() {
         </section>
         <div className="container mx-auto p-8 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
-          <div className="w-60 mb-5">
-            <Button
-              title="Start Rent Review"
-              onClick={() => {
-                navigate(`/dashboard/rentalRecords/${id}/rent-review`);
-              }}
-            />
-          </div>
+
           {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
             <div className="mb-5">
               <button
@@ -613,6 +607,7 @@ export default function RentalRecordDetails() {
             <div className="mb-3">No Additional fees</div>
           )}
         </div>
+        <ReviewsOnRentalRecord />
         {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
           <KYCPreview
             openAgreementForm={showKYCPreview}

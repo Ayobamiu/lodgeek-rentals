@@ -3,6 +3,7 @@ import userReducer from "./features/userSlice";
 import propertyReducer from "./features/propertySlice";
 import rentalRecordReducer from "./features/rentalRecordSlice";
 import rentReducer from "./features/rentSlice";
+import rentReviewReducer from "./features/rentReviewSlice";
 import bankRecordReducer from "./features/bankRecordSlice";
 import notificationReducer from "./features/notificationSlice";
 import companyReducer from "./features/companySlice";
@@ -13,6 +14,7 @@ export const store = configureStore({
     user: userReducer,
     rentalRecord: rentalRecordReducer,
     rent: rentReducer,
+    rentReview: rentReviewReducer,
     bankRecord: bankRecordReducer,
     notification: notificationReducer,
     company: companyReducer,

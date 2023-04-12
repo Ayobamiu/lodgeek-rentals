@@ -291,7 +291,7 @@ V696.973z M540.707,100.191l21.15,42.688l-238.955,65.218L540.707,100.191z"
           <SubscriptionNotification closable />
         </div>
       </aside>
-      <div className="p-4 sm:ml-64 pt-14">{children}</div>
+      <div className="p-4 sm:ml-64 pt-16">{children}</div>
     </div>
   );
 };

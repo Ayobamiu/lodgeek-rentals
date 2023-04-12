@@ -3,11 +3,11 @@ import { Rent } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
 import { RootState } from "../store";
 
-interface PropertyState {
+interface RentState {
   rents: Rent[];
 }
 
-const initialState: PropertyState = {
+const initialState: RentState = {
   rents: [],
 };
 export const propertySlice = createSlice({

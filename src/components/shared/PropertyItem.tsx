@@ -1,11 +1,11 @@
-import { Property } from "../../models";
+import { IProperty, Property } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 
 export default function PropertyItem({
   property,
   onClick,
 }: {
-  property: Property;
+  property: IProperty;
   onClick: () => void;
 }) {
   return (

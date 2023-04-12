@@ -2,20 +2,25 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import formatPrice from "../../utils/formatPrice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { selectUser, updateUser } from "../../app/features/userSlice";
+import { selectUser } from "../../app/features/userSlice";
 import BankRecordItem from "../../components/shared/BankRecordItem";
 import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import useQuery from "../../hooks/useQuery";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase/config";
-import { FirebaseCollections, User } from "../../models";
+import { Company, FirebaseCollections } from "../../models";
 import { toast } from "react-toastify";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useAuth from "../../hooks/useAuth";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
-import { selectSelectedCompany } from "../../app/features/companySlice";
+import {
+  selectSelectedCompany,
+  setSelectedCompany,
+  updateCompany,
+} from "../../app/features/companySlice";
 import useBanks from "../../hooks/useBanks";
+import LostPage from "../../components/shared/LostPage";
 
 export default function BankRecords() {
   useBanks();
@@ -28,7 +33,9 @@ export default function BankRecords() {
   const selectedCompany = useAppSelector(selectSelectedCompany);
   const [updatingDirectRemittance, setUpdatingDirectRemittance] =
     useState(false);
+
   const { updateDefaultRemittanceAccount } = useAuth();
+
   useEffect(() => {
     if (!selectedCompany?.remittanceAccount && bankRecords.length > 0) {
       const firstRecord = bankRecords[0];
@@ -37,22 +44,23 @@ export default function BankRecords() {
   }, [loggedInUser, bankRecords]);
 
   const updateDirectRemittance = async (activate: boolean) => {
-    const ownerRef = doc(
+    const propertyCompanyRef = doc(
       db,
-      FirebaseCollections.users,
-      loggedInUser?.email || ""
+      FirebaseCollections.companies,
+      selectedCompany?.id || ""
     );
     setUpdatingDirectRemittance(true);
-    const docSnap = await getDoc(ownerRef);
+    const docSnap = await getDoc(propertyCompanyRef);
     if (docSnap.exists()) {
-      const ownerDoc = docSnap.data() as User;
-      const updatedUser: User = {
-        ...ownerDoc,
+      const propertyCompanyDoc = docSnap.data() as Company;
+      const updatedPropertyCompany: Company = {
+        ...propertyCompanyDoc,
         directRemitance: activate,
       };
-      await updateDoc(ownerRef, updatedUser)
+      await updateDoc(propertyCompanyRef, updatedPropertyCompany)
         .then((c) => {
-          dispatch(updateUser(updatedUser));
+          dispatch(updateCompany(updatedPropertyCompany));
+          dispatch(setSelectedCompany(updatedPropertyCompany));
           toast("Direct remittance updated", { type: "success" });
         })
         .finally(() => {
@@ -62,6 +70,9 @@ export default function BankRecords() {
       setUpdatingDirectRemittance(false);
     }
   };
+
+  const ownerAccess = loggedInUser?.email === selectedCompany?.primaryOwner;
+  if (!ownerAccess) return <LostPage />;
 
   return (
     <DashboardWrapper>
@@ -171,7 +182,7 @@ export default function BankRecords() {
                           type="checkbox"
                           name="directRemitance"
                           id="directRemitance"
-                          defaultChecked={loggedInUser?.directRemitance}
+                          defaultChecked={selectedCompany?.directRemitance}
                           disabled={updatingDirectRemittance}
                           className="h-5 w-5 accent-green-500"
                           onChange={(e) => {

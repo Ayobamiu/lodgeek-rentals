@@ -9,7 +9,7 @@ import AppInput from "../components/shared/AppInput";
 import { createCompany } from "../firebase/apis/company";
 import { generateFirebaseId } from "../firebase/config";
 import useQuery from "../hooks/useQuery";
-import { Company, FirebaseCollections } from "../models";
+import { Company, CompanyRole, FirebaseCollections } from "../models";
 import base64 from "base-64";
 
 function IndividualRegistrationPage() {
@@ -56,7 +56,7 @@ function IndividualRegistrationPage() {
                   {
                     dateJoined: Date.now(),
                     email: loggedInUser.email,
-                    role: "owner",
+                    role: CompanyRole.owner,
                   },
                 ],
                 name,
@@ -66,6 +66,7 @@ function IndividualRegistrationPage() {
                 size,
                 team: [loggedInUser.email],
                 updatedAt: Date.now(),
+                balance: 0,
               };
               setSigningIn(true);
               await createCompany(companyData)
@@ -76,7 +77,8 @@ function IndividualRegistrationPage() {
                     const decodedRedirectUrl = base64.decode(redirectFromQuery);
                     navigate(decodedRedirectUrl);
                   } else {
-                    navigate(`/dashboard/${companyData.id}/rentalRecords`);
+                    // navigate(`/dashboard/${companyData.id}/rentalRecords`);
+                    navigate(`/select-plans`);
                   }
                 })
                 .finally(() => {

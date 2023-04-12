@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Company } from "../../models";
+import { Company, CompanyMember, TeamMemberData, User } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
 import { RootState } from "../store";
 
 interface CompanyState {
   companies: Company[];
   selectedCompany?: Company;
+  selectedCompanyTeamMembers?: TeamMemberData[];
 }
 
 const initialState: CompanyState = {
@@ -37,10 +38,16 @@ export const companySlice = createSlice({
       state.companies = filterUniqueByKey(currentCompanies, "id");
     },
     setCompanies: (state, action: PayloadAction<Company[]>) => {
-      state.companies = action.payload;
+      state.companies = filterUniqueByKey(action.payload, "id");
     },
     setSelectedCompany: (state, action: PayloadAction<Company>) => {
       state.selectedCompany = action.payload;
+    },
+    setSelectedCompanyMembers: (
+      state,
+      action: PayloadAction<TeamMemberData[]>
+    ) => {
+      state.selectedCompanyTeamMembers = action.payload;
     },
   },
 });
@@ -51,10 +58,13 @@ export const {
   setCompanies,
   updateCompany,
   setSelectedCompany,
+  setSelectedCompanyMembers,
 } = companySlice.actions;
 
 export const selectCompanies = (state: RootState) => state.company.companies;
 export const selectSelectedCompany = (state: RootState) =>
   state.company.selectedCompany;
+export const selectSelectedCompanyMembers = (state: RootState) =>
+  state.company.selectedCompanyTeamMembers;
 
 export default companySlice.reducer;

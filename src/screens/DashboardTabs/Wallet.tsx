@@ -10,6 +10,7 @@ import { selectUser } from "../../app/features/userSlice";
 import useBanks from "../../hooks/useBanks";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
+import LostPage from "../../components/shared/LostPage";
 
 export default function Wallet() {
   const loggedInUser = useAppSelector(selectUser);
@@ -86,6 +87,8 @@ export default function Wallet() {
     getBanks();
   }, []);
 
+  const ownerAccess = loggedInUser?.email === selectedCompany?.primaryOwner;
+  if (!ownerAccess) return <LostPage />;
   return (
     <DashboardWrapper>
       <div>

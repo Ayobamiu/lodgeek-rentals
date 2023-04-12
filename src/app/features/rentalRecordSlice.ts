@@ -1,62 +1,45 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RentalRecord, UserKYC } from "../../models";
+import {
+  Company,
+  IProperty,
+  Property,
+  Rent,
+  RentalRecord,
+  TeamMemberData,
+  User,
+  UserKYC,
+} from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
+import { initialNewRentalRecord, initialUserKYC } from "../initialValues";
 import { RootState } from "../store";
 
-interface PropertyState {
+interface RentalRecordState {
   rentalRecords: RentalRecord[];
   newRentalRecord: RentalRecord;
   userKYC: UserKYC;
+  /* Current rental record being loaded on the Rental record details page */
+  currentRentalRecord: RentalRecord;
+  /* Members of the current rental record being loaded on the Rental record details page */
+  currentRentalRecordMembers: TeamMemberData[];
+  /* Company related the current rental record being loaded on the Rental record details page */
+  currentRentalRecordCompany?: Company;
+  /* Property related the current rental record being loaded on the Rental record details page */
+  currentRentalRecordProperty?: IProperty;
+  /* Owner of the current rental record being loaded on the Rental record details page */
+  currentRentalRecordOwner?: User;
+  /* tenant on the current rental record being loaded on the Rental record details page */
+  currentRentalRecordTenant?: User;
+  /* Rents on the current rental record being loaded on the Rental record details page */
+  currentRentalRecordRents: Rent[];
 }
 
-const initialNewRentalRecord: RentalRecord = {
-  createdDate: Date.now(),
-  rentStarts: Date.now(),
-  id: "",
-  owner: "",
-  property: "",
-  rent: 0,
-  rentPer: "year",
-  tenant: "",
-  status: "created",
-  fees: [],
-  rentInstruction: "",
-  tenantAgreed: false,
-  tenantAgreedOn: -1,
-  company: "",
-};
-const initialUserKYC: UserKYC = {
-  associatedWithFelonyOrMisdemeanor: "no",
-  beenEvictedBefore: "no",
-  emergencyContact: "",
-  guarantorAddress: "",
-  guarantorContact: "",
-  guarantorEmail: "",
-  guarantorName: "",
-  guarantorOccupation: "",
-  guarantorRelationship: "",
-  id: "",
-  idType: "National Identification Number (NIN)",
-  meansOfId: "",
-  moveInDate: Date.now(),
-  readyToLeaveCurrentAddress: "yes",
-  referee1Address: "",
-  referee1Contact: "",
-  referee1Email: "",
-  referee1Name: "",
-  referee1Occupation: "",
-  referee1Relationship: "",
-  tenantCurrentAddress: "",
-  tenantPhone: "",
-  user: "",
-  emergencyContactAddress: "",
-  emergencyContactName: "",
-  emergencyContactRelationship: "",
-};
-const initialState: PropertyState = {
+const initialState: RentalRecordState = {
   rentalRecords: [],
   newRentalRecord: initialNewRentalRecord,
+  currentRentalRecord: initialNewRentalRecord,
   userKYC: initialUserKYC,
+  currentRentalRecordMembers: [],
+  currentRentalRecordRents: [],
 };
 export const propertySlice = createSlice({
   name: "rentalRecord",
@@ -100,8 +83,53 @@ export const propertySlice = createSlice({
     resetNewRentalRecord: (state) => {
       state.newRentalRecord = initialNewRentalRecord;
     },
+    setCurrentRentalRecord: (state, action: PayloadAction<RentalRecord>) => {
+      state.currentRentalRecord = action.payload;
+    },
+    updateCurrentRentalRecord: (
+      state,
+      action: PayloadAction<Partial<RentalRecord>>
+    ) => {
+      state.currentRentalRecord = {
+        ...state.currentRentalRecord,
+        ...action.payload,
+      };
+    },
+    resetCurrentRentalRecord: (state) => {
+      state.currentRentalRecord = initialNewRentalRecord;
+    },
     setRentalRecords: (state, action: PayloadAction<RentalRecord[]>) => {
       state.rentalRecords = action.payload;
+    },
+    setCurrentRentalRecordMembers: (
+      state,
+      action: PayloadAction<TeamMemberData[]>
+    ) => {
+      state.currentRentalRecordMembers = action.payload;
+    },
+    setCurrentRentalRecordCompany: (state, action: PayloadAction<Company>) => {
+      state.currentRentalRecordCompany = action.payload;
+    },
+    setCurrentRentalRecordProperty: (
+      state,
+      action: PayloadAction<IProperty | undefined>
+    ) => {
+      state.currentRentalRecordProperty = action.payload;
+    },
+    setCurrentRentalRecordOwner: (
+      state,
+      action: PayloadAction<User | undefined>
+    ) => {
+      state.currentRentalRecordOwner = action.payload;
+    },
+    setCurrentRentalRecordTenant: (
+      state,
+      action: PayloadAction<User | undefined>
+    ) => {
+      state.currentRentalRecordTenant = action.payload;
+    },
+    setCurrentRentalRecordRents: (state, action: PayloadAction<Rent[]>) => {
+      state.currentRentalRecordRents = action.payload;
     },
   },
 });
@@ -115,12 +143,28 @@ export const {
   resetNewRentalRecord,
   addRentalRecords,
   updateUserKYC,
+  resetCurrentRentalRecord,
+  setCurrentRentalRecord,
+  updateCurrentRentalRecord,
+  setCurrentRentalRecordMembers,
+  setCurrentRentalRecordCompany,
+  setCurrentRentalRecordProperty,
+  setCurrentRentalRecordOwner,
+  setCurrentRentalRecordTenant,
+  setCurrentRentalRecordRents,
 } = propertySlice.actions;
 
+export const selectRentalRecord = (state: RootState) => state.rentalRecord;
 export const selectRentalRecords = (state: RootState) =>
   state.rentalRecord.rentalRecords;
 export const selectNewRentalRecord = (state: RootState) =>
   state.rentalRecord.newRentalRecord;
+export const selectCurrentRentalRecord = (state: RootState) =>
+  state.rentalRecord.currentRentalRecord;
+export const selectCurrentRentalRecordMembers = (state: RootState) =>
+  state.rentalRecord.currentRentalRecordMembers;
 export const selectUserKYC = (state: RootState) => state.rentalRecord.userKYC;
+export const selectCurrentRentalRecordCompany = (state: RootState) =>
+  state.rentalRecord.currentRentalRecordCompany;
 
 export default propertySlice.reducer;

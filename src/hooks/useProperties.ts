@@ -17,7 +17,7 @@ import {
 } from "../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { db, PROPERTY_PATH } from "../firebase/config";
-import { Property } from "../models";
+import { IProperty, Property } from "../models";
 
 const useProperties = () => {
   const propertyRef = collection(db, PROPERTY_PATH);
@@ -34,7 +34,7 @@ const useProperties = () => {
       .then((propertiesSnapshot) => {
         const propertiesList = propertiesSnapshot.docs.map((doc) =>
           doc.data()
-        ) as Property[];
+        ) as IProperty[];
 
         dispatch(setProperties(propertiesList));
       })
@@ -42,15 +42,13 @@ const useProperties = () => {
         toast.error("Error Loading Properties");
       })
       .finally(() => {});
-  }, [selectedCompany?.id, dispatch]);
+  }, [selectedCompany, dispatch]);
 
   useEffect(() => {
-    if (!properties.length) {
-      getUsersProperties();
-    }
-  }, [selectedCompany?.id, properties.length, getUsersProperties]);
+    getUsersProperties();
+  }, [selectedCompany, properties.length, getUsersProperties]);
 
-  const handleAddProperty = async (data: Property) => {
+  const handleAddProperty = async (data: IProperty) => {
     setAddingProperty(true);
     await setDoc(doc(propertyRef, data.id), data)
       .then((c) => {
@@ -67,13 +65,15 @@ const useProperties = () => {
       });
   };
 
-  const getPropertyData = async (id: string): Promise<Property | undefined> => {
+  const getPropertyData = async (
+    id: string
+  ): Promise<IProperty | undefined> => {
     let property = properties.find((i) => i.id === id);
     if (!property) {
       const docRef = doc(db, PROPERTY_PATH, id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        property = docSnap.data() as Property;
+        property = docSnap.data() as IProperty;
       }
     }
 

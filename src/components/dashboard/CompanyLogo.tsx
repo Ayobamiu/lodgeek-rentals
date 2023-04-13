@@ -46,7 +46,7 @@ export function CompanyLogo(): JSX.Element {
             <small>{selectedCompany?.email}</small>
           </div>
         </div>
-        {selectedCompany && (
+        {/* {selectedCompany && (
           <Link
             to={`/dashboard/${selectedCompany?.id}/settings/reports`}
             className="p-4 border-b-[0.3px] flex items-center gap-3 cursor-pointer"
@@ -59,7 +59,7 @@ export function CompanyLogo(): JSX.Element {
               </span>
             </div>
           </Link>
-        )}
+        )} */}
         {selectedCompany && (
           <Link
             to={`/dashboard/${selectedCompany?.id}/settings/team`}

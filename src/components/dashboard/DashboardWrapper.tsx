@@ -19,7 +19,13 @@ import ActivityIndicator from "../shared/ActivityIndicator";
 import { SubscriptionNotification } from "../homepage/SubscriptionNotification";
 import { Popover } from "@headlessui/react";
 
-const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+const DashboardWrapper = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string | undefined;
+}) => {
   let query = useQuery();
   const navigate = useNavigate();
   const loggedInUser = useAppSelector(selectUser);
@@ -291,7 +297,7 @@ V696.973z M540.707,100.191l21.15,42.688l-238.955,65.218L540.707,100.191z"
           <SubscriptionNotification closable />
         </div>
       </aside>
-      <div className="sm:ml-60 lg:ml-64 pt-14">{children}</div>
+      <div className={`sm:ml-60 lg:ml-64 pt-14 ${className}`}>{children}</div>
     </div>
   );
 };

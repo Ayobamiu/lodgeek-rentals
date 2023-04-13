@@ -43,11 +43,18 @@ export default function AddProperty() {
   const [propertyCondition, setPropertyCondition] = useState("");
   const [propertyFurnishing, setPropertyFurnishing] = useState("");
   const [propertyFacilities, setPropertyFacilities] = useState<any>([]);
-  // const [furnishingDataLocal,setFurnishingDataLocal] = useState<{value:string,label:string}[] | undefined>(undefined)
   const [propertyLga, setPropertyLga] = useState("");
   const [propertySize, setPropertySize] = useState("");
   const [propertyType, setPropertyType] = useState("");
   const [lgaData, setLgaData] = useState<string[]>([]);
+  const [lanLordFullName, setLanLordFullName] = useState("");
+  const [lanLordContactNumber, setLanLordContactNumber] = useState("");
+  const [lanLordEmailAddress, setLanLordEmailAddress] = useState("");
+  const [lanLordMailingAddress, setLanLordMailingAddress] = useState("");
+  const [lanLordEmergencyContact, setLanLordEmergencyContact] = useState("");
+  const [lanLordTinNumber, setLanLordTinNumber] = useState("");
+  const [lanLordPropertyManagementExp, setLanLordPropertyManagementExp] =
+    useState("");
 
   const navigate = useNavigate();
   const { addProperty, addingProperty } = useProperties();
@@ -89,6 +96,13 @@ export default function AddProperty() {
       rent,
       rentPer,
       location,
+      landLordFullName: lanLordFullName,
+      landLordContactPhoneNumber: lanLordContactNumber,
+      landLordEmailAddress: lanLordEmailAddress,
+      landLordMailingAddress: lanLordMailingAddress,
+      landLordEmergencyContactInformation: lanLordEmergencyContact,
+      landLordTaxIdentificationNumber: lanLordTinNumber,
+      landLordPropertyManagementExperience: lanLordPropertyManagementExp,
     };
 
     await addProperty(mainData).then(() => {
@@ -132,7 +146,7 @@ export default function AddProperty() {
               <div className="pb-6 border-b border-coolGray-100">
                 <div className="flex flex-wrap items-center justify-between -m-2">
                   <div className="w-full md:w-auto p-2">
-                    <h2 className="text-coolGray-900 text-lg font-semibold">
+                    <h2 className="text-coolGray-900 text-2xl font-semibold">
                       Add Property
                     </h2>
                   </div>
@@ -167,6 +181,11 @@ export default function AddProperty() {
               </div>
               {/* End of form Header */}
               <section className="w-full mt-5">
+                <div className="w-full border-b border-b-gray-200 mb-5 pb-2">
+                  <h6 className="text-gray-400 font-semibold text-lg">
+                    Property Information
+                  </h6>
+                </div>
                 {/* Single Property data */}
                 <div className="w-full grid  md:grid-cols-2 gap-5 items-center">
                   <Input
@@ -355,127 +374,91 @@ export default function AddProperty() {
                   />
                 </div>
               </section>
+              {/* Lanlord information */}
+              <section className="w-full mt-10">
+                <div className="w-full border-b border-b-gray-200 mb-5 pb-2">
+                  <h6 className="text-gray-400 font-semibold text-lg">
+                    LanLord's Information
+                  </h6>
+                </div>
+                {/* Single Property data */}
+                <div className="w-full grid  md:grid-cols-2 gap-5 items-center mt-5">
+                  <Input
+                    value={lanLordFullName}
+                    onChange={(e) => setLanLordFullName(e?.target.value)}
+                    className="w-full"
+                    label="FullName"
+                    required
+                    placeholder="Enter lanlord full name..."
+                  />
+                  <Input
+                    value={lanLordEmailAddress}
+                    onChange={(e) => setLanLordEmailAddress(e?.target.value)}
+                    className="w-full"
+                    label="Email Address"
+                    placeholder="Enter lanlord email address..."
+                    type="email"
+                    required
+                  />
+                </div>
+                {/* Single Property data */}
+                <div className="w-full grid  md:grid-cols-2 gap-5 items-center mt-5">
+                  <Input
+                    value={lanLordContactNumber}
+                    onChange={(e) => setLanLordContactNumber(e?.target.value)}
+                    className="w-full"
+                    label="Contact Number"
+                    required
+                    placeholder="Enter lanlord contact phone number..."
+                    type="tel"
+                  />
+                  <Input
+                    value={lanLordEmergencyContact}
+                    onChange={(e) =>
+                      setLanLordEmergencyContact(e?.target.value)
+                    }
+                    className="w-full"
+                    label="Emergency Contact Number"
+                    placeholder="Enter lanlord emergency contact phone number..."
+                    type="tel"
+                    required
+                  />
+                </div>
+                {/* Single Property data */}
+                <div className="w-full grid  md:grid-cols-2 gap-5 items-center mt-5">
+                  <Input
+                    value={lanLordMailingAddress}
+                    onChange={(e) => setLanLordMailingAddress(e?.target.value)}
+                    className="w-full"
+                    label="Mailing Address (P.O.BOX)"
+                    required
+                    placeholder="Enter lanlord mailing address..."
+                  />
+                  <Input
+                    value={lanLordTinNumber}
+                    onChange={(e) => setLanLordTinNumber(e?.target.value)}
+                    className="w-full"
+                    label="Tax Identification Number (TIN)"
+                    placeholder="Enter lanlord TIN number..."
+                  />
+                </div>
+                {/* Single Property data */}
+                <div className="w-full mt-5">
+                  <TextAreaInput
+                    value={lanLordPropertyManagementExp}
+                    onChange={(e) =>
+                      setLanLordPropertyManagementExp(e?.target.value)
+                    }
+                    className="w-full"
+                    label="About Me"
+                    placeholder="Enter lanLord about details..."
+                  />
+                </div>
+              </section>
             </form>
           </div>
         </section>
       </div>
     </DashboardWrapper>
   );
-}
-
-{
-  /* <>
-  <div className="py-6 border-b border-coolGray-100">
-    <div className="w-full md:w-9/12">
-      <div className="flex flex-wrap -m-3">
-        <div className="w-full md:w-1/3 p-3">
-          <p className="text-sm text-coolGray-800 font-semibold">Title</p>
-        </div>
-        <div className="w-full md:flex-1 p-3">
-          <input
-            required
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-            type="text"
-            placeholder="Title of apartment"
-            onChange={(e) => setTitle(e.target.value)}
-            defaultValue={title}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="py-6 border-b border-coolGray-100">
-    <div className="w-full md:w-9/12">
-      <div className="flex flex-wrap -m-3">
-        <div className="w-full md:w-1/3 p-3">
-          <p className="text-sm text-coolGray-800 font-semibold">Description</p>
-        </div>
-        <div className="w-full md:flex-1 p-3">
-          <input
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-            type="text"
-            placeholder="Description of apartment"
-            onChange={(e) => setDescription(e.target.value)}
-            defaultValue={description}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="py-6 border-b border-coolGray-100">
-    <div className="w-full md:w-9/12">
-      <div className="flex flex-wrap -m-3">
-        <div className="w-full md:w-1/3 p-3">
-          <p className="text-sm text-coolGray-800 font-semibold">Location</p>
-        </div>
-        <div className="w-full md:flex-1 p-3">
-          <input
-            // ref={ref}
-            required
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-            type="text"
-            placeholder="Lekki, Lagos"
-            onChange={(e) => setLocation(e.target.value)}
-            defaultValue={location}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="py-6 border-b border-coolGray-100">
-    <div className="w-full md:w-9/12">
-      <div className="flex flex-wrap -m-3">
-        <div className="w-full md:w-1/3 p-3">
-          <p className="text-sm text-coolGray-800 font-semibold">Address</p>
-        </div>
-        <div className="w-full md:flex-1 p-3 relative">
-          <input
-            required
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-            type="text"
-            placeholder="2, New Avenue Street"
-            onChange={(e) => setAddress(e.target.value)}
-            defaultValue={address}
-          />
-        </div>
-      </div>
-    </div>
-  </div>
-  <div className="py-6 border-b border-coolGray-100">
-    <div className="w-full md:w-9/12">
-      <div className="flex flex-wrap -m-3">
-        <div className="w-full md:w-1/3 p-3">
-          <p className="text-sm text-coolGray-800 font-semibold">Rent</p>
-        </div>
-        <div className="w-full md:w-1/3 p-3 flex items-center ">
-          <CurrencyInput
-            id="input-example"
-            name="input-name"
-            placeholder="₦ 500,000.00"
-            decimalsLimit={2}
-            onValueChange={(value, name) => {
-              setRent(Number(value));
-            }}
-            defaultValue={rent}
-            required
-            prefix="₦ "
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-          />
-        </div>
-        <div className="w-full md:w-1/3 p-3 flex">
-          <select
-            required
-            className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
-            placeholder="Doe"
-            defaultValue={rentPer}
-            onSelect={(e) => setRentPer(e.currentTarget.value as RentType)}
-          >
-            <option value="month">per month</option>
-            <option value="year">per year</option>
-          </select>
-        </div>
-      </div>
-    </div>
-  </div>
-</>; */
 }

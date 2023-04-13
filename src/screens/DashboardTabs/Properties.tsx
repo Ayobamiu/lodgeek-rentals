@@ -28,7 +28,7 @@ export default function Properties() {
   );
   let searchResults = properties;
 
-  console.log(searchResults);
+  // console.log(searchResults);
 
   if (searchQuery) {
     searchResults = searcher.search(searchQuery);

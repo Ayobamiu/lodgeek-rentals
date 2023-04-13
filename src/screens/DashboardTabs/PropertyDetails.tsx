@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import Button from "../../components/shared/button/Button";
 import { propertyOne } from "../../utils/devData";
@@ -6,14 +6,43 @@ import PropertyImageCarousel from "../../components/dashboard/PropertyImageCarou
 import { MdLocationPin } from "react-icons/md";
 import { Tabs } from "flowbite-react";
 import PropertyDetailTab from "../../components/dashboard/PropertyDetailTab";
+import { useParams } from "react-router-dom";
+import { IProperty } from "../../models";
+import { getProperty } from "../../firebase/apis/company";
 
 const PropertyDetails = () => {
   const { images, title, rent, rentPer, location, description, address } =
     propertyOne;
   const [activeTab, setActiveTab] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const tabsRef = useRef<any>(null);
+  const { propertyId } = useParams();
+  const [propertyDetail, setPropertyDetail] = useState<IProperty | null>(null);
+
+  const getPropertyDetail = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    const property = await getProperty(propertyId);
+    if (property) {
+      setLoading(false);
+      setError("");
+      setPropertyDetail(property);
+      return;
+    }
+    if (!property) {
+      setLoading(false);
+      setError("Error occured while getting the property detail");
+      return;
+    }
+  }, [propertyId]);
+
+  useEffect(() => {
+    getPropertyDetail();
+  }, [getPropertyDetail]);
+
   return (
-    <DashboardWrapper>
+    <DashboardWrapper className="lg:ml-56 xl:ml-40">
       <section className="container mx-auto bg-white py-8 px-4 md:px-10 lg:px-20 xl:px-40 border-b print:hidden">
         <div className="flex flex-wrap items-center -m-2">
           <div className="w-full md:w-1/2 p-2">
@@ -29,7 +58,7 @@ const PropertyDetails = () => {
             <div className="flex flex-wrap justify-end -m-2">
               <div className="w-full md:w-auto p-2"></div>
               <div className="w-full md:w-auto p-2">
-                <Button title="Buy" />
+                <Button title="Edit" />
               </div>
               <div className="w-full md:w-auto p-2"></div>
             </div>
@@ -41,20 +70,23 @@ const PropertyDetails = () => {
         <div className="w-full flex flex-row  justify-between mb-10 ">
           <div className="w-[80%] md:w-[70%]">
             <h1 className="text-lg md:text-2xl  text-gray-400 font-semibold">
-              {title}
+              {propertyDetail?.title}
             </h1>
             <div className="flex flex-row items-center">
               <MdLocationPin className="text-gray-500" />
-              &nbsp; <p className="text-gray-500 font-semibold">{location}</p>
+              &nbsp;{" "}
+              <p className="text-gray-500 font-semibold">
+                {propertyDetail?.location}
+              </p>
             </div>
           </div>
           {/* Price */}
           <div className="">
             <h6 className="text:xl md:text-2xl xl:text-3xl text-gray-800 font-bold">
-              {rent}
+              ₦{propertyDetail?.rent?.toLocaleString()}
             </h6>
-            <span className="text-gray-500 font-semibold">
-              /per&nbsp;{rentPer}
+            <span className="text-gray-500 font-semibold lowercase">
+              / per&nbsp;{propertyDetail?.rentPer}
             </span>
           </div>
         </div>
@@ -70,7 +102,7 @@ const PropertyDetails = () => {
             onActiveTabChange={(tab) => setActiveTab(tab)}
           >
             <Tabs.Item active title="Detail">
-              <PropertyDetailTab description={description} address={address} />
+              <PropertyDetailTab property={propertyDetail} />
             </Tabs.Item>
             {/* <Tabs.Item title="Dashboard">Dashboard content</Tabs.Item> */}
           </Tabs.Group>

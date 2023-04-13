@@ -63,6 +63,13 @@ export type IProperty = {
   createdDate: number;
   rent: number;
   rentPer: RentType;
+  landLordFullName: string;
+  landLordContactPhoneNumber: string;
+  landLordEmailAddress: string;
+  landLordMailingAddress: string;
+  landLordEmergencyContactInformation: string;
+  landLordTaxIdentificationNumber?: string;
+  landLordPropertyManagementExperience?: string;
 };
 export type AdditionalFee = {
   id: string;

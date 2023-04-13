@@ -47,9 +47,13 @@ export function RentReviewForm() {
 
   const nextFourDuePayments = [];
 
+  const firstRent = [...currentRentalRecordRents].sort(
+    (a, b) => a.dueDate - b.dueDate
+  )[0];
+
   for (let index = 1; index < 6; index++) {
     nextFourDuePayments.push(
-      moment(lastPaidRent.dueDate)
+      moment(lastPaidRent?.dueDate || firstRent.dueDate)
         .add(index, currentRentalRecord.rentPer)
         .toDate()
         .getTime()

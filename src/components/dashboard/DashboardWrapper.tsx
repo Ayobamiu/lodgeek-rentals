@@ -2,13 +2,16 @@ import React from "react";
 import { useEffect } from "react";
 import useQuery from "../../hooks/useQuery";
 import useAuth from "../../hooks/useAuth";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/features/userSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { manageRedirectAndUserCompanies } from "../../firebase/apis/manageRedirectAndUserCompanies";
 import { CompanyLogo } from "./CompanyLogo";
 import { Drawer } from "flowbite";
-import { selectSelectedCompany } from "../../app/features/companySlice";
+import {
+  selectSelectedCompany,
+  setSelectedCompany,
+} from "../../app/features/companySlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCog,
@@ -18,6 +21,7 @@ import {
 import ActivityIndicator from "../shared/ActivityIndicator";
 import { SubscriptionNotification } from "../homepage/SubscriptionNotification";
 import { Popover } from "@headlessui/react";
+import { getUserDefaultCompany } from "../../firebase/apis/company";
 
 const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   let query = useQuery();
@@ -27,6 +31,17 @@ const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
   const { signingOut, handleSignOutUser } = useAuth();
   const redirectFromQuery = query.get("redirect") as string;
   const emailFromQuery = query.get("email") as string;
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    (async () => {
+      if (loggedInUser?.email) {
+        const company = await getUserDefaultCompany(loggedInUser?.email);
+        if (company) {
+          dispatch(setSelectedCompany(company));
+        }
+      }
+    })();
+  }, [loggedInUser?.email]);
 
   useEffect(() => {
     manageRedirectAndUserCompanies(

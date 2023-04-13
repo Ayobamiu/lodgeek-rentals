@@ -38,6 +38,7 @@ const useAuth = () => {
       const docSnap = await getDoc(docRef);
       const user = docSnap.data() as User;
       dispatch(updateUser(user));
+      localStorage.setItem("user", JSON.stringify(user));
     },
     [dispatch]
   );
@@ -52,6 +53,7 @@ const useAuth = () => {
           });
         }
       } else {
+        localStorage.removeItem("user");
         setCurrentUser(undefined);
         dispatch(updateUser(undefined));
       }
@@ -131,6 +133,7 @@ const useAuth = () => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
+        localStorage.removeItem("user");
         dispatch(updateUser(undefined));
       })
       .catch(() => {

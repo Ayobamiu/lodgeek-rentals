@@ -5,6 +5,7 @@ const SupportFab = ({ onClick }: { onClick: () => void }) => {
   return (
     <FAB
       className="fixed bottom-2 right-10 flex flex-row items-center justify-center animate-bounce"
+
       onClick={onClick}
     >
       <MdHelpCenter className="text-white text-4xl" />

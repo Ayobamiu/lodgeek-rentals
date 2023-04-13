@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { selectRentalRecord } from "../../app/features/rentalRecordSlice";
 import { selectRentReview } from "../../app/features/rentReviewSlice";
+import { selectUser } from "../../app/features/userSlice";
 import { useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useRentalRecords from "../../hooks/useRentalRecords";
@@ -12,6 +14,8 @@ export const ReviewsOnRentalRecord = () => {
   const { rentReviews } = useAppSelector(selectRentReview);
   const { loadRentalReviews } = useRentalRecords();
   const [loading, setLoading] = useState(false);
+  const { currentRentalRecord } = useAppSelector(selectRentalRecord);
+  const loggedInUser = useAppSelector(selectUser);
 
   useEffect(() => {
     if (id) {
@@ -30,16 +34,18 @@ export const ReviewsOnRentalRecord = () => {
         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white flex gap-x-3 items-center">
           Rent reviews {loading && <ActivityIndicator size="4" />}
         </h5>
-        <button
-          type="submit"
-          title="Start Rent Review"
-          onClick={() => {
-            navigate(`/dashboard/rentalRecords/${id}/rent-review/new`);
-          }}
-          className="flex gap-x-3 items-center justify-center text-white bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-        >
-          Start Review
-        </button>
+        {currentRentalRecord.owner === loggedInUser?.email && (
+          <button
+            type="submit"
+            title="Start Rent Review"
+            onClick={() => {
+              navigate(`/dashboard/rentalRecords/${id}/rent-review/new`);
+            }}
+            className="flex gap-x-3 items-center justify-center text-white bg-green-700 disabled:bg-gray-500 disabled:cursor-not-allowed hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+          >
+            Start Review
+          </button>
+        )}
       </div>
       <p className="mb-3 font-normal text-gray-700 dark:text-gray-400">
         Here are the recent rent reviews, in reverse chronological order.

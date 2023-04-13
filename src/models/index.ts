@@ -136,6 +136,12 @@ export enum RentStatus {
   "Paid - Rent has been paid." = "paid",
   "Late - Due date has passed and rent has not been paid." = "late",
 }
+export enum RentStatusColor {
+  "upcoming" = "gray",
+  "pending" = "yellow",
+  "paid" = "green",
+  "late" = "red",
+}
 export type Rent = {
   id: string;
   property: string;

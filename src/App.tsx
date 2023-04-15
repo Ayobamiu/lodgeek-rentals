@@ -67,15 +67,15 @@ function App() {
             element={<RentalRecords />}
           />
           <Route
-            path="dashboard/rentalRecords/:id"
+            path="dashboard/rentalRecords/:rentalRecordId"
             element={<RentalRecordDetails />}
           />
           <Route
-            path="dashboard/rentalRecords/:id/rent-review/new"
+            path="dashboard/rentalRecords/:rentalRecordId/rent-review/new"
             element={<RentReviewpage />}
           />
           <Route
-            path="dashboard/rentalRecords/:id/rent-review/:reviewId"
+            path="dashboard/rentalRecords/:rentalRecordId/rent-review/:reviewId"
             element={<RentReviewpage />}
           />
           <Route

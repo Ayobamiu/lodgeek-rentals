@@ -42,7 +42,7 @@ export function RentInvoiceTable() {
   );
   const dispatch = useAppDispatch();
   const [updatingRents, setUpdatingRents] = useState(false);
-  let { id } = useParams();
+  let { rentalRecordId } = useParams();
 
   const loggedInUser = useAppSelector(selectUser);
 
@@ -63,7 +63,7 @@ export function RentInvoiceTable() {
 
     await updatePaidRents({
       rents: selectedRents,
-      rentalRecordId: id || "",
+      rentalRecordId: rentalRecordId || "",
       owner: currentRentalRecordOwner?.email || "",
       propertyTitle: currentRentalRecordProperty?.title || "",
       tenantName: `${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName}`,

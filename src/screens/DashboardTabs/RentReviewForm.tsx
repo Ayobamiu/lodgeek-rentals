@@ -35,7 +35,7 @@ export function RentReviewForm() {
   } = useAppSelector(selectRentalRecord);
   const { currentRentReview } = useAppSelector(selectRentReview);
 
-  let { id } = useParams();
+  let { rentalRecordId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -104,9 +104,12 @@ export function RentReviewForm() {
           );
         });
 
-        navigate(`/dashboard/rentalRecords/${id}/rent-review/${newReview.id}`, {
-          replace: true,
-        });
+        navigate(
+          `/dashboard/rentalRecords/${rentalRecordId}/rent-review/${newReview.id}`,
+          {
+            replace: true,
+          }
+        );
       })
       .finally(() => {
         setSubmittingReview(false);

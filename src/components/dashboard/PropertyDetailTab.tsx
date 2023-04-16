@@ -50,8 +50,8 @@ const PropertyDetailTab = ({ property }: { property: IProperty | null }) => {
           title="PROPERTY SIZE"
         />
         <SinglePropertyDetail
-          text={property ? property?.furnishing : ""}
-          title="PROPERTY FURNISHING"
+          text={property ? property?.condition : ""}
+          title="PROPERTY CONDITION"
         />
         {/* </div> */}
         {/* Single detail sec */}

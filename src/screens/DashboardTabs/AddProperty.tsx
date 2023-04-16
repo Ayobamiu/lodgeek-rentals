@@ -27,6 +27,8 @@ import NaijaStates from "naija-state-local-government";
 import Select from "../../components/shared/Select/Select";
 import MultiSelect from "../../components/shared/Select/MultiSelect";
 import TextAreaInput from "../../components/shared/input/TextAreaInput";
+import PropertyImagePicker from "../../components/property/PropertyImagePicker";
+import SinglePropertyImage from "../../components/property/SinglePropertyImage";
 
 export default function AddProperty() {
   const [rent, setRent] = useState(0);
@@ -55,11 +57,32 @@ export default function AddProperty() {
   const [lanLordTinNumber, setLanLordTinNumber] = useState("");
   const [lanLordPropertyManagementExp, setLanLordPropertyManagementExp] =
     useState("");
+  const [propertyImages, setPropertyImages] = useState<any[] | []>([]);
 
   const navigate = useNavigate();
   const { addProperty, addingProperty } = useProperties();
   const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
+
+  // Handle Image
+  const handleImage = (val: any) => {
+    const images = Array.from(val?.target?.files);
+
+    setPropertyImages([
+      ...propertyImages,
+      ...images.map((item: any) => ({
+        type: item?.type,
+        name: item.name,
+        src: item,
+        id: Math.floor(Math.random() * 1000 + 1),
+      })),
+    ]);
+  };
+
+  const deleteImage = (val: number) => {
+    let newImages = propertyImages.filter((item, index) => index !== val);
+    setPropertyImages(newImages);
+  };
 
   const submitStageOne = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -180,6 +203,21 @@ export default function AddProperty() {
                 </div>
               </div>
               {/* End of form Header */}
+              <section className=" mt-10 ">
+                <div className="flex flex-row items-center overflow-x-scroll whitespace-nowrap">
+                  {propertyImages &&
+                    propertyImages.length > 0 &&
+                    propertyImages.map((item, index) => (
+                      <SinglePropertyImage
+                        img={item?.src}
+                        key={index}
+                        deleteImage={() => deleteImage(index)}
+                      />
+                    ))}
+                  <PropertyImagePicker handleImage={handleImage} />
+                </div>
+              </section>
+
               <section className="w-full mt-5">
                 <div className="w-full border-b border-b-gray-200 mb-5 pb-2">
                   <h6 className="text-gray-400 font-semibold text-lg">

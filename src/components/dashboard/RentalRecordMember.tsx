@@ -63,6 +63,7 @@ export function RentalRecordMember(props: Props): JSX.Element {
     const updatedRecord: RentalRecord = {
       ...currentRentalRecord,
       members,
+      team: members.map((i) => i.email),
     };
     if (type === "deleteaccess") {
       setDeletingAccess(true);

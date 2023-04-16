@@ -51,7 +51,18 @@ const AdditionalfeeForm = () => {
           onChange={(e) => {
             setFeeTitle(e.target.value);
           }}
+          list="feesFortenant"
         />
+        <datalist id="feesFortenant">
+          <option value="Service fee">Service fee</option>
+          <option value="Security deposit">Security deposit</option>
+          <option value="Application fee">Application fee</option>
+          <option value="Move-in fee">Move-in fee</option>
+          <option value="Pet fee">Pet fee</option>
+          <option value="Late payment fee">Late payment fee</option>
+          <option value="Parking fee">Parking fee</option>
+          <option value="Utility fees">Utility fees</option>
+        </datalist>
       </div>
       <div className="col-span-2">
         <label htmlFor="feeAmount">Amount</label>

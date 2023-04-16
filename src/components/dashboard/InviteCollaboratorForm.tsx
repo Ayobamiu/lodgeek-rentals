@@ -36,8 +36,8 @@ export function InviteCollaboratorForm() {
 
   const inviteCollaborator = async (e: FormEvent) => {
     e.preventDefault();
-    const memberWithThisEmailExists = currentRentalRecord.members?.find(
-      (i) => i.email === email
+    const memberWithThisEmailExists = currentRentalRecord.team?.find(
+      (i) => i === email
     );
     const asAccess =
       memberWithThisEmailExists ||
@@ -55,10 +55,12 @@ export function InviteCollaboratorForm() {
         role,
       },
     ];
+    const team = [...(currentRentalRecord.team || []), email];
 
     const updatedRecord: RentalRecord = {
       ...currentRentalRecord,
       members,
+      team,
     };
 
     setInvitingGuest(true);

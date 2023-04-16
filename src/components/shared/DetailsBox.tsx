@@ -17,7 +17,11 @@ export default function DetailsBox(props: DetailsBoxProps) {
       {isLink ? (
         <h3 className="mb-1 font-medium text-lg  flex text-blue-500 underline gap-2 gap-x-3 w-full items-center">
           <span>
-            {loading ? <ActivityIndicator color="black" /> : value || "--"}
+            {loading ? (
+              <ActivityIndicator size="4" color="black" />
+            ) : (
+              value || "--"
+            )}
           </span>{" "}
           <div className="ml-auto"></div>
           <small
@@ -42,7 +46,11 @@ export default function DetailsBox(props: DetailsBoxProps) {
         </h3>
       ) : (
         <h3 className="mb-1 font-medium text-lg text-coolGray-900 flex">
-          {loading ? <ActivityIndicator color="black" /> : value || "--"}
+          {loading ? (
+            <ActivityIndicator size="4" color="black" />
+          ) : (
+            value || "--"
+          )}
         </h3>
       )}
     </div>

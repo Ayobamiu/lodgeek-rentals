@@ -3,6 +3,14 @@ import { User } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
 import { RootState } from "../store";
 
+const doc = localStorage.getItem("user");
+let user: User | undefined = undefined;
+if (doc) {
+  const storedUser = JSON.parse(doc || "");
+  if (storedUser) {
+    user = storedUser as User;
+  }
+}
 interface UserState {
   user?: User;
   users: User[];
@@ -10,7 +18,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-  user: undefined,
+  user,
   users: [],
   loadingloggedInUser: false,
 };

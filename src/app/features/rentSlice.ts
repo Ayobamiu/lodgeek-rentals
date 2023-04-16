@@ -1,14 +1,20 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Rent } from "../../models";
+import { AdditionalFee, Rent } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
 import { RootState } from "../store";
 
-interface PropertyState {
+interface RentState {
   rents: Rent[];
+  selectedRents: Rent[];
+  selectedAdditionalFees: AdditionalFee[];
+  openRentPayment: boolean;
 }
 
-const initialState: PropertyState = {
+const initialState: RentState = {
   rents: [],
+  selectedRents: [],
+  selectedAdditionalFees: [],
+  openRentPayment: false,
 };
 export const propertySlice = createSlice({
   name: "rent",
@@ -38,12 +44,36 @@ export const propertySlice = createSlice({
     setRents: (state, action: PayloadAction<Rent[]>) => {
       state.rents = action.payload;
     },
+    setSelectedRents: (state, action: PayloadAction<Rent[]>) => {
+      state.selectedRents = action.payload;
+    },
+    setOpenRentPayment: (state, action: PayloadAction<boolean>) => {
+      state.openRentPayment = action.payload;
+    },
+    setSelectedAdditionalFees: (
+      state,
+      action: PayloadAction<AdditionalFee[]>
+    ) => {
+      state.selectedAdditionalFees = action.payload;
+    },
   },
 });
 
-export const { addRent, updateRent, deleteRent, setRents } =
-  propertySlice.actions;
+export const {
+  addRent,
+  updateRent,
+  deleteRent,
+  setRents,
+  setSelectedRents,
+  setSelectedAdditionalFees,
+  setOpenRentPayment,
+} = propertySlice.actions;
 
+export const selectRent = (state: RootState) => state.rent;
 export const selectRents = (state: RootState) => state.rent.rents;
+export const selectSelectedRents = (state: RootState) =>
+  state.rent.selectedRents;
+export const selectSelectedAdditionalFees = (state: RootState) =>
+  state.rent.selectedAdditionalFees;
 
 export default propertySlice.reducer;

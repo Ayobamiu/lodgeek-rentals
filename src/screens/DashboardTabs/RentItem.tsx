@@ -1,15 +1,17 @@
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
+import {
+  selectSelectedRents,
+  setSelectedRents,
+} from "../../app/features/rentSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Rent, RentStatus } from "../../models";
-import { rentSelected } from "./RentalRecordDetails";
+import { rentSelected } from "../../utils/others";
 
 type RentItemProps = {
-  index: number;
   showPayRentButton: boolean;
   rent: Rent;
-  selectedRents: Rent[];
-  setSelectedRents: React.Dispatch<React.SetStateAction<Rent[]>>;
 };
 
 function getStatusColor(status: RentStatus) {
@@ -33,20 +35,22 @@ const RentStatusItem = ({ status }: { status: RentStatus }) => (
 );
 
 export function RentItem(props: RentItemProps): JSX.Element {
-  const { index, rent, selectedRents, setSelectedRents, showPayRentButton } =
-    props;
+  const selectedRents = useAppSelector(selectSelectedRents);
+  const dispatch = useAppDispatch();
+  const { rent, showPayRentButton } = props;
+
+  const onClickRentItem = () => {
+    const rentNotClickable = !showPayRentButton || rent.status === "paid";
+    if (rentNotClickable) return;
+    if (rentSelected(selectedRents, rent)) {
+      dispatch(setSelectedRents(selectedRents.filter((i) => i.id !== rent.id)));
+    } else {
+      dispatch(setSelectedRents([...selectedRents, rent]));
+    }
+  };
   return (
     <button
-      key={index}
-      onClick={() => {
-        const rentNotClickable = !showPayRentButton || rent.status === "paid";
-        if (rentNotClickable) return;
-        if (rentSelected(selectedRents, rent)) {
-          setSelectedRents((v) => [...v].filter((i) => i.id !== rent.id));
-        } else {
-          setSelectedRents((v) => [...v, rent]);
-        }
-      }}
+      onClick={onClickRentItem}
       className="flex items-center bg-gray-300 lg:px-3 px-2 lg:gap-3 gap-2 rounded lg:min-w-[300px] min-w-full relative min-h-[50px]"
     >
       {!(!showPayRentButton || rent.status === "paid") && (
@@ -57,7 +61,7 @@ export function RentItem(props: RentItemProps): JSX.Element {
         />
       )}
 
-      <p key={index} className="text-lg font-medium text-coolGray-500 ">
+      <p className="text-lg font-medium text-coolGray-500 ">
         {moment(rent.dueDate).format("MMM YYYY")}
       </p>
       <div className="ml-auto">

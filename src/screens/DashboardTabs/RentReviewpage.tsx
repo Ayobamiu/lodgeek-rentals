@@ -20,12 +20,12 @@ import { RentReviewProcessOne } from "./RentReviewProcessOne";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 
 const RentReviewpage = () => {
-  let { id, reviewId } = useParams();
+  let { rentalRecordId, reviewId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const goBack = () => {
-    navigate(`/dashboard/rentalRecords/${id}`);
+    navigate(`/dashboard/rentalRecords/${rentalRecordId}`);
   };
 
   const [fetchingReview, setFetchingReview] = useState(false);
@@ -57,7 +57,9 @@ const RentReviewpage = () => {
           dispatch(setCurrentRentReview(reviewResponse));
         } else {
           toast.error("Review details not found");
-          navigate(`/dashboard/rentalRecords/${id}`, { replace: true });
+          navigate(`/dashboard/rentalRecords/${rentalRecordId}`, {
+            replace: true,
+          });
         }
       })
       .finally(() => {
@@ -75,7 +77,7 @@ const RentReviewpage = () => {
           company: currentRentalRecord.company,
           tenant: currentRentalRecord.tenant,
           owner: currentRentalRecord.owner,
-          rentalRecord: id,
+          rentalRecord: rentalRecordId,
         })
       );
       updateReveiwFormDetails({
@@ -87,7 +89,7 @@ const RentReviewpage = () => {
     return () => {
       dispatch(resetCurrentRentReview());
     };
-  }, [id, reviewId]);
+  }, [rentalRecordId, reviewId]);
 
   return (
     <DashboardWrapper>

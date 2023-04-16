@@ -18,6 +18,7 @@ import {
   addRentalRecord,
   addRentalRecords,
   selectRentalRecords,
+  updateCurrentRentalRecord,
   updateRentalRecord,
   updateUserKYC,
 } from "../app/features/rentalRecordSlice";
@@ -65,22 +66,44 @@ const useRentalRecords = () => {
   const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const { processWithdrawal } = useBanks();
-  const getUsersRentalRecords = useCallback(async () => {
+
+  async function getAllRecords() {
     const rentalRecordsCol = collection(db, RENTAL_RECORD_PATH);
-    const q = query(
-      rentalRecordsCol,
-      (where("tenant", "==", loggedInUser?.email),
-      where("company", "==", selectedCompany?.id),
-      where("team", "array-contains", loggedInUser?.email))
+
+    const iAmATenant = getDocs(
+      query(rentalRecordsCol, where("tenant", "==", loggedInUser?.email))
+    );
+    const isSelectedCompany = getDocs(
+      query(rentalRecordsCol, where("company", "==", selectedCompany?.id))
+    );
+    const iAmATeamMember = getDocs(
+      query(
+        rentalRecordsCol,
+        where("team", "array-contains", loggedInUser?.email)
+      )
     );
 
-    await getDocs(q)
-      .then((rentalRecordsSnapshot) => {
-        const rentalRecordsList = rentalRecordsSnapshot.docs.map((doc) =>
-          doc.data()
-        ) as RentalRecord[];
-        console.log({ rentalRecordsList });
+    const [
+      recordsWhereIamATenantQuerySnapshot,
+      recordsForSelectedCompanySnapshot,
+      recordsWhereIAmATeamMemberSnapshot,
+    ] = await Promise.all([iAmATenant, isSelectedCompany, iAmATeamMember]);
+    const recordsWhereIamATenant = recordsWhereIamATenantQuerySnapshot.docs;
+    const recordsForSelectedCompany = recordsForSelectedCompanySnapshot.docs;
+    const recordsWhereIAmATeamMember = recordsWhereIAmATeamMemberSnapshot.docs;
 
+    const allRecords = recordsWhereIamATenant.concat(
+      recordsForSelectedCompany,
+      recordsWhereIAmATeamMember
+    );
+
+    return allRecords;
+  }
+
+  const getUsersRentalRecords = useCallback(async () => {
+    getAllRecords()
+      .then((result) => {
+        const rentalRecordsList = result.map((i) => i.data()) as RentalRecord[];
         dispatch(addRentalRecords(rentalRecordsList));
       })
       .catch(() => {
@@ -111,8 +134,9 @@ const useRentalRecords = () => {
   }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
-    getUsersRentalRecords();
-    // getRentalRecordsForYourTenants();
+    if (loggedInUser?.email && selectedCompany?.id) {
+      getUsersRentalRecords();
+    }
   }, [
     loggedInUser?.email,
     rentalRecords.length,
@@ -125,6 +149,9 @@ const useRentalRecords = () => {
     if (!loggedInUser?.email) {
       return toast.error("Error getting user details.");
     }
+    if (!selectedCompany?.id) {
+      return toast.error("Error getting account details.");
+    }
 
     const property = properties.find((i) => i.id === data.property);
 
@@ -135,6 +162,7 @@ const useRentalRecords = () => {
       id: rentalRecordId,
       owner: loggedInUser?.email,
       status: "inviteSent",
+      company: selectedCompany.id,
     };
     await setDoc(doc(rentalRecordRef, rentalRecordId), rentalRecordData)
       .then(() => {
@@ -236,7 +264,6 @@ const useRentalRecords = () => {
       .then(async () => {
         const redirectURL = `/dashboard/rentalRecords/${rentalRecordId}`;
         const encodedRedirectUrl = base64.encode(redirectURL);
-        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${rentalRecordId}?redirect=${encodedRedirectUrl}&email=${owner}`;
 
         var { transactionDescription, totalAmount } =
           getTransactionDescriptionAndAmount(
@@ -350,22 +377,6 @@ const useRentalRecords = () => {
 
         const emailSubjectForTenant = "Your rent payment has been confirmed.";
 
-        const generatedEmailForLandlord = generateSimpleEmail({
-          paragraphs: paragraphsForLandlord,
-          buttons: [
-            {
-              link: rentalRecordLink,
-              text: "View details",
-            },
-          ],
-          title: transactionDescription,
-        });
-
-        const generatedEmailForTenant = generateSimpleEmail({
-          paragraphs: paragraphsForTenant,
-          title: emailSubjectForTenant,
-        });
-
         const transactionEmailHTML = generateReciept({
           date: moment().format("LL"),
           duePayments: [],
@@ -435,6 +446,7 @@ const useRentalRecords = () => {
     await updateDoc(doc(rentalRecordRef, data.id), data)
       .then(() => {
         dispatch(updateRentalRecord(data));
+        dispatch(updateCurrentRentalRecord(data));
       })
       .finally(() => {});
   }

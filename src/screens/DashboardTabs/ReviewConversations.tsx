@@ -44,7 +44,6 @@ export function ReviewConversations() {
 
   const sendNewResponseEmail = async (email: string, recipientName: string) => {
     const reviewLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${currentRentReview.rentalRecord}/rent-review/${currentRentReview.id}`;
-    //TODO: Send email to tenant
     const paragraphs = [
       `Dear ${recipientName},`,
       `This is to inform you that there has been a response to the rent review request for ${currentRentalRecordProperty?.title} that you initiated on Lodgeek.`,

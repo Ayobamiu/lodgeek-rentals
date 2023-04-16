@@ -13,14 +13,24 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
-import { RentReview, RentReviewRecord, RentReviewStatus } from "../../models";
+import {
+  Rent,
+  RentReview,
+  RentReviewRecord,
+  RentReviewStatus,
+} from "../../models";
 import { updateRentReviewInDatabase } from "../../firebase/apis/rentReview";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import { selectRentalRecord } from "../../app/features/rentalRecordSlice";
+import {
+  selectRentalRecord,
+  setCurrentRentalRecordRents,
+} from "../../app/features/rentalRecordSlice";
 import formatPrice from "../../utils/formatPrice";
 import moment from "moment";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { sendEmail } from "../../api/email";
+import { collection, doc, writeBatch } from "firebase/firestore";
+import { db, RENT_PATH } from "../../firebase/config";
 
 export function SubmitNewLeaseAgreement() {
   const [acceptingIncrease, setAcceptingIncrease] = useState(false);
@@ -33,6 +43,7 @@ export function SubmitNewLeaseAgreement() {
     currentRentalRecord,
     currentRentalRecordTenant,
     currentRentalRecordOwner,
+    currentRentalRecordRents,
   } = useAppSelector(selectRentalRecord);
   const { handleUpdateRentalRecord } = useRentalRecords();
 
@@ -89,6 +100,50 @@ export function SubmitNewLeaseAgreement() {
       }
     }
   };
+  /**
+   * Updates rents with the newRentAmount
+   */
+  async function updateRentFees() {
+    const rentBatch = writeBatch(db);
+
+    //Change rent amount on all rent after reviewDate
+    const rentsAfterReviewDate = currentRentalRecordRents.filter((i) =>
+      moment(i.dueDate).isSameOrAfter(
+        currentRentReview.reveiwFormDetails.reviewDate,
+        "day"
+      )
+    );
+
+    //Update rents fees to newRentAmount
+    const rentsWithUpdatedFees = rentsAfterReviewDate.map((rentdoc) => {
+      const rentData: Rent = {
+        ...rentdoc,
+        rent: currentRentReview.reveiwFormDetails.newRentAmount,
+      };
+      return rentData;
+    });
+
+    rentsWithUpdatedFees.forEach((rentdoc) => {
+      var docRef = doc(collection(db, RENT_PATH), rentdoc.id);
+      rentBatch.update(docRef, rentdoc);
+    });
+
+    rentBatch.commit().then(() => {
+      const updatedRents = currentRentalRecordRents.map(
+        (rentWithOriginalRentFees) => {
+          const rentWithUpdatedRentFees = rentsWithUpdatedFees.find(
+            (x) => x.id === rentWithOriginalRentFees.id
+          );
+          if (rentWithUpdatedRentFees) {
+            return rentWithUpdatedRentFees;
+          } else {
+            return rentWithOriginalRentFees;
+          }
+        }
+      );
+      dispatch(setCurrentRentalRecordRents(updatedRents));
+    });
+  }
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -158,6 +213,8 @@ export function SubmitNewLeaseAgreement() {
         },
       ]
     );
+
+    await updateRentFees();
 
     await handleUpdateRentalRecord({
       ...currentRentalRecord,

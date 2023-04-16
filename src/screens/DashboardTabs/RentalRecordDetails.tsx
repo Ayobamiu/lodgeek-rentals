@@ -1,35 +1,16 @@
-import {
-  faCheckCircle,
-  faExternalLink,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
+import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
-import DetailsBox from "../../components/shared/DetailsBox";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import useRents from "../../hooks/useRents";
-import {
-  AdditionalFee,
-  Rent,
-  RentalRecord,
-  RentStatus,
-  UserKYC,
-} from "../../models";
-import formatPrice from "../../utils/formatPrice";
-import { Transition } from "@headlessui/react";
+import { AdditionalFee, RentalRecord, UserKYC } from "../../models";
 import { sendEmail } from "../../api/email";
-import { PaystackButton } from "react-paystack";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
-import { RentItem } from "./RentItem";
 import { KYCPreview } from "../../components/shared/KYCPreview";
-import { getRentsAndFees } from "./getRentsAndFees";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { setNotification } from "../../app/features/notificationSlice";
@@ -37,42 +18,38 @@ import { RentalRecordCollaboration } from "../../components/dashboard/RentalReco
 import {
   selectRentalRecord,
   setCurrentRentalRecord,
-  setCurrentRentalRecordRents,
 } from "../../app/features/rentalRecordSlice";
 import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
-import Button from "../../components/shared/button/Button";
 import { ReviewsOnRentalRecord } from "./ReviewsOnRentalRecord";
+import { UpaidRents } from "./UpaidRents";
+import { PaidRents } from "./PaidRents";
+import {
+  selectRent,
+  setOpenRentPayment,
+  setSelectedAdditionalFees,
+} from "../../app/features/rentSlice";
+import { AdditionalFees } from "./AdditionalFees";
+import { RentInvoiceTable } from "./RentInvoiceTable";
+import { RentalRecordSimpleDetails } from "./RentalRecordSimpleDetails";
 
 export default function RentalRecordDetails() {
-  const {
-    rentalRecordStatuses,
-    handleUpdateRentalRecord,
-    updatePaidRents,
-    sendEmailInvitationToTenant,
-  } = useRentalRecords();
-  const navigate = useNavigate();
+  const { handleUpdateRentalRecord, sendEmailInvitationToTenant } =
+    useRentalRecords();
 
   const dispatch = useAppDispatch();
 
   const loggedInUser = useAppSelector(selectUser);
+  const { selectedRents, selectedAdditionalFees } = useAppSelector(selectRent);
+
   const {
     currentRentalRecord,
     currentRentalRecordCompany,
     currentRentalRecordProperty,
     currentRentalRecordOwner,
     currentRentalRecordTenant,
-    currentRentalRecordRents,
   } = useAppSelector(selectRentalRecord);
 
-  let { id } = useParams();
-
-  const {
-    loadingOwner,
-    loadingProperty,
-    loadingRentalRecord,
-    loadingTenant,
-    loadingRents,
-  } = useCurrentRentalRecord();
+  const { loadingRentalRecord } = useCurrentRentalRecord();
 
   const ownerFullName = currentRentalRecordOwner
     ? `${currentRentalRecordOwner?.firstName || "-"} ${
@@ -86,25 +63,22 @@ export default function RentalRecordDetails() {
       }`
     : currentRentalRecord?.tenant;
 
-  const [selectedRents, setSelectedRents] = useState<Rent[]>([]);
-  const [selectedAdditionalFees, setSelectedAdditionalFees] = useState<
-    AdditionalFee[]
-  >([]);
+  const updateSelectedAdditionalFees = (value: AdditionalFee[]) => {
+    dispatch(setSelectedAdditionalFees(value));
+  };
 
   useEffect(() => {
     const feesToPay = [...(currentRentalRecord?.fees || [])].filter(
       (i) => i.feeIsRequired && !i.paid
     );
-    setSelectedAdditionalFees(feesToPay);
+    updateSelectedAdditionalFees(feesToPay);
   }, [currentRentalRecord]);
 
   useEffect(() => {
     if (!selectedRents.length) {
-      setIsOpen(false);
+      dispatch(setOpenRentPayment(false));
     }
   }, [selectedRents]);
-
-  const [isOpen, setIsOpen] = useState(false);
 
   const payRent = () => {
     if (!currentRentalRecordCompany) {
@@ -134,59 +108,10 @@ export default function RentalRecordDetails() {
       return toast.warn("Select Rents or Fee to pay for.");
     }
 
-    setIsOpen(true);
+    dispatch(setOpenRentPayment(true));
   };
 
   const [updatingRents, setUpdatingRents] = useState(false);
-
-  const handlePaidRents = async () => {
-    setUpdatingRents(true);
-
-    await updatePaidRents({
-      rents: selectedRents,
-      rentalRecordId: id || "",
-      owner: currentRentalRecordOwner?.email || "",
-      propertyTitle: currentRentalRecordProperty?.title || "",
-      tenantName: `${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName}`,
-      tenantEmail: currentRentalRecordTenant?.email || "",
-      selectedAdditionalFees,
-      rentalRecord: currentRentalRecord!,
-    })
-      .finally(() => {
-        setSelectedRents([]);
-        setUpdatingRents(false);
-      })
-      .then(() => {
-        const updatedRents = currentRentalRecordRents.map((i) => {
-          const justPaid = selectedRents.findIndex((x) => x.id === i.id) > -1;
-          if (justPaid) {
-            const paidRent: Rent = {
-              ...i,
-              status: RentStatus["Paid - Rent has been paid."],
-            };
-            return paidRent;
-          } else {
-            return i;
-          }
-        });
-        const updateDfees: AdditionalFee[] =
-          currentRentalRecord?.fees?.map((i) => {
-            if (selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1) {
-              return { ...i, paid: true, paidOn: Date.now() };
-            } else {
-              return i;
-            }
-          }) || [];
-        const updatedRentalRecord = {
-          ...currentRentalRecord!,
-          fees: updateDfees,
-        };
-        dispatch(setCurrentRentalRecord(updatedRentalRecord));
-
-        dispatch(setCurrentRentalRecordRents(updatedRents));
-        setIsOpen(false);
-      });
-  };
 
   const PayRentButton = () => {
     const unpaidFees = currentRentalRecord?.fees?.filter((i) => !i.paid) || [];
@@ -308,137 +233,18 @@ export default function RentalRecordDetails() {
 
   useEffect(() => {
     if (!selectedRents.length) {
-      setIsOpen(false);
+      dispatch(setOpenRentPayment(false));
     }
   }, [selectedRents]);
 
-  const totalAmountToPay = useMemo(() => {
-    const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
-      selectedRents,
-      selectedAdditionalFees,
-      currentRentalRecordCompany
-    );
-    return transactionFee + totalFeeMinusTransactionFee;
-  }, [selectedRents, selectedAdditionalFees]);
-
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: loggedInUser?.email || "",
-    amount: totalAmountToPay * 100,
-    publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
-  };
-
-  const componentProps = {
-    ...config,
-    text: "Pay",
-    onSuccess: () => handlePaidRents(),
-    onClose: () => {},
-  };
-
-  const showAdditionalFeePayButton =
-    loggedInUser?.email === currentRentalRecord?.tenant;
-
   const [showKYCPreview, setShowKYCPreview] = useState(false);
-  const { transactionFee, totalFeeMinusTransactionFee } = getRentsAndFees(
-    selectedRents,
-    selectedAdditionalFees,
-    currentRentalRecordCompany
-  );
+
   return (
     <DashboardWrapper>
       <div>
         {updatingRents && <FullScreenActivityIndicator />}
         {/* Rent Invoice Table */}
-        <Transition
-          show={isOpen}
-          enter="transition-opacity duration-150"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="transition-opacity duration-150"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="bg-black bg-opacity-50 fixed h-full w-full top-0 left-0 flex items-center justify-center z-50">
-            <div className="lg:w-[600px] w-full lg:h-auto h-screen overflow-y-scroll bg-white lg:rounded-3xl p-6 relative">
-              <FontAwesomeIcon
-                icon={faTimes}
-                className="absolute right-4 top-3 cursor-pointer"
-                size="1x"
-                onClick={() => setIsOpen(false)}
-              />
-              <div className="p-3">
-                <table
-                  className="w-full table-auto border-collapse border border-slate-500  ..."
-                  title="Payment Invoice"
-                >
-                  <caption className="text-left mb-3">Payment Invoice</caption>
-                  <thead>
-                    <tr>
-                      <th className="p-3 border border-slate-600 text-left  ...">
-                        Description
-                      </th>
-                      <th className="p-3 border border-slate-600 text-left  ...">
-                        Amount
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedRents.map((rent, rentIndex) => (
-                      <tr key={rentIndex}>
-                        <td className="p-3 border border-slate-700 ...">
-                          Rent for {moment(rent.dueDate).format("MMM YYYY")}
-                        </td>
-                        <td className="p-3 border border-slate-700 ...">
-                          {formatPrice(rent.rent)}
-                        </td>
-                      </tr>
-                    ))}
-                    {selectedAdditionalFees.map((fee, feeIndex) => (
-                      <tr key={feeIndex}>
-                        <td className="p-3 border border-slate-700 ...">
-                          fee for {fee.feeTitle}
-                        </td>
-                        <td className="p-3 border border-slate-700 ...">
-                          {formatPrice(fee.feeAmount)}
-                        </td>
-                      </tr>
-                    ))}
-                    <tr>
-                      <td className="p-3 border border-slate-700 ...">
-                        Transaction fee
-                      </td>
-                      <td className="p-3 border border-slate-700 ...">
-                        {formatPrice(transactionFee)}
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <th className="p-3 border border-slate-600 text-left  ...">
-                        Total
-                      </th>
-                      <th className="p-3 border border-slate-600 text-left  ...">
-                        {formatPrice(
-                          totalFeeMinusTransactionFee + transactionFee
-                        )}
-                      </th>
-                    </tr>
-                  </tfoot>
-                </table>
-                {/* <button
-                  onClick={handlePaidRents}
-                  className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
-                >
-                  Pay
-                </button> */}
-                <PaystackButton
-                  className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button my-3"
-                  {...componentProps}
-                />
-              </div>
-            </div>
-          </div>
-        </Transition>
+        <RentInvoiceTable />
         {/* Rent Invoice Table */}
         {/* KYC and Agreement form */}
         {currentRentalRecord && (
@@ -477,7 +283,7 @@ export default function RentalRecordDetails() {
             </div>
           </div>
         </section>
-        <div className="container mx-auto p-8 print:hidden">
+        <div className="container mx-auto lg:p-8 p-3 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
 
           {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
@@ -493,121 +299,12 @@ export default function RentalRecordDetails() {
               </button>
             </div>
           )}
-          <DetailsBox
-            label="Property"
-            value={currentRentalRecordProperty?.title}
-            loading={loadingProperty}
-          />
-          <DetailsBox
-            label="Property Owner"
-            value={ownerFullName}
-            loading={loadingOwner}
-          />
-          <DetailsBox
-            label="Tenant"
-            value={tenantFullName}
-            loading={loadingTenant}
-          />
-          <DetailsBox
-            label="Property Location"
-            value={currentRentalRecordProperty?.location}
-            loading={loadingProperty}
-          />
-          <DetailsBox
-            label="Property Address"
-            value={currentRentalRecordProperty?.address}
-            loading={loadingProperty}
-          />
-          <DetailsBox
-            label="Rent"
-            value={`${formatPrice(currentRentalRecord?.rent || 0)}/${
-              currentRentalRecord?.rentPer
-            }`}
-          />
-          <p className="text-xs font-medium text-coolGray-500 mb-2">Rents</p>
-          <div className="flex gap-5 items-center mb-4 justify-start flex-wrap">
-            {loadingRents ? (
-              <ActivityIndicator color="black" />
-            ) : (
-              currentRentalRecordRents.map((rent, index) => (
-                <RentItem
-                  index={index}
-                  showPayRentButton={showPayRentButton}
-                  rent={rent}
-                  selectedRents={selectedRents}
-                  setSelectedRents={setSelectedRents}
-                  key={index}
-                />
-              ))
-            )}
-          </div>
-          <DetailsBox
-            label="Status"
-            value={
-              currentRentalRecord?.status
-                ? rentalRecordStatuses[currentRentalRecord?.status]
-                : "--"
-            }
-          />
-          <h1 className="text-3xl">Additional fees</h1>
-          {currentRentalRecord?.fees?.map((i, feeIndex) => (
-            <div
-              key={feeIndex}
-              className="flex gap-2 items-center py-2 flex-wrap border-b"
-            >
-              <p>{i.feeTitle}</p>
-              <p>{formatPrice(i.feeAmount)}</p>{" "}
-              {i.feeIsRequired ? (
-                <div
-                  className="bg-green-500 text-white rounded px-2 text-xs"
-                  title="Tenant must pay this fee."
-                >
-                  Required
-                </div>
-              ) : (
-                <div
-                  className="bg-gray-500 text-white rounded px-2 text-xs"
-                  title="Tenants are not required to pay this fee."
-                >
-                  Not required
-                </div>
-              )}
-              {showAdditionalFeePayButton && (
-                <button
-                  type="button"
-                  className={`ml-auto w-full disabled:border-gray-600 lg:w-auto p-2 text-sm text-white font-medium ${
-                    i.paid
-                      ? "disabled:bg-green-400 bg-green-500 hover:bg-green-600 border border-green-600"
-                      : "disabled:bg-gray-400 bg-gray-500 hover:bg-gray-600 border border-gray-600"
-                  } rounded-md shadow-button flex items-center justify-center gap-x-2`}
-                  onClick={() => {
-                    if (feeIsSelected(i)) {
-                      setSelectedAdditionalFees((v) => [
-                        ...v.filter((x) => x.id !== i.id),
-                      ]);
-                    } else {
-                      setSelectedAdditionalFees((v) => [...v, i]);
-                    }
-                  }}
-                  disabled={i.feeIsRequired || i.paid}
-                >
-                  {i.paid ? "Paid" : `Select${feeIsSelected(i) ? "ed" : ""}`}{" "}
-                  {feeIsSelected(i) && (
-                    <FontAwesomeIcon
-                      icon={faCheckCircle}
-                      color="white"
-                      className=""
-                    />
-                  )}
-                </button>
-              )}
-            </div>
-          ))}
-          {!currentRentalRecord?.fees?.length && (
-            <div className="mb-3">No Additional fees</div>
-          )}
+          <RentalRecordSimpleDetails />
+          <PaidRents showPayRentButton={showPayRentButton} />
+          <UpaidRents showPayRentButton={showPayRentButton} />
+          <AdditionalFees showPayRentButton={showPayRentButton} />
+          <ReviewsOnRentalRecord />
         </div>
-        <ReviewsOnRentalRecord />
         {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
           <KYCPreview
             openAgreementForm={showKYCPreview}
@@ -622,12 +319,4 @@ export default function RentalRecordDetails() {
       </div>
     </DashboardWrapper>
   );
-
-  function feeIsSelected(i: AdditionalFee) {
-    return selectedAdditionalFees.findIndex((x) => x.id === i.id) > -1;
-  }
-}
-
-export function rentSelected(selectedRents: Rent[], rent: Rent) {
-  return selectedRents.findIndex((i) => i.id === rent.id) > -1;
 }

@@ -28,14 +28,14 @@ import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
-// import { TextEncoder } from "util";
-// import TextEditor from "../../components/lib/rental/TextEditor";
+import useProperties from "../../hooks/useProperties";
 
 export default function AddRentalRecords() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [stage, setStage] = useState<"one" | "two">("one");
   const [showRentStarts, setShowRentStarts] = useState(false);
+  useProperties();
   const openRentStarts = () => {
     setShowRentStarts(true);
   };

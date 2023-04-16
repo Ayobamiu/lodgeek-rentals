@@ -35,7 +35,7 @@ export function RentReviewForm() {
   } = useAppSelector(selectRentalRecord);
   const { currentRentReview } = useAppSelector(selectRentReview);
 
-  let { id } = useParams();
+  let { rentalRecordId } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -47,9 +47,13 @@ export function RentReviewForm() {
 
   const nextFourDuePayments = [];
 
+  const firstRent = [...currentRentalRecordRents].sort(
+    (a, b) => a.dueDate - b.dueDate
+  )[0];
+
   for (let index = 1; index < 6; index++) {
     nextFourDuePayments.push(
-      moment(lastPaidRent.dueDate)
+      moment(lastPaidRent?.dueDate || firstRent.dueDate)
         .add(index, currentRentalRecord.rentPer)
         .toDate()
         .getTime()
@@ -100,9 +104,12 @@ export function RentReviewForm() {
           );
         });
 
-        navigate(`/dashboard/rentalRecords/${id}/rent-review/${newReview.id}`, {
-          replace: true,
-        });
+        navigate(
+          `/dashboard/rentalRecords/${rentalRecordId}/rent-review/${newReview.id}`,
+          {
+            replace: true,
+          }
+        );
       })
       .finally(() => {
         setSubmittingReview(false);

@@ -55,7 +55,7 @@ export const initialUserKYC: UserKYC = {
 };
 export const initialRentReview: RentReview = {
   company: "",
-  createdDate: Date.now(),
+  createdDate: 0,
   id: "",
   owner: "",
   property: "",

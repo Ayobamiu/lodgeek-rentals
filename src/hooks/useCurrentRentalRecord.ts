@@ -18,7 +18,7 @@ import useRentalRecords from "./useRentalRecords";
 import useRents from "./useRents";
 
 const useCurrentRentalRecord = () => {
-  let { id } = useParams();
+  let { rentalRecordId } = useParams();
   const { getRentalRecordData } = useRentalRecords();
   const { currentRentalRecord } = useAppSelector(selectRentalRecord);
   const { getUserData } = useAuth();
@@ -36,18 +36,20 @@ const useCurrentRentalRecord = () => {
   /* Load rental record */
   useEffect(() => {
     const loadRelatedRentalRecord = async () => {
-      if (!id) return;
+      if (!rentalRecordId) return;
       setLoadingRentalRecord(true);
-      const rentalRecordD = await getRentalRecordData(id).finally(() => {
-        setLoadingRentalRecord(false);
-      });
+      const rentalRecordD = await getRentalRecordData(rentalRecordId).finally(
+        () => {
+          setLoadingRentalRecord(false);
+        }
+      );
 
       if (rentalRecordD) {
         dispatch(setCurrentRentalRecord(rentalRecordD));
       }
     };
     loadRelatedRentalRecord();
-  }, [id]);
+  }, [rentalRecordId]);
   /* Load rental record */
 
   /* Load property company data */

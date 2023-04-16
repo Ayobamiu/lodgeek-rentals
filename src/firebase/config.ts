@@ -66,9 +66,6 @@ export {
   userKYCRef,
   bankRecordRef,
   companyRef,
-<<<<<<< HEAD
   propertyRef,
-=======
   rentReviewRef,
->>>>>>> 052a99d5113fa7620c21daaaf52e50784e7cfb4f
 };

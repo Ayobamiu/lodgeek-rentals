@@ -7,8 +7,8 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { Company, FirebaseCollections, User } from "../../models";
-import { companyRef, db, usersRef } from "../config";
+import { Company, FirebaseCollections, Property, User } from "../../models";
+import { companyRef, db, propertyRef, usersRef } from "../config";
 
 export async function getUserCompanies(email: string) {
   const q = query(
@@ -46,6 +46,13 @@ export async function getCompany(id: string) {
   const docRef = doc(companyRef, id);
   const docSnap = await getDoc(docRef);
   return docSnap.data() as Company;
+}
+
+// pROPERTY REF
+export async function getProperty(id?: string) {
+  const docRef = doc(propertyRef, id);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data() as Property;
 }
 
 export const updateCompanyInDatabase = async (company: Company) => {

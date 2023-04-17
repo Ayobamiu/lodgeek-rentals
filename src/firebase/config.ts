@@ -43,13 +43,16 @@ const PROPERTY_PATH = "properties";
 const RENTAL_RECORD_PATH = "rentalRecords";
 const RENT_PATH = "rents";
 const rentalRecordRef = collection(db, RENTAL_RECORD_PATH);
+// const propertyRef = collection(db, PROPERTY_PATH);
 const usersRef = collection(db, FirebaseCollections.users);
 const userKYCRef = collection(db, FirebaseCollections.userKYC);
 const transactionRef = collection(db, FirebaseCollections.transaction);
 const bankRecordRef = collection(db, FirebaseCollections.bankReord);
 const companyRef = collection(db, FirebaseCollections.companies);
+const propertyRef = collection(db, FirebaseCollections.properties);
 const rentReviewRef = collection(db, FirebaseCollections.rentReview);
 const rentRef = collection(db, FirebaseCollections.rents);
+const landlordRef = collection(db, FirebaseCollections.landlord);
 
 export {
   analytics,
@@ -65,6 +68,8 @@ export {
   userKYCRef,
   bankRecordRef,
   companyRef,
+  propertyRef,
   rentReviewRef,
   rentRef,
+  landlordRef,
 };

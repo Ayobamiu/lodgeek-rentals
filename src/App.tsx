@@ -26,6 +26,7 @@ import BankRecords from "./screens/DashboardTabs/BankRecords";
 import Wallet from "./screens/DashboardTabs/Wallet";
 import CompanyProfileSettingsPage from "./screens/SettingsPages/CompanyProfileSettingsPage";
 import InviteTeamMembersPage from "./screens/InviteTeamMembersPage";
+import PropertyDetails from "./screens/DashboardTabs/PropertyDetails";
 import CompanyProfileEditPage from "./screens/SettingsPages/CompanyProfileEditPage";
 import CompanyBillingSettingsPage from "./screens/SettingsPages/CompanyBillingSettingsPage";
 import SelectPlans from "./screens/SelectPlans";
@@ -91,7 +92,15 @@ function App() {
             element={<Properties />}
           />
           <Route
+            path="dashboard/:companyId/properties/:propertyId"
+            element={<PropertyDetails />}
+          />
+          <Route
             path="dashboard/:companyId/properties/new"
+            element={<AddProperty />}
+          />
+          <Route
+            path="dashboard/:companyId/properties/edit/:propertyId"
             element={<AddProperty />}
           />
           <Route path="dashboard/:companyId/rents" element={<Rents />} />

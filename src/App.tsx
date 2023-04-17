@@ -99,6 +99,10 @@ function App() {
             path="dashboard/:companyId/properties/new"
             element={<AddProperty />}
           />
+          <Route
+            path="dashboard/:companyId/properties/edit/:propertyId"
+            element={<AddProperty />}
+          />
           <Route path="dashboard/:companyId/rents" element={<Rents />} />
           <Route
             path="dashboard/:companyId/bankRecords"

@@ -8,22 +8,29 @@ import {
   where,
 } from "firebase/firestore";
 import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { selectSelectedCompany } from "../app/features/companySlice";
 import {
   addProperty,
-  selectProperties,
+  selectProperty,
+  setLandlords,
   setProperties,
 } from "../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { getLandlordsForCompany } from "../firebase/apis/landlord";
 import { db, PROPERTY_PATH } from "../firebase/config";
-import { IProperty, Property } from "../models";
+import { Property } from "../models";
 
 const useProperties = () => {
   const propertyRef = collection(db, PROPERTY_PATH);
   const [addingProperty, setAddingProperty] = useState(false);
+
+  const [loadingLandlords, setLoadingLandlords] = useState(false);
+  let { companyId } = useParams();
+
   const dispatch = useAppDispatch();
-  const properties = useAppSelector(selectProperties);
+  const { landlords, properties } = useAppSelector(selectProperty);
   const selectedCompany = useAppSelector(selectSelectedCompany);
 
   const getUsersProperties = useCallback(async () => {
@@ -34,7 +41,7 @@ const useProperties = () => {
       .then((propertiesSnapshot) => {
         const propertiesList = propertiesSnapshot.docs.map((doc) =>
           doc.data()
-        ) as IProperty[];
+        ) as Property[];
 
         dispatch(setProperties(propertiesList));
       })
@@ -48,7 +55,11 @@ const useProperties = () => {
     getUsersProperties();
   }, [selectedCompany, properties.length, getUsersProperties]);
 
-  const handleAddProperty = async (data: IProperty) => {
+  useEffect(() => {
+    getCompanyLandlords();
+  }, [landlords, companyId]);
+
+  const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);
     await setDoc(doc(propertyRef, data.id), data)
       .then((c) => {
@@ -65,15 +76,25 @@ const useProperties = () => {
       });
   };
 
-  const getPropertyData = async (
-    id: string
-  ): Promise<IProperty | undefined> => {
+  const getCompanyLandlords = useCallback(async () => {
+    if (!landlords.length && companyId) {
+      setLoadingLandlords(true);
+      const landlordss = await getLandlordsForCompany(companyId).finally(() => {
+        setLoadingLandlords(false);
+      });
+      if (landlordss) {
+        dispatch(setLandlords(landlordss));
+      }
+    }
+  }, [landlords, companyId]);
+
+  const getPropertyData = async (id: string): Promise<Property | undefined> => {
     let property = properties.find((i) => i.id === id);
     if (!property) {
       const docRef = doc(db, PROPERTY_PATH, id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        property = docSnap.data() as IProperty;
+        property = docSnap.data() as Property;
       }
     }
 
@@ -84,6 +105,7 @@ const useProperties = () => {
     addProperty: handleAddProperty,
     addingProperty,
     getPropertyData,
+    loadingLandlords,
   };
 };
 export default useProperties;

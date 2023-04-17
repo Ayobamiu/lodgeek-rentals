@@ -52,6 +52,7 @@ const companyRef = collection(db, FirebaseCollections.companies);
 const propertyRef = collection(db, FirebaseCollections.properties);
 const rentReviewRef = collection(db, FirebaseCollections.rentReview);
 const rentRef = collection(db, FirebaseCollections.rents);
+const landlordRef = collection(db, FirebaseCollections.landlord);
 
 export {
   analytics,
@@ -70,4 +71,5 @@ export {
   propertyRef,
   rentReviewRef,
   rentRef,
+  landlordRef,
 };

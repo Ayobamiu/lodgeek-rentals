@@ -19,28 +19,31 @@ export type User = {
   defaultCompany?: string;
   userType?: UserType;
 };
-export type RentType = "month" | "year";
-export type propertyConditionType =
-  | "Fairly Used"
-  | "Newly-Built"
-  | "Old"
-  | "Renovated";
-export type propertyFurnishing = "furnished" | "semi-furnished" | "unfurnished";
+export enum RentType {
+  "month" = "month",
+  "year" = "year",
+}
+export enum propertyConditionType {
+  "Fairly Used" = "Fairly Used",
+  "Newly-Built" = "Newly-Built",
+  "Old" = "Old",
+  "Renovated" = "Renovated",
+}
+export enum propertyFurnishing {
+  "Furnished" = "Furnished",
+  "Semi-Furnished" = "Semi-Furnished",
+  "Unfurnished" = "Unfurnished",
+}
+
+export type ImageCard = {
+  size: number;
+  type: string;
+  name: string;
+  url: string;
+  id: string;
+};
 
 export type Property = {
-  id: string;
-  owner: string;
-  company: string;
-  title: string;
-  description: string;
-  address: string;
-  location: string;
-  rent: number;
-  createdDate: number;
-  rentPer: RentType;
-  images?: string[];
-};
-export type IProperty = {
   id: string;
   owner: string;
   title: string;
@@ -50,7 +53,7 @@ export type IProperty = {
   location?: string;
   state: string;
   lga: string;
-  images?: string[];
+  images: ImageCard[];
   estateName?: string;
   propertyType: string;
   propertySize: string;
@@ -70,6 +73,18 @@ export type IProperty = {
   landLordEmergencyContactInformation: string;
   landLordTaxIdentificationNumber?: string;
   landLordPropertyManagementExperience?: string;
+};
+export type Landlord = {
+  id: string;
+  landLordFullName: string;
+  landLordContactPhoneNumber: string;
+  landLordEmailAddress: string;
+  landLordMailingAddress: string;
+  landLordEmergencyContactInformation: string;
+  landLordTaxIdentificationNumber?: string;
+  landLordPropertyManagementExperience?: string;
+  company: string;
+  photoUrl: string;
 };
 export type AdditionalFee = {
   id: string;
@@ -270,6 +285,7 @@ export enum FirebaseCollections {
   transaction = "transaction",
   bankReord = "bankReord",
   companies = "companies",
+  landlord = "landlord",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -393,7 +409,7 @@ export interface BankRecord {
 }
 export type TenantInviteProps = {
   rentalRecordData: RentalRecord;
-  property?: IProperty;
+  property?: Property;
   loggedInUser: User;
 };
 export type LodgeekNotification = {

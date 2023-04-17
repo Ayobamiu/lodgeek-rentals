@@ -5,7 +5,7 @@ import useAuth from "../../hooks/useAuth";
 import useProperties from "../../hooks/useProperties";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
-import { IProperty, Rent, RentalRecord, User } from "../../models";
+import { Property, Rent, RentalRecord, User } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import ActivityIndicator from "./ActivityIndicator";
 
@@ -19,7 +19,7 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
   const { getRentsForARentalRecord } = useRents();
   const { rentalRecordStatuses } = useRentalRecords();
   const { getUserData } = useAuth();
-  const [property, setProperty] = useState<IProperty>();
+  const [property, setProperty] = useState<Property>();
   const [loadingProperty, setLoadingProperty] = useState(false);
   useEffect(() => {
     (async () => {

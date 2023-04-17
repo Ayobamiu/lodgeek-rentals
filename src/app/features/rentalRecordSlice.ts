@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
   Company,
-  IProperty,
   Property,
   Rent,
   RentalRecord,
@@ -24,7 +23,7 @@ interface RentalRecordState {
   /* Company related the current rental record being loaded on the Rental record details page */
   currentRentalRecordCompany?: Company;
   /* Property related the current rental record being loaded on the Rental record details page */
-  currentRentalRecordProperty?: IProperty;
+  currentRentalRecordProperty?: Property;
   /* Owner of the current rental record being loaded on the Rental record details page */
   currentRentalRecordOwner?: User;
   /* tenant on the current rental record being loaded on the Rental record details page */
@@ -112,7 +111,7 @@ export const propertySlice = createSlice({
     },
     setCurrentRentalRecordProperty: (
       state,
-      action: PayloadAction<IProperty | undefined>
+      action: PayloadAction<Property | undefined>
     ) => {
       state.currentRentalRecordProperty = action.payload;
     },

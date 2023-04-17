@@ -82,7 +82,7 @@ const SelectPlans = () => {
             <LodgeekPlan
               name={plan.name}
               amount={plan.price}
-              rentPer="month"
+              rentPer={RentType.month}
               details={[
                 { text: plan.properties },
                 { text: "Rent collection", notAllowed: !plan.rentCollection },

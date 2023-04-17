@@ -1,5 +1,3 @@
-import React from "react";
-
 const InputSelect = ({
   value,
   onChange,
@@ -8,8 +6,10 @@ const InputSelect = ({
   required,
   placeholder,
   options,
+  defaultValue,
 }: {
   value: string;
+  defaultValue?: string;
   onChange: (val: any) => void;
   label?: string;
   className?: string;
@@ -33,8 +33,11 @@ const InputSelect = ({
         className="bg-transparent border border-coolGray-200 text-coolGray-400 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full py-3 px-3 placeholder:text-gray-300 placeholder:text-sm"
         value={value}
         onChange={onChange}
+        defaultValue={defaultValue}
       >
-        <option className="text-gray-300 text-sm">{placeholder}</option>
+        <option value="" className="text-gray-300 text-sm">
+          {placeholder}
+        </option>
         {options.map((item, index) => (
           <option key={index} value={item}>
             {item}

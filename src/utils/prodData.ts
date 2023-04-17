@@ -1,3 +1,5 @@
+import { propertyConditionType, propertyFurnishing } from "../models";
+
 export const supportChannels = [
   { value: "08036137042", iconName: "phone" },
   { value: "contact@lodgeek.com", iconName: "email" },
@@ -345,8 +347,17 @@ export const propertyTypeList = [
   "Townhouse / Terrace",
   "Villa",
 ];
-export const conditionList = ["Fairly Used", "Newly-Built", "Old", "Renovated"];
-export const furnishingList = ["Furnished", "Semi-Furnished", "Unfurnished"];
+export const conditionList = [
+  propertyConditionType["Fairly Used"],
+  propertyConditionType["Newly-Built"],
+  propertyConditionType["Old"],
+  propertyConditionType["Renovated"],
+];
+export const furnishingList = [
+  propertyFurnishing.Furnished,
+  propertyFurnishing["Semi-Furnished"],
+  propertyFurnishing["Unfurnished"],
+];
 
 export const mainFacilitiesList = [
   { value: "All-rooms-ensuite", label: "All rooms ensuite" },

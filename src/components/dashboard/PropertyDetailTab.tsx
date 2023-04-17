@@ -1,9 +1,9 @@
-import { IProperty } from "../../models";
+import { Property } from "../../models";
 import SinglePropertyAmenities from "../property/SinglePropertyAmenities";
 import SinglePropertyDetail from "../property/SinglePropertyDetail";
 import SinglePropertyFacility from "../property/SinglePropertyFacility";
 
-const PropertyDetailTab = ({ property }: { property: IProperty | null }) => {
+const PropertyDetailTab = ({ property }: { property: Property | null }) => {
   console.log(property);
 
   return (

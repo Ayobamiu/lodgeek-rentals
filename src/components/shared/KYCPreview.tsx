@@ -1,5 +1,5 @@
 import { Transition } from "@headlessui/react";
-import { IProperty, Property, RentalRecord, UserKYC } from "../../models";
+import { Property, RentalRecord, UserKYC } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import DetailsBox from "./DetailsBox";
 import moment from "moment";
@@ -12,7 +12,7 @@ type KYCPreviewProps = {
   rentalRecordData: RentalRecord;
   userKYC: UserKYC;
   tenantFullName: string;
-  property: IProperty;
+  property: Property;
   ownerFullName: string;
 };
 

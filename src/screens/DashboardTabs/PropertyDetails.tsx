@@ -1,16 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
-import Button from "../../components/shared/button/Button";
 import { propertyOne } from "../../utils/devData";
 import PropertyImageCarousel from "../../components/dashboard/PropertyImageCarousel";
 import { MdLocationPin } from "react-icons/md";
 import { Tabs } from "flowbite-react";
 import PropertyDetailTab from "../../components/dashboard/PropertyDetailTab";
-import { useParams } from "react-router-dom";
-import { IProperty } from "../../models";
+import { useNavigate, useParams } from "react-router-dom";
+import { Property } from "../../models";
 import { getProperty } from "../../firebase/apis/company";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAngleLeft, faEdit } from "@fortawesome/free-solid-svg-icons";
+import PropertyLandlordTab from "../../components/dashboard/PropertyLandlordTab";
+import { selectSelectedCompany } from "../../app/features/companySlice";
+import { useAppSelector } from "../../app/hooks";
 
 const PropertyDetails = () => {
+  const navigate = useNavigate();
+  const selectedCompany = useAppSelector(selectSelectedCompany);
+
   const { images, title, rent, rentPer, location, description, address } =
     propertyOne;
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -18,7 +25,7 @@ const PropertyDetails = () => {
   const [error, setError] = useState("");
   const tabsRef = useRef<any>(null);
   const { propertyId } = useParams();
-  const [propertyDetail, setPropertyDetail] = useState<IProperty | null>(null);
+  const [propertyDetail, setPropertyDetail] = useState<Property | null>(null);
 
   const getPropertyDetail = useCallback(async () => {
     setLoading(true);
@@ -44,25 +51,26 @@ const PropertyDetails = () => {
   return (
     <DashboardWrapper className="lg:ml-56 xl:ml-40">
       <section className="container mx-auto bg-white py-8 px-4 md:px-10 lg:px-20 xl:px-40 border-b print:hidden">
-        <div className="flex flex-wrap items-center -m-2">
-          <div className="w-full md:w-1/2 p-2">
-            <div className="flex flex-wrap items-center -m-2">
-              <div className="flex-1 p-2">
-                <h2 className="font-semibold text-black text-3xl">
-                  Property Detail
-                </h2>
-              </div>
-            </div>
-          </div>
-          <div className="w-full md:w-1/2 p-2">
-            <div className="flex flex-wrap justify-end -m-2">
-              <div className="w-full md:w-auto p-2"></div>
-              <div className="w-full md:w-auto p-2">
-                <Button title="Edit" />
-              </div>
-              <div className="w-full md:w-auto p-2"></div>
-            </div>
-          </div>
+        <div className="flex flex-wrap items-center justify-between">
+          <button
+            onClick={() => {
+              navigate(`/dashboard/${selectedCompany?.id}/properties`);
+            }}
+            className="flex items-center gap-x-3 text-blue-500 cursor-pointer"
+          >
+            <FontAwesomeIcon icon={faAngleLeft} className="" />
+            go to properties
+          </button>
+          <FontAwesomeIcon
+            icon={faEdit}
+            size="lg"
+            className="cursor-pointer"
+            onClick={() => {
+              navigate(
+                `/dashboard/${selectedCompany?.id}/properties/edit/${propertyId}`
+              );
+            }}
+          />
         </div>
         {/* Content */}
       </section>
@@ -91,7 +99,7 @@ const PropertyDetails = () => {
           </div>
         </div>
         <div className="w-full">
-          <PropertyImageCarousel images={images} />
+          <PropertyImageCarousel images={propertyDetail?.images || []} />
         </div>
         {/* Others */}
         <div className="w-full mt-10">
@@ -104,7 +112,11 @@ const PropertyDetails = () => {
             <Tabs.Item active title="Detail">
               <PropertyDetailTab property={propertyDetail} />
             </Tabs.Item>
-            {/* <Tabs.Item title="Dashboard">Dashboard content</Tabs.Item> */}
+            <Tabs.Item active title="Landlord">
+              {propertyDetail && (
+                <PropertyLandlordTab property={propertyDetail} />
+              )}
+            </Tabs.Item>
           </Tabs.Group>
         </div>
       </section>

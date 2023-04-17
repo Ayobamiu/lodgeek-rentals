@@ -1,20 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { IProperty } from "../../models";
+import { Landlord, Property } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
+import { initialNewProperty } from "../initialValues";
 import { RootState } from "../store";
 
 interface PropertyState {
-  properties: IProperty[];
+  properties: Property[];
+  landlords: Landlord[];
+  newProperty: Property;
 }
 
 const initialState: PropertyState = {
   properties: [],
+  landlords: [],
+  newProperty: initialNewProperty,
 };
 export const propertySlice = createSlice({
   name: "property",
   initialState,
   reducers: {
-    deleteProperty: (state, action: PayloadAction<IProperty>) => {
+    deleteProperty: (state, action: PayloadAction<Property>) => {
       const currentProperties = [...state.properties];
       const propertyIndex = currentProperties.findIndex(
         (i) => i.id === action.payload.id
@@ -22,7 +27,7 @@ export const propertySlice = createSlice({
       currentProperties.splice(propertyIndex, 1);
       state.properties = currentProperties;
     },
-    updateProperty: (state, action: PayloadAction<IProperty>) => {
+    updateProperty: (state, action: PayloadAction<Property>) => {
       const currentProperties = [...state.properties];
       const propertyIndex = currentProperties.findIndex(
         (i) => i.id === action.payload.id
@@ -30,20 +35,43 @@ export const propertySlice = createSlice({
       currentProperties.splice(propertyIndex, 1, action.payload);
       state.properties = currentProperties;
     },
-    addProperty: (state, action: PayloadAction<IProperty>) => {
+    setNewProperty: (state, action: PayloadAction<Property>) => {
+      state.newProperty = action.payload;
+    },
+    updateNewProperty: (state, action: PayloadAction<Partial<Property>>) => {
+      state.newProperty = { ...state.newProperty, ...action.payload };
+    },
+    resetNewProperty: (state) => {
+      state.newProperty = initialNewProperty;
+    },
+    addProperty: (state, action: PayloadAction<Property>) => {
       const currentProperties = [...state.properties];
       currentProperties.push(action.payload);
       state.properties = filterUniqueByKey(currentProperties, "id");
     },
-    setProperties: (state, action: PayloadAction<IProperty[]>) => {
+    setProperties: (state, action: PayloadAction<Property[]>) => {
       state.properties = action.payload;
+    },
+    setLandlords: (state, action: PayloadAction<Landlord[]>) => {
+      state.landlords = action.payload;
     },
   },
 });
 
-export const { addProperty, deleteProperty, setProperties, updateProperty } =
-  propertySlice.actions;
+export const {
+  addProperty,
+  deleteProperty,
+  setProperties,
+  updateProperty,
+  updateNewProperty,
+  resetNewProperty,
+  setLandlords,
+  setNewProperty,
+} = propertySlice.actions;
 
+export const selectProperty = (state: RootState) => state.property;
 export const selectProperties = (state: RootState) => state.property.properties;
+export const selectNewProperty = (state: RootState) =>
+  state.property.newProperty;
 
 export default propertySlice.reducer;

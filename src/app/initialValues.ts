@@ -6,6 +6,7 @@ import {
   RentalRecord,
   RentReview,
   RentReviewStatus,
+  RentType,
   SignedTenancyAgreementStatus,
   UserKYC,
 } from "../models";

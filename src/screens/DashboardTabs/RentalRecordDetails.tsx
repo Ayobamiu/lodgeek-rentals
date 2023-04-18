@@ -1,4 +1,7 @@
-import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
+import {
+  faExternalLink,
+  faFileDownload,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -333,6 +336,18 @@ export default function RentalRecordDetails() {
               >
                 View signed agreement <FontAwesomeIcon icon={faExternalLink} />
               </button>
+            </div>
+          )}
+          {currentRentalRecord?.signedTenancyAgreementFile && (
+            <div className="mb-5">
+              <a
+                href={currentRentalRecord.signedTenancyAgreementFile}
+                target="_blank"
+                download="Lease agreement"
+                className="text-blue-500 underline underline-offset-4 my-2 block"
+              >
+                Download signed lease <FontAwesomeIcon icon={faFileDownload} />
+              </a>
             </div>
           )}
           {showAcceptInvitationButton && (

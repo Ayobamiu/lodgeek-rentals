@@ -87,7 +87,7 @@ export function SubscriptionNotification({ closable }: { closable?: boolean }) {
       <p className="mb-3 text-sm text-blue-800 dark:text-blue-400">{text}</p>
 
       <Link
-        to="/select-accounts"
+        to="/select-plans"
         className="text-sm text-blue-800 underline font-medium hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
       >
         {actionText}

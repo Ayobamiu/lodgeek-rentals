@@ -15,7 +15,7 @@ export default function PropertyItem({
     >
       <img
         className="object-cover w-full rounded-t-lg   md:h-auto  md:w-48 md:rounded-none md:rounded-l-lg"
-        src={property.images[0]?.url}
+        src={(property.images && property.images[0]?.url) || ""}
         alt=""
       />
 

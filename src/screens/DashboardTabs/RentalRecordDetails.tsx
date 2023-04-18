@@ -6,10 +6,15 @@ import { selectUser } from "../../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import { AdditionalFee, RentalRecord, UserKYC } from "../../models";
+import {
+  AdditionalFee,
+  RentalRecord,
+  SignedTenancyAgreementStatus,
+  UserKYC,
+} from "../../models";
 import { sendEmail } from "../../api/email";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
-import { AgreementAndKYCForm } from "./AgreementAndKYCForm";
+import { AcceptInvitationForm } from "./AcceptInvitationForm";
 import { KYCPreview } from "../../components/shared/KYCPreview";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
@@ -17,6 +22,7 @@ import { setNotification } from "../../app/features/notificationSlice";
 import { RentalRecordCollaboration } from "../../components/dashboard/RentalRecordCollaboration";
 import {
   selectRentalRecord,
+  selectUserKYC,
   setCurrentRentalRecord,
 } from "../../app/features/rentalRecordSlice";
 import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
@@ -31,6 +37,10 @@ import {
 import { AdditionalFees } from "./AdditionalFees";
 import { RentInvoiceTable } from "./RentInvoiceTable";
 import { RentalRecordSimpleDetails } from "./RentalRecordSimpleDetails";
+import { SignedAgreementPreview } from "../../components/shared/SignedAgreementPreview";
+import { UserKYCForm } from "./UserKYCForm";
+import { CompleteKYCAndSignLease } from "./CompleteKYCAndSignLease";
+import { VerifySignedLease } from "./VerifySignedLease";
 
 export default function RentalRecordDetails() {
   const { handleUpdateRentalRecord, sendEmailInvitationToTenant } =
@@ -40,6 +50,7 @@ export default function RentalRecordDetails() {
 
   const loggedInUser = useAppSelector(selectUser);
   const { selectedRents, selectedAdditionalFees } = useAppSelector(selectRent);
+  const currentUserKYC = useAppSelector(selectUserKYC);
 
   const {
     currentRentalRecord,
@@ -130,8 +141,9 @@ export default function RentalRecordDetails() {
 
   const [acceptingInvite, setAcceptingInvite] = useState(false);
   const [openAgreementForm, setOpenAgreementForm] = useState(false);
+
   const acceptInvitation = async (userKYC: UserKYC) => {
-    if (!userKYC) return toast.error("You need to complete your tenancy form.");
+    if (!userKYC) return toast.error("You need to complete your KYC.");
     if (!currentRentalRecord) return toast.error("Error Accepting Invite");
     setAcceptingInvite(true);
     const agreeedRecord: RentalRecord = {
@@ -139,6 +151,7 @@ export default function RentalRecordDetails() {
       status: "inviteAccepted",
       tenantAgreed: true,
       userKYC,
+      tenantAgreedOn: Date.now(),
     };
 
     await handleUpdateRentalRecord(agreeedRecord)
@@ -238,17 +251,28 @@ export default function RentalRecordDetails() {
   }, [selectedRents]);
 
   const [showKYCPreview, setShowKYCPreview] = useState(false);
+  const [showSignedAgreement, setShowSignedAgreement] = useState(false);
+  const [openKYCForm, setOpenKYCForm] = useState(false);
+  const [showReviewSignedLeaseBox, setShowReviewSignedLeaseBox] =
+    useState(false);
 
   return (
     <DashboardWrapper>
       <div>
         {updatingRents && <FullScreenActivityIndicator />}
+
+        <UserKYCForm
+          open={openKYCForm}
+          closeForm={() => {
+            setOpenKYCForm(false);
+          }}
+        />
         {/* Rent Invoice Table */}
         <RentInvoiceTable />
         {/* Rent Invoice Table */}
         {/* KYC and Agreement form */}
         {currentRentalRecord && (
-          <AgreementAndKYCForm
+          <AcceptInvitationForm
             openAgreementForm={openAgreementForm}
             setOpenAgreementForm={setOpenAgreementForm}
             rentalRecordData={currentRentalRecord}
@@ -262,7 +286,7 @@ export default function RentalRecordDetails() {
               <div className="flex flex-wrap items-center -m-2">
                 <div className="flex-1 p-2">
                   <h2 className="font-semibold text-black text-3xl">
-                    Rental Record
+                    {currentRentalRecordProperty?.title || "Rental Record"}
                   </h2>
                 </div>
               </div>
@@ -283,6 +307,7 @@ export default function RentalRecordDetails() {
             </div>
           </div>
         </section>
+
         <div className="container mx-auto lg:p-8 p-3 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
 
@@ -294,11 +319,40 @@ export default function RentalRecordDetails() {
                 }}
                 className="text-blue-500 underline underline-offset-4"
               >
-                View tenancy agreement and documents{" "}
-                <FontAwesomeIcon icon={faExternalLink} />
+                View tenant's KYC <FontAwesomeIcon icon={faExternalLink} />
               </button>
             </div>
           )}
+          {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
+            <div className="mb-5">
+              <button
+                onClick={() => {
+                  setShowSignedAgreement(true);
+                }}
+                className="text-blue-500 underline underline-offset-4"
+              >
+                View signed agreement <FontAwesomeIcon icon={faExternalLink} />
+              </button>
+            </div>
+          )}
+          {showAcceptInvitationButton && (
+            <CompleteKYCAndSignLease
+              setOpenKYCForm={setOpenKYCForm}
+              currentUserKYC={currentUserKYC}
+              setOpenAgreementForm={setOpenAgreementForm}
+              currentRentalRecord={currentRentalRecord}
+            />
+          )}
+
+          {showResendInviteButton &&
+            currentRentalRecord.signedTenancyAgreementFile &&
+            [
+              SignedTenancyAgreementStatus.underReview,
+              SignedTenancyAgreementStatus.rejected,
+            ].includes(currentRentalRecord.signedTenancyAgreementStatus) && (
+              <VerifySignedLease />
+            )}
+
           <RentalRecordSimpleDetails />
           <PaidRents showPayRentButton={showPayRentButton} />
           <UpaidRents showPayRentButton={showPayRentButton} />
@@ -309,6 +363,17 @@ export default function RentalRecordDetails() {
           <KYCPreview
             openAgreementForm={showKYCPreview}
             setOpenAgreementForm={setShowKYCPreview}
+            rentalRecordData={currentRentalRecord}
+            userKYC={currentRentalRecord?.userKYC}
+            tenantFullName={tenantFullName || ""}
+            property={currentRentalRecordProperty}
+            ownerFullName={ownerFullName || ""}
+          />
+        )}
+        {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
+          <SignedAgreementPreview
+            openAgreementForm={showSignedAgreement}
+            setOpenAgreementForm={setShowSignedAgreement}
             rentalRecordData={currentRentalRecord}
             userKYC={currentRentalRecord?.userKYC}
             tenantFullName={tenantFullName || ""}

@@ -59,7 +59,7 @@ export function KYCPreview(props: KYCPreviewProps) {
     >
       <div className="bg-white fixed h-screen w-screen top-0 left-0 z-50 overflow-scroll ">
         <div className="h-20 w-full border-b flex justify-between items-center p-3">
-          <h1 className="lg:text-3xl text-2xl">Tenancy agreement</h1>
+          <h1 className="lg:text-3xl text-2xl">Tenant's KYC</h1>
           <div className="flex ml-auto item-center gap-x-5">
             <button
               className="text-red-500"
@@ -98,12 +98,8 @@ export function KYCPreview(props: KYCPreviewProps) {
               />
 
               <h3 className="lg:text-xl text-sm font-bold mb-2">
-                Tenancy agreement for {tenantFullName} at {property.title}
+                {tenantFullName}'s KYC for {property.title}
               </h3>
-              <p className="text-xs font-medium text-coolGray-500 ">
-                This agreement is between <strong>{ownerFullName} </strong>{" "}
-                (Property owner) and <strong>{tenantFullName} </strong>(Tenant)
-              </p>
             </div>
             <DetailsBox
               label="Application Received"
@@ -293,90 +289,6 @@ export function KYCPreview(props: KYCPreviewProps) {
                 />
               </>
             )}
-            <h3 className="text-xl font-bold my-5">DECLARATION:</h3>
-            <div className="mb-1 font-medium lg:text-lg text-justify text-coolGray-900 flex lg:leading-10">
-              I, {tenantFullName}, hereby offer to rent the property from the
-              owner under a lease to be prepared by the Agent. Should this
-              application be approved, I acknowledge that I will be required to
-              pay the following amount: {formatPrice(rentalRecordData.rent)}{" "}
-              rent per {rentalRecordData.rentPer} (which may be subject to
-              review). I acknowledge that this application is subject to the
-              approval of the owner. I declare that all information contained in
-              this application is true and correct and given of my own free
-              will. I declare that I have inspected the premises and am
-              satisfied with the current condition and cleanliness of the
-              property. I acknowledge that my personal contents insurance is not
-              covered under any lessor insurance policy/s and understand that it
-              is my responsibility to insure my own personal belongings. I
-              acknowledge and accept that if this application is denied, the
-              agent is not legally obliged to provide reasons. I certify that
-              the above information is correct and complete and hereby authorize
-              you to do a credit check and make any inquiries you feel necessary
-              to evaluate my tenancy and credit standing. I understand that
-              giving incomplete or false information is grounds for rejection of
-              this application. If any information supplied on this application
-              is later found to be false, this is grounds for termination of
-              tenancy. Applicant screening entails the checking of the
-              applicant’s credit, rental history, employment history, public
-              records and other criteria for residency.
-            </div>
-            <div className="flex gap-3">
-              <input
-                type="checkbox"
-                defaultChecked={rentalRecordData.tenantAgreed}
-                name="tenantAgreed"
-                id="tenantAgreed"
-                className="h-5 w-5"
-              />
-              <label htmlFor="tenantAgreed">
-                I Agree to this tenancy declaration.
-              </label>
-            </div>
-
-            <div className="mt-10">
-              <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
-                Lodgeek is an intermediary that provides a range of rental
-                management services to property owners. These services include,
-                but are not limited to, marketing and advertising properties for
-                rent, screening and selecting tenants, managing the lease
-                process, collecting rent, managing repairs and maintenance, and
-                facilitating communication between property owners and tenants.
-              </div>
-
-              <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
-                Lodgeek is not a party to the rental agreements entered into
-                between property owners and tenants, and its role is limited to
-                that of an intermediary facilitating the rental process. Lodgeek
-                does not own or control any of the properties listed on its
-                platform, and its relationship with property owners and tenants
-                is limited to facilitating the rental process and providing
-                rental management services.
-              </div>
-
-              <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
-                Lodgeek does not discriminate against any person based on their
-                race, color, religion, sex, national origin, familial status, or
-                disability. Lodgeek is committed to ensuring that all properties
-                listed on its platform comply with applicable laws and
-                regulations.
-              </div>
-
-              <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
-                Property owners and tenants are responsible for their own
-                actions and decisions related to the rental process. They
-                acknowledge that Lodgeek is not responsible for any disputes,
-                damages, or losses that may arise from the use of its platform
-                or the rental process, and that Lodgeek is not liable for any
-                damages or losses incurred by them as a result of their use of
-                the platform or the services provided by Lodgeek.
-              </div>
-
-              <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
-                By using Lodgeek's platform and services, property owners and
-                tenants agree to be bound by the terms and conditions set out in
-                this declaration.
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React from "react";
 //test
 export default function Pricing() {
   return (
-    <section className="py-20 xl:py-24 bg-white pattern-white-bg">
+    <section id="pricing" className="py-20 xl:py-24 bg-white pattern-white-bg">
       <div className="container px-4 mx-auto">
         <div className="text-center">
           <span className="inline-block py-px px-2 mb-4 text-xs leading-5 text-green-500 bg-green-100 font-medium uppercase rounded-9xl">

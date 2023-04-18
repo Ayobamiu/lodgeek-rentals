@@ -12,6 +12,7 @@ export type RentType = "month" | "year";
 export type Property = {
   id: string;
   owner: string;
+  company: string;
   title: string;
   description: string;
   address: string;
@@ -25,6 +26,7 @@ export type RentalRecord = {
   property: string;
   tenant: string;
   owner: string;
+  company: string;
   createdDate: number;
   rentStarts: number;
   rent: number;
@@ -53,6 +55,7 @@ export type Rent = {
   rentPer: RentType;
   tenant: string;
   owner: string;
+  company: string;
   sentAWeekReminder?: boolean;
   sentADayReminder?: boolean;
   sentFirstFailedRent?: boolean;

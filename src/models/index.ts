@@ -1,3 +1,10 @@
+import { WhereFilterOp } from "firebase/firestore";
+
+export enum UserType {
+  "individual" = "individual",
+  "company" = "company",
+}
+
 export type User = {
   firstName: string;
   lastName: string;
@@ -9,19 +16,75 @@ export type User = {
   balance: number;
   directRemitance?: boolean;
   remittanceAccount?: string;
+  defaultCompany?: string;
+  userType?: UserType;
 };
-export type RentType = "month" | "year";
+export enum RentType {
+  "month" = "month",
+  "year" = "year",
+}
+export enum propertyConditionType {
+  "Fairly Used" = "Fairly Used",
+  "Newly-Built" = "Newly-Built",
+  "Old" = "Old",
+  "Renovated" = "Renovated",
+}
+export enum propertyFurnishing {
+  "Furnished" = "Furnished",
+  "Semi-Furnished" = "Semi-Furnished",
+  "Unfurnished" = "Unfurnished",
+}
+
+export type ImageCard = {
+  size: number;
+  type: string;
+  name: string;
+  url: string;
+  id: string;
+};
 
 export type Property = {
   id: string;
   owner: string;
   title: string;
+  company: string;
   description: string;
   address: string;
-  location: string;
-  rent: number;
+  location?: string;
+  state: string;
+  lga: string;
+  images: ImageCard[];
+  estateName?: string;
+  propertyType: string;
+  propertySize: string;
+  condition: propertyConditionType;
+  furnishing: propertyFurnishing;
+  numberOfBedrooms: number;
+  numberOfBathrooms: number;
+  numberOfToilets: number;
+  facilities: string[];
   createdDate: number;
+  rent: number;
   rentPer: RentType;
+  landLordFullName: string;
+  landLordContactPhoneNumber: string;
+  landLordEmailAddress: string;
+  landLordMailingAddress: string;
+  landLordEmergencyContactInformation: string;
+  landLordTaxIdentificationNumber?: string;
+  landLordPropertyManagementExperience?: string;
+};
+export type Landlord = {
+  id: string;
+  landLordFullName: string;
+  landLordContactPhoneNumber: string;
+  landLordEmailAddress: string;
+  landLordMailingAddress: string;
+  landLordEmergencyContactInformation: string;
+  landLordTaxIdentificationNumber?: string;
+  landLordPropertyManagementExperience?: string;
+  company: string;
+  photoUrl: string;
 };
 export type AdditionalFee = {
   id: string;
@@ -31,12 +94,51 @@ export type AdditionalFee = {
   paid: boolean;
   paidOn: number;
 };
+export type RentReviewRecord = {
+  id: string;
+  dateSubmitted: number;
+  effectDate: number;
+  leaseAgreement: string;
+  rentIncreaseNotice: string;
+  currentRentAmount: number;
+  newRentAmount: number;
+  reviewDate: number;
+  reasonForReview: string;
+  notes?: string;
+};
+
+export enum SignedTenancyAgreementStatus {
+  "notSubmitted" = "Not Submited",
+  "underReview" = "Under Review",
+  "verified" = "Verified",
+  "rejected" = "Rejected",
+}
+
+export enum SignedTenancyAgreementStatusColor {
+  "Not Submited" = "gray",
+  "Under Review" = "yellow",
+  "Verified" = "green",
+  "Rejected" = "red",
+}
+export enum SignedTenancyAgreementStatusType {
+  "Not Submited" = "info",
+  "Under Review" = "warning",
+  "Verified" = "success",
+  "Rejected" = "error",
+}
+export enum SignedTenancyAgreementStatusHelpText {
+  "Not Submited" = "You haven't submitted your signed lease agreement yet. Please do so as soon as possible.",
+  "Under Review" = "Your signed lease document is currently being reviewed. We'll notify you once it's been processed.",
+  "Verified" = "Your signed lease documents have been verified and accepted. You can now proceed to pay rent.",
+  "Rejected" = "Unfortunately, your signed lease document was rejected. Please check your email for instructions on how to upload an acceptable copy.",
+}
 export type RentalRecord = {
   id: string;
   property: string;
   tenant: string;
   rentInstruction: string;
   owner: string;
+  company: string;
   createdDate: number;
   rentStarts: number;
   rent: number;
@@ -52,12 +154,76 @@ export type RentalRecord = {
   tenantAgreedOn: number;
   userKYC?: UserKYC;
   remittanceAccount?: string; //id of bank record
+  team: string[];
+  members: CompanyMember[];
+  rentReviews: RentReviewRecord[];
+  tenancyAgreementFile: string;
+  signedTenancyAgreementFile: string;
+  signedTenancyAgreementStatus: SignedTenancyAgreementStatus;
+  reasonToRejectSignedTenancyAgreement: string;
+  tenancyAgreementFileSignedOn: number;
+};
+
+export type ReveiwFormDetails = {
+  address: string;
+  unitNumber: string;
+  tenantName: string;
+  currentRentAmount: number;
+  newRentAmount: number;
+  reviewDate: number;
+  reasonForReview: string;
+  notes?: string;
+};
+
+export type RentReviewResponse = {
+  user: string;
+  message: string;
+  date: number;
+  id: string;
+};
+
+export enum RentReviewStatus {
+  "opened" = "Opened",
+  "reviewSent" = "Review Sent",
+  "tenantResponded" = "Tenant Responded",
+  "increaseAccepted" = "Increase Accepted",
+  "increaseRejected" = "Increase Rejected",
+}
+export enum RentReviewStatusColor {
+  "Opened" = "gray",
+  "Review Sent" = "yellow",
+  "Tenant Responded" = "blue",
+  "Increase Accepted" = "green",
+  "Increase Rejected" = "red",
+}
+
+export type RentReview = {
+  id: string;
+  property: string;
+  tenant: string;
+  owner: string;
+  company: string;
+  createdDate: number;
+  acceptedOn: number;
+  rejectedOn: number;
+  status: RentReviewStatus;
+  responses: RentReviewResponse[];
+  reveiwFormDetails: ReveiwFormDetails;
+  rentalRecord: string;
+  rentIncreaseNotice: string;
+  leaseAgreement: string;
 };
 export enum RentStatus {
   "Upcoming - Rent is not due for payment." = "upcoming",
   "Pending - Tenant has not started the rent." = "pending",
   "Paid - Rent has been paid." = "paid",
   "Late - Due date has passed and rent has not been paid." = "late",
+}
+export enum RentStatusColor {
+  "upcoming" = "gray",
+  "pending" = "yellow",
+  "paid" = "green",
+  "late" = "red",
 }
 export type Rent = {
   id: string;
@@ -75,6 +241,7 @@ export type Rent = {
   rentPer: RentType;
   tenant: string;
   owner: string;
+  company: string;
   sentAWeekReminder?: boolean;
   sentADayReminder?: boolean;
   sentFirstFailedRent?: boolean;
@@ -87,6 +254,51 @@ export type SimpleEmailProps = {
   paragraphs: string[];
   buttons?: ButtonItemProps[];
 };
+export type RecieptProps = {
+  /**Title of the email. */
+  title?: string;
+  /**Customer who made payment: This can be the name of a company or tenant. */
+  receivedfrom: string;
+  /**Title of the property the fees are for. */
+  property: string;
+  /**Property manager in charge of the property: This can be the name of a company or an individual. */
+  propertyCompany: string;
+  /**Company logo. */
+  propertyCompanyLogo?: string;
+  /**Date of the transaction in this format February 19, 2023 */
+  date: string;
+  /**receiptNumber prop on the MoneyTransaction for this transaction e.g. 001234 */
+  receiptNumber: string;
+  /**List of payments made.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   */
+  payments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+  }[];
+  /**String format of the total amount paid in this format N1,000,000 */
+  totalPaid: string;
+  /**List of due payments and their due dates.
+   * 1. Description: Describes the payment in details
+   * 2. Amount: string format of the amount in this format N1,000,000
+   * 3. Date: Due date of the payment in this format February 19, 2023
+   */
+  duePayments: {
+    /**Describes the payment in details */
+    description: string;
+    /**String format of the amount in this format N1,000,000 */
+    amount: string;
+    /**Due date of the payment in this format February 19, 2023 */
+    dueDate: string;
+  }[];
+  /**String format of the total due amount in this format N1,000,000 */
+  totalAmountDue: string;
+  /**Salutaions at the end of the receipt. Can include information about due payments */
+  extraComment?: string;
+};
 export type ButtonItemProps = {
   text: string;
   link: string;
@@ -97,10 +309,13 @@ export enum FirebaseCollections {
   rentalRecords = "rentalRecords",
   mail = "mail",
   rents = "rents",
+  rentReview = "rentReview",
   users = "users",
   userKYC = "userKYC",
   transaction = "transaction",
   bankReord = "bankReord",
+  companies = "companies",
+  landlord = "landlord",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -140,6 +355,8 @@ export type MoneyTransaction = {
   serviceFee: number;
   payer: string;
   payee: string;
+  receiptNumber: string;
+  company?: string;
 };
 export type YesOrNo = "yes" | "no";
 
@@ -218,6 +435,7 @@ export interface BankRecord {
   user: string;
   createdAt: number;
   updatedAt: number;
+  company: string;
 }
 export type TenantInviteProps = {
   rentalRecordData: RentalRecord;
@@ -235,3 +453,163 @@ export type LodgeekNotification = {
     link?: string;
   }[];
 };
+
+/** 
+  * 
+  * 1. Company Owners:
+  Primary Owners can assign Company Owners. They have the same level of permissions as the Primary Owner, except they can’t delete or transfer ownership of a Company.
+  2. Company Admins:
+  Company Owners can assign Company Admins. They help manage members and can perform other administrative tasks.
+  3. Regular members
+  Members have access to use features in Lodgeek, except for those that are limited to only owners and admins.
+*/
+export enum CompanyRole {
+  "owner" = "owner",
+  "admin" = "admin",
+  "regular" = "regular",
+}
+export type CompanyMember = {
+  email: string;
+  role: CompanyRole;
+  dateJoined: number;
+};
+export type TeamMemberData = {
+  userData?: User;
+  memberData: CompanyMember;
+};
+
+export type Company = {
+  id: string;
+  name: string;
+  registrationNumber: string;
+  address: string;
+  phone: string;
+  email: string;
+  size: string;
+  logo: string;
+  createdBy: string;
+  /**
+   * Company Primary Owner:
+    A Lodgeek Company has a single Primary Owner. Only this person can delete the Company or transfer ownership to someone else.
+   */
+  primaryOwner: string;
+  createdAt: number;
+  updatedAt: number;
+  team: string[];
+  members: CompanyMember[];
+  remittanceAccount?: string;
+  planCode?: string;
+  subscriptionCode?: string;
+  nextPaymentDate?: string;
+  balance: number;
+  directRemitance?: boolean;
+};
+
+export enum SettingsTab {
+  profile = "profile",
+  team = "team",
+  billing = "billing",
+}
+
+type PayStackAuthorization = {
+  account_name: string;
+  authorization_code: string;
+  bank: string;
+  bin: string;
+  brand: string;
+  card_type: string;
+  channel: string;
+  country_code: string;
+  exp_month: string;
+  exp_year: string;
+  last4: string;
+  receiver_bank: string;
+  receiver_bank_account_number: string;
+  reusable: boolean;
+  signature: string;
+};
+
+type PayStackPlan = {
+  domain: string;
+  name: string;
+  plan_code: string;
+  description: null;
+  amount: number;
+  interval: string;
+  send_invoices: boolean;
+  send_sms: boolean;
+  hosted_page: false;
+  hosted_page_url: null;
+  hosted_page_summary: null;
+  currency: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type PayStackCustomer = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: null;
+  metadata: {
+    photos: {
+      type: string;
+      typeId: string;
+      typeName: string;
+      url: string;
+      isPrimary: false;
+    }[];
+  };
+  domain: string;
+  customer_code: string;
+  id: number;
+  integration: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PayStackSubscription = {
+  invoices: any[];
+  customer: PayStackCustomer;
+  plan: PayStackPlan;
+  integration: number;
+  authorization: PayStackAuthorization;
+  domain: string;
+  start: number;
+  /**1. active: The subscription is currently active, and will be charged on the next payment date.
+   * 2. non-renewing: The subscription is currently active, but we won't be charging it on the next payment date. This occurs when a subscription is about to be complete, or has been cancelled (but we haven't reached the next payment date yet).
+   * 3. attention: The subscription is still active, but there was an issue while trying to charge the customer's card. The issue can be an expired card, insufficient funds, etc. We'll attempt charging the card again on the next payment date.
+   * 4. completed: The subscription is complete, and will no longer be charged.
+   * 5. cancelled: The subscription has been cancelled, and we'll no longer attempt to charge the card on the subscription.
+   */
+  status: "active" | "non-renewing" | "attention" | "completed" | "cancelled";
+  quantity: 1;
+  amount: number;
+  subscription_code: string;
+  email_token: string;
+  easy_cron_id: null;
+  cron_expression: string;
+  next_payment_date: string;
+  open_invoice: null;
+  id: number;
+  cancelledAt?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+/**
+ * Used to filter documents.
+ * @link https://googleapis.dev/nodejs/firestore/latest/CollectionReference.html#where
+ */
+export type WhereCriteria = {
+  field: string;
+  operation: WhereFilterOp;
+  criteria: any;
+};
+export enum SubscriptionPlan {
+  "Free Plan" = "Free Plan",
+  "Basic Plan" = "Basic Plan",
+  "Pro Plan" = "Pro Plan",
+  "Premium Plan" = "Premium Plan",
+}

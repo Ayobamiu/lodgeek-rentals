@@ -32,7 +32,7 @@ export default function SignUpBoxForLoginPage() {
   const { handleSignUpUser, signingUp, handleSignInUser, signingIn } =
     useAuth();
 
-  const [tab, setTab] = useState<"signUp" | "signIn">("signUp");
+  const [tab, setTab] = useState<"signUp" | "signIn">("signIn");
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

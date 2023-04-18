@@ -35,7 +35,7 @@ export async function fetchDataAndSendDueDateNotice(rent: Rent): Promise<void> {
       paragraphs,
       buttons: [
         {
-          link: `https://lodgeek-rentals.vercel.app/dashboard?tab=rentalRecordDetails&rentalRecordId=${rent.rentalRecord}`,
+          link: `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${rent.rentalRecord}`,
           text: "Pay now",
         },
       ],

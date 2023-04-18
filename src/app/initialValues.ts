@@ -6,7 +6,7 @@ import {
   RentalRecord,
   RentReview,
   RentReviewStatus,
-  RentType,
+  SignedTenancyAgreementStatus,
   UserKYC,
 } from "../models";
 
@@ -28,6 +28,11 @@ export const initialNewRentalRecord: RentalRecord = {
   members: [],
   team: [],
   rentReviews: [],
+  tenancyAgreementFile: "",
+  signedTenancyAgreementFile: "",
+  tenancyAgreementFileSignedOn: 0,
+  signedTenancyAgreementStatus: SignedTenancyAgreementStatus["notSubmitted"],
+  reasonToRejectSignedTenancyAgreement: "",
 };
 export const initialUserKYC: UserKYC = {
   associatedWithFelonyOrMisdemeanor: "no",

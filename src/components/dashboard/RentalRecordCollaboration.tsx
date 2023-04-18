@@ -20,9 +20,21 @@ export const RentalRecordCollaboration = () => {
   } = useAppSelector(selectRentalRecord);
 
   useRentalRecorCollaborator();
+  const options = {
+    placement: "left",
+    backdrop: true,
+    bodyScrolling: false,
+    edge: false,
+    edgeOffset: "",
+    backdropClasses:
+      "bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-30",
+    onHide: () => {},
+    onShow: () => {},
+    onToggle: () => {},
+  };
 
   const drawer: DrawerInterface | null = $targetEl
-    ? new Drawer($targetEl)
+    ? new Drawer($targetEl, options)
     : null;
 
   type OnwerOrTenantProps = {

@@ -92,7 +92,7 @@ export default function BankRecords() {
                   <div className="w-full md:w-auto p-2">
                     <small>Available Balance</small>
                     <h2 className="text-coolGray-900 text-lg font-semibold">
-                      {formatPrice(loggedInUser?.balance || 0)}
+                      {formatPrice(selectedCompany?.balance || 0)}
                     </h2>
                   </div>
                   <div className="w-full md:w-auto p-2">

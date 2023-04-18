@@ -15,8 +15,11 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
+  faExternalLink,
+  faFolderOpen,
   faPlus,
   faTimesCircle,
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import moment from "moment";
 import formatPrice from "../../utils/formatPrice";
@@ -29,6 +32,8 @@ import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useProperties from "../../hooks/useProperties";
+import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
+import ActivityIndicator from "../../components/shared/ActivityIndicator";
 // import { TextEncoder } from "util";
 // import TextEditor from "../../components/lib/rental/TextEditor";
 
@@ -48,10 +53,36 @@ export default function AddRentalRecords() {
   const { addingRentalRecord, handleAddRentalRecord } = useRentalRecords();
   const properties = useAppSelector(selectProperties);
   const newRentalRecord = useAppSelector(selectNewRentalRecord);
+
   const loggedInUser = useAppSelector(selectUser);
   const selectedCompany = useAppSelector(selectSelectedCompany);
   // Rental Agreement state
   const [file, setFile] = useState<any>(null);
+
+  const [uploadingTenancy, setUploadingTenancy] = useState(false);
+
+  const handleUploadTenancy = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files?.length) {
+      const fileUploaded = e.target.files[0];
+      setUploadingTenancy(true);
+      const url = await UploadPhotoAsync(
+        `/rentdocs/${Date.now()}-${fileUploaded.name}`,
+        fileUploaded
+      )
+        .finally(() => {
+          setUploadingTenancy(false);
+        })
+        .catch(() => {
+          toast.error("Error uploading file.");
+        });
+
+      if (url) {
+        dispatch(updateNewRentalRecord({ tenancyAgreementFile: url }));
+      }
+    }
+  };
 
   const chooseFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e?.target?.files && e.target.files[0]?.type !== "application/pdf") {
@@ -397,29 +428,78 @@ export default function AddRentalRecords() {
                     <div className="flex flex-wrap -m-3">
                       <div className="w-full md:w-1/3 p-3">
                         <p className="text-sm text-coolGray-800 font-semibold">
-                          Rent Instruction
+                          Tenancy agreement
                         </p>
                       </div>
                       <div className="w-full md:flex-1 p-3">
                         {/* Upload options */}
+
                         <>
                           <label
-                            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                            className=" mb-2 text-sm font-medium text-gray-900 dark:text-white"
                             htmlFor="file_input"
                           >
-                            Upload tenant agreement file
+                            {newRentalRecord.tenancyAgreementFile ? (
+                              <small className="text-grey-500 underline underline-offset-4">
+                                Change file{" "}
+                                <FontAwesomeIcon icon={faFolderOpen} />
+                              </small>
+                            ) : (
+                              <div className=" flex gap-x-3 items-center">
+                                Choose file{" "}
+                                {newRentalRecord.tenancyAgreementFile && (
+                                  <FontAwesomeIcon
+                                    icon={faCheckCircle}
+                                    className="text-green-500"
+                                  />
+                                )}
+                                {uploadingTenancy && (
+                                  <ActivityIndicator size="4" />
+                                )}
+                              </div>
+                            )}
                           </label>
                           <input
                             accept="application/pdf"
-                            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                            className={`block ${
+                              newRentalRecord.tenancyAgreementFile
+                                ? "w-0 h-0"
+                                : "w-full"
+                            } text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400`}
                             aria-describedby="file_input_help"
                             id="file_input"
                             type="file"
                             // value={file?.name}
-                            onChange={(e) => {
-                              chooseFile(e);
-                            }}
+                            onChange={handleUploadTenancy}
                           />
+                          {newRentalRecord.tenancyAgreementFile && (
+                            <div className="mb-3">
+                              <div className="flex items-center">
+                                <small className="flex items-center gap-x-3">
+                                  <a
+                                    href={newRentalRecord.tenancyAgreementFile}
+                                    className="text-blue-500 underline underline-offset-4"
+                                    target="_blank"
+                                  >
+                                    Lease Agreement{" "}
+                                    <FontAwesomeIcon icon={faExternalLink} />
+                                  </a>
+                                  <FontAwesomeIcon
+                                    icon={faTrashAlt}
+                                    title="Delete Lease Agreement file"
+                                    className="text-red-500 cursor-pointer"
+                                    onClick={() => {
+                                      dispatch(
+                                        updateNewRentalRecord({
+                                          tenancyAgreementFile: "",
+                                        })
+                                      );
+                                    }}
+                                  />
+                                </small>
+                              </div>
+                            </div>
+                          )}
                           <p
                             className="mt-1 text-sm text-gray-500 dark:text-gray-300"
                             id="file_input_help"
@@ -427,6 +507,7 @@ export default function AddRentalRecords() {
                             Only PDF file is allowed.
                           </p>
                         </>
+
                         {/* <div className="flex flex-row items-center">
                           <hr className="h-px my-8 bg-gray-300 border-0 w-[48%]" />
                           <p className="text-sm font-semibold text-gray-400 px-5">
@@ -439,10 +520,10 @@ export default function AddRentalRecords() {
                           <TextEditor />
                         </div> */}
 
-                        <small className="text-coolGray-400">
+                        {/* <small className="text-coolGray-400">
                           Write some instructions you want the tenants to
                           understand and or agree to.
-                        </small>
+                        </small> */}
                       </div>
                     </div>
                   </div>

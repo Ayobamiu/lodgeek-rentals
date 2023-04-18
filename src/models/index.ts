@@ -107,6 +107,31 @@ export type RentReviewRecord = {
   notes?: string;
 };
 
+export enum SignedTenancyAgreementStatus {
+  "notSubmitted" = "Not Submited",
+  "underReview" = "Under Review",
+  "verified" = "Verified",
+  "rejected" = "Rejected",
+}
+
+export enum SignedTenancyAgreementStatusColor {
+  "Not Submited" = "gray",
+  "Under Review" = "yellow",
+  "Verified" = "green",
+  "Rejected" = "red",
+}
+export enum SignedTenancyAgreementStatusType {
+  "Not Submited" = "info",
+  "Under Review" = "warning",
+  "Verified" = "success",
+  "Rejected" = "error",
+}
+export enum SignedTenancyAgreementStatusHelpText {
+  "Not Submited" = "You haven't submitted your signed lease agreement yet. Please do so as soon as possible.",
+  "Under Review" = "Your signed lease document is currently being reviewed. We'll notify you once it's been processed.",
+  "Verified" = "Your signed lease documents have been verified and accepted. You can now proceed to pay rent.",
+  "Rejected" = "Unfortunately, your signed lease document was rejected. Please check your email for instructions on how to upload an acceptable copy.",
+}
 export type RentalRecord = {
   id: string;
   property: string;
@@ -132,6 +157,11 @@ export type RentalRecord = {
   team: string[];
   members: CompanyMember[];
   rentReviews: RentReviewRecord[];
+  tenancyAgreementFile: string;
+  signedTenancyAgreementFile: string;
+  signedTenancyAgreementStatus: SignedTenancyAgreementStatus;
+  reasonToRejectSignedTenancyAgreement: string;
+  tenancyAgreementFileSignedOn: number;
 };
 
 export type ReveiwFormDetails = {

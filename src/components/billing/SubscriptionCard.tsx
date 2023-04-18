@@ -24,7 +24,7 @@ export function SubscriptionCard({
             Cost
           </h1>
           <p className="font-normal text-gray-700 dark:text-gray-400">
-            {formatPrice(subscription.amount / 100)} per{" "}
+            {formatPrice(subscription.amount / 100)}{" "}
             {subscription.plan.interval}
           </p>
         </div>

@@ -33,6 +33,13 @@ import SelectPlans from "./screens/SelectPlans";
 import TeamCollaboration from "./screens/SettingsPages/TeamCollaboration";
 import FinancialReport from "./screens/SettingsPages/FinancialReport";
 import RentReviewpage from "./screens/DashboardTabs/RentReviewpage";
+import InvoicesPage from "./screens/InvoicingSystem/InvoicesPage";
+import InvoiceDetails from "./screens/InvoicingSystem/InvoiceDetails";
+import AddInvoice from "./screens/InvoicingSystem/AddInvoice";
+import PaymentsPage from "./screens/Payments/PaymentsPage";
+import ClientsPage from "./screens/Clients/ClientsPage";
+import PayForInvoice from "./screens/InvoicingSystem/PayForInvoice";
+import ReceiptPage from "./screens/Receipt/ReceiptPage";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -48,6 +55,11 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="select-plans" element={<SelectPlans />} />
+          <Route path="view-receipt/:paymentId" element={<ReceiptPage />} />
+          <Route
+            path="pay-for-invoice/:invoiceId"
+            element={<PayForInvoice />}
+          />
           <Route
             path="individual-registration"
             element={<IndividualRegistrationPage />}
@@ -72,6 +84,10 @@ function App() {
             element={<RentalRecordDetails />}
           />
           <Route
+            path="dashboard/invoices/:invoiceId"
+            element={<InvoiceDetails />}
+          />
+          <Route
             path="dashboard/rentalRecords/:rentalRecordId/rent-review/new"
             element={<RentReviewpage />}
           />
@@ -86,6 +102,10 @@ function App() {
           <Route
             path="dashboard/:companyId/paymentHistory"
             element={<PaymentHistory />}
+          />
+          <Route
+            path="dashboard/:companyId/clients"
+            element={<ClientsPage />}
           />
           <Route
             path="dashboard/:companyId/properties"
@@ -108,6 +128,23 @@ function App() {
             path="dashboard/:companyId/bankRecords"
             element={<BankRecords />}
           />
+          <Route
+            path="dashboard/:companyId/invoices/edit/:invoiceId"
+            element={<AddInvoice />}
+          />
+          <Route
+            path="dashboard/:companyId/invoices"
+            element={<InvoicesPage />}
+          />
+          <Route
+            path="dashboard/:companyId/payments"
+            element={<PaymentsPage />}
+          />
+          <Route
+            path="dashboard/:companyId/invoices/new"
+            element={<AddInvoice />}
+          />
+
           <Route path="dashboard/:companyId/withdraw" element={<Wallet />} />
           <Route
             path="dashboard/:companyId/settings"

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Company, CompanyMember, TeamMemberData, User } from "../../models";
+import { Company, TeamMemberData } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
 import { RootState } from "../store";
 

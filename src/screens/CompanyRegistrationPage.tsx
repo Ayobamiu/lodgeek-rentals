@@ -117,6 +117,8 @@ function CompanyRegistrationPage() {
         team: [loggedInUser.email],
         updatedAt: Date.now(),
         balance: 0,
+        numberOfInvoices: 0,
+        numberOfReceipts: 0,
       };
       setSigningIn(true);
       await createCompany(companyData)

@@ -12,7 +12,6 @@ const TextEditor = () => {
   const editState = (val: EditorState) => {
     setValue(val);
   };
-  console.log(value, "Value");
 
   return (
     <Editor

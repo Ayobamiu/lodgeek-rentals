@@ -901,6 +901,8 @@ export type Payment = {
   propertyName?: string;
   forRent: boolean;
   rentReceipt?: ReceiptProps;
+  propertyId?: string;
+  rentalRecordId?: string;
 };
 
 export enum CompanyUserRole {

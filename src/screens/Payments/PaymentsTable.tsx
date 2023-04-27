@@ -125,12 +125,19 @@ const PaymentsTable = () => {
     },
   ];
   const { payments } = useAppSelector(selectPayment);
+
+  function sortByDate(payments_: Payment[]) {
+    payments_.sort((a, b) => b.createdAt - a.createdAt);
+    return payments_;
+  }
+  const sortedPayments = sortByDate([...payments]);
+
   return (
     <>
       <Table
         size="large"
         columns={columns}
-        dataSource={payments}
+        dataSource={sortedPayments}
         scroll={{ x: "100%" }}
       />
     </>

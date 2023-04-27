@@ -52,7 +52,7 @@ const useProperties = () => {
   }, [selectedCompany, dispatch]);
 
   useEffect(() => {
-    if (!properties.length) {
+    if (!properties.length && selectedCompany) {
       getUsersProperties();
     }
   }, [selectedCompany, properties.length, getUsersProperties]);

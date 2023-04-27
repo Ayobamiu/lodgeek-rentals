@@ -42,6 +42,10 @@ const columns: ColumnsType<InvoiceItem> = [
 const PayForInvoice = () => {
   let { invoiceId } = useParams();
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([
+    ...(currentInvoice?.lineItems.filter((i) => !i.paid).map((i) => i.key) ||
+      []),
+  ]);
   const [loadingInvoiceDetails, setLoadingInvoiceDetails] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<"success" | "failed">();
   const [confirming, setConfirming] = useState(false);
@@ -91,6 +95,7 @@ const PayForInvoice = () => {
   const onClose = () => {};
   const initializePayment = usePaystackPayment(config);
 
+  //load invoice docs
   useEffect(() => {
     (async () => {
       setLoadingInvoiceDetails(true);
@@ -107,11 +112,7 @@ const PayForInvoice = () => {
     })();
   }, [invoiceId]);
 
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([
-    ...(currentInvoice?.lineItems.filter((i) => !i.paid).map((i) => i.key) ||
-      []),
-  ]);
-
+  //Do caculations of totalPay, totalDue, itemsPaid, itemsDue based on selections
   const { totalPay, totalDue, itemsPaid, itemsDue } = useMemo(() => {
     const itemsPaid =
       currentInvoice?.lineItems.filter((i) =>
@@ -263,7 +264,9 @@ const PayForInvoice = () => {
         </Space>
         <div>
           <Table
-            rowSelection={rowSelection}
+            rowSelection={
+              !currentInvoice?.acceptPartialPayment ? undefined : rowSelection
+            }
             columns={columns}
             dataSource={currentInvoice?.lineItems}
             pagination={{ position: [] }}

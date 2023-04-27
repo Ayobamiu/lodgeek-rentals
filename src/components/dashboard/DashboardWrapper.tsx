@@ -1,5 +1,9 @@
 import React from "react";
 import useAppRedirects from "../../hooks/useAppRedirects";
+import useClient from "../../hooks/useClient";
+import useInvoice from "../../hooks/useInvoice";
+import usePayments from "../../hooks/usePayments";
+import useProperties from "../../hooks/useProperties";
 import { DashboardNavbar } from "./DashboardNavbar";
 import { DashboardSideBar } from "./DashboardSideBar";
 
@@ -11,6 +15,10 @@ const DashboardWrapper = ({
   className?: string;
 }) => {
   useAppRedirects();
+  useClient();
+  useInvoice();
+  usePayments();
+  useProperties();
   return (
     <div>
       <DashboardNavbar />

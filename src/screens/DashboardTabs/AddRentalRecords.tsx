@@ -31,7 +31,6 @@ import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
-import useProperties from "../../hooks/useProperties";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 // import { TextEncoder } from "util";
@@ -42,7 +41,6 @@ export default function AddRentalRecords() {
   const dispatch = useAppDispatch();
   const [stage, setStage] = useState<"one" | "two">("one");
   const [showRentStarts, setShowRentStarts] = useState(false);
-  useProperties();
   const openRentStarts = () => {
     setShowRentStarts(true);
   };

@@ -102,13 +102,13 @@ export default function Wallet() {
             >
               <div className="pb-6 border-b border-coolGray-100">
                 <div className="flex flex-wrap items-center justify-between -m-2">
-                  <div className="w-full md:w-auto p-2">
+                  {/* <div className="w-full md:w-auto p-2">
                     <small>Available Balance</small>
                     <h2 className="text-coolGray-900 text-lg font-semibold">
                       {formatPrice(loggedInUser?.balance || 0)}
                     </h2>
-                  </div>
-                  <div className="w-full md:w-auto p-2">
+                  </div> */}
+                  {/* <div className="w-full md:w-auto p-2">
                     <div className="flex flex-wrap justify-between -m-1.5">
                       <div className="w-full md:w-auto p-1.5">
                         <button
@@ -126,7 +126,7 @@ export default function Wallet() {
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
               <div className="py-6 border-b border-coolGray-100">

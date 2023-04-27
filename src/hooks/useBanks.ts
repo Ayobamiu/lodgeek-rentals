@@ -92,7 +92,9 @@ function useBanks() {
   }, [selectedCompany?.id, dispatch]);
 
   useEffect(() => {
-    getUsersBankRecords();
+    if (!bankRecords.length) {
+      getUsersBankRecords();
+    }
   }, [selectedCompany?.id, getUsersBankRecords]);
 
   const addBank = async (data: BankRecord) => {

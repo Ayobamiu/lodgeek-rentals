@@ -14,8 +14,6 @@ import { setNotification } from "../../app/features/notificationSlice";
 export default function Properties() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
-  useProperties();
   const properties = useAppSelector(selectProperties);
   const selectedCompany = useAppSelector(selectSelectedCompany);
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,8 +25,6 @@ export default function Properties() {
     }
   );
   let searchResults = properties;
-
-  // console.log(searchResults);
 
   if (searchQuery) {
     searchResults = searcher.search(searchQuery);

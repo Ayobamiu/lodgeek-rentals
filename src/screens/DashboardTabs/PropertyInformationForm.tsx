@@ -189,7 +189,6 @@ export function PropertyInformationForm() {
             placeholder="Select the property facilities..."
             value={newProperty.facilities}
             onChange={(value: string[]) => {
-              console.log(`selected ${value}`);
               dispatch(
                 updateNewProperty({
                   facilities: value,

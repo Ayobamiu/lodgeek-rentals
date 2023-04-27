@@ -16,6 +16,7 @@ import { Company } from "../../models";
 import SettingsWrapper from "../../components/settings/SettingsWrapper";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import { selectUser } from "../../app/features/userSlice";
+import { message } from "antd";
 
 function CompanyProfileEditPage() {
   const selectedCompany = useAppSelector(selectSelectedCompany);
@@ -77,7 +78,7 @@ function CompanyProfileEditPage() {
         .then(() => {
           dispatch(updateCompany(updatedCompanyData));
           dispatch(setSelectedCompany(updatedCompanyData));
-          toast("Account updated.", { type: "success" });
+          message.success("Account updated.");
         })
         .finally(() => {
           setUpdatingCompany(false);
@@ -118,6 +119,7 @@ function CompanyProfileEditPage() {
               className="w-0 h-0 disabled:cursor-not-allowed"
               disabled={uploadingLogo || !userCanEditProfile}
               onChange={handleUploadLogo}
+              accept="image/png, image/gif, image/jpeg"
             />
             {uploadingLogo && <ActivityIndicator />}
           </label>

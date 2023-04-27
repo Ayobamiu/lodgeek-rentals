@@ -10,7 +10,6 @@ import {
   setOpenRentPayment,
   setSelectedRents,
 } from "../../app/features/rentSlice";
-import useRentalRecords from "../../hooks/useRentalRecords";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/features/userSlice";
 import {
@@ -22,9 +21,9 @@ import { getRentsAndFees } from "./getRentsAndFees";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
+import { payRentAndFees } from "../../functions/payRentAndFees";
 
 export function RentInvoiceTable() {
-  const { updatePaidRents } = useRentalRecords();
   const {
     currentRentalRecord,
     currentRentalRecordCompany,
@@ -61,7 +60,7 @@ export function RentInvoiceTable() {
   const handlePaidRents = async () => {
     setUpdatingRents(true);
 
-    await updatePaidRents({
+    await payRentAndFees({
       rents: selectedRents,
       rentalRecordId: rentalRecordId || "",
       owner: currentRentalRecordOwner?.email || "",
@@ -169,7 +168,10 @@ export function RentInvoiceTable() {
                           scope="row"
                           className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
                         >
-                          Rent for {moment(rent.dueDate).format("MMM YYYY")}
+                          Rent for {moment(rent.dueDate).format("MMM YYYY")} -{" "}
+                          {moment(rent.dueDate)
+                            .add(1, rent.rentPer)
+                            .format("MMM YYYY")}
                         </th>
 
                         <td className="px-6 py-4">{formatPrice(rent.rent)}</td>

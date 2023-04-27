@@ -50,7 +50,6 @@ const MultiSelect: React.FC<MultiSelectProps> = ({
         onFocus={onFocus}
         isMulti
         id={id}
-        // onChange={(e) => console.log(`e`, e)}
         onChange={(e) => onChange(e)}
         isDisabled={disabled}
         required={required}

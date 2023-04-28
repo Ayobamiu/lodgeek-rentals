@@ -72,24 +72,25 @@ function useBanks() {
 
   const getUsersBankRecords = useCallback(async () => {
     const bankRecordsCol = collection(db, FirebaseCollections.bankReord);
-    const q = query(
-      bankRecordsCol,
-      where("company", "==", selectedCompany?.id)
-    );
+    if (selectedCompany?.id) {
+      const q = query(
+        bankRecordsCol,
+        where("company", "==", selectedCompany?.id)
+      );
+      await getDocs(q)
+        .then((bankRecordsSnapshot) => {
+          const bankRecordDocs = bankRecordsSnapshot.docs.map((doc) =>
+            doc.data()
+          ) as BankRecord[];
 
-    await getDocs(q)
-      .then((bankRecordsSnapshot) => {
-        const bankRecordDocs = bankRecordsSnapshot.docs.map((doc) =>
-          doc.data()
-        ) as BankRecord[];
-
-        dispatch(setBankRecords(bankRecordDocs));
-      })
-      .catch((error) => {
-        toast.error("Error Loading Bank Records.");
-      })
-      .finally(() => {});
-  }, [selectedCompany?.id, dispatch]);
+          dispatch(setBankRecords(bankRecordDocs));
+        })
+        .catch((error) => {
+          toast.error("Error Loading Bank Records.");
+        })
+        .finally(() => {});
+    }
+  }, [selectedCompany, dispatch]);
 
   useEffect(() => {
     if (!bankRecords.length) {

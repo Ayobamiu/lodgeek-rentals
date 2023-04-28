@@ -135,6 +135,7 @@ export enum SignedTenancyAgreementStatusHelpText {
 export type RentalRecord = {
   id: string;
   property: string;
+  unitNo?: string;
   tenant: string;
   rentInstruction: string;
   owner: string;

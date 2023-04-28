@@ -213,3 +213,13 @@
   padding: 8px 0;
   text-align: center;
 }
+ /* For WebKit-based browsers */
+.input_without_button::-webkit-inner-spin-button,
+.input_without_button::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* For Firefox */
+.input_without_button {
+  -moz-appearance: textfield;
+}

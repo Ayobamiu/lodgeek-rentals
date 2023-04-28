@@ -1,15 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Payment } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
+import { initialPayment } from "../initialValues";
 import { RootState } from "../store";
 
 interface PaymentState {
   payments: Payment[];
-  selectedPayment?: Payment;
+  selectedPayment: Payment;
 }
 
 const initialState: PaymentState = {
   payments: [],
+  selectedPayment: initialPayment,
 };
 export const paymentSlice = createSlice({
   name: "payment",
@@ -43,7 +45,7 @@ export const paymentSlice = createSlice({
       state.selectedPayment = action.payload;
     },
     resetSelectedPayment: (state) => {
-      state.selectedPayment = undefined;
+      state.selectedPayment = initialPayment;
     },
   },
 });

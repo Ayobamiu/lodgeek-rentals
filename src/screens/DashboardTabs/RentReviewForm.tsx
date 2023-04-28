@@ -242,8 +242,10 @@ export function RentReviewForm() {
               defaultValue={currentRentReview.reveiwFormDetails.reviewDate}
             >
               <option selected>Select date</option>
-              {nextFourDuePayments.map((i) => (
-                <option value={i}>{moment(i).format("LL")}</option>
+              {nextFourDuePayments.map((i, index) => (
+                <option key={index} value={i}>
+                  {moment(i).format("LL")}
+                </option>
               ))}
             </select>
           </div>

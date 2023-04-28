@@ -96,6 +96,8 @@ export const verifyInvoicePayment = async (
           50
         ),
         forRent: false,
+        propertyId: currentInvoice.propertyId,
+        propertyName: currentInvoice.propertyName,
       };
 
       await createPayment(payment);

@@ -8,7 +8,7 @@ import formatPrice from "../../utils/formatPrice";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { selectSelectedCompany } from "../../app/features/companySlice";
-import { Invoice, InvoiceStatusColor } from "../../models/index";
+import { Invoice, InvoiceStatus, InvoiceStatusColor } from "../../models/index";
 import {
   selectInvoice,
   setCurrentInvoice,
@@ -129,6 +129,7 @@ const InvoicesTable = () => {
                 `/dashboard/${selectedCompany?.id}/invoices/edit/${record.id}`
               );
             },
+            disabled: record.status === InvoiceStatus.Paid,
           },
           // {
           //   key: "3",
@@ -169,12 +170,17 @@ const InvoicesTable = () => {
     },
   ];
   const { invoices } = useAppSelector(selectInvoice);
+  function sortByDate(invoices_: Invoice[]) {
+    invoices_.sort((a, b) => b.date - a.date);
+    return invoices_;
+  }
+  const sortedInvoices = sortByDate([...invoices]);
 
   return (
     <Table
       size="large"
       columns={columns}
-      dataSource={invoices}
+      dataSource={sortedInvoices}
       //   pagination={{ defaultPageSize: 2 }}
       scroll={{ x: "100%" }}
     />

@@ -44,8 +44,8 @@ export function DashboardNavbar() {
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  clip-rule="evenodd"
-                  fill-rule="evenodd"
+                  clipRule="evenodd"
+                  fillRule="evenodd"
                   d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
                 ></path>
               </svg>
@@ -56,10 +56,7 @@ export function DashboardNavbar() {
             <div className="flex items-center ml-3 relative">
               <Popover className="relative">
                 <Popover.Button>
-                  <button
-                    type="button"
-                    className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                  >
+                  <div className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">
                     {loggedInUser?.photoURL ? (
                       <img
                         className="w-8 h-8 rounded-full"
@@ -73,7 +70,7 @@ export function DashboardNavbar() {
                         </span>
                       </div>
                     )}
-                  </button>
+                  </div>
                 </Popover.Button>
                 <Popover.Panel className="absolute z-40 dark:bg-[#222529] right-0">
                   {loggedInUser && (

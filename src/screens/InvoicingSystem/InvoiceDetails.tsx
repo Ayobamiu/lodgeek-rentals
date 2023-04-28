@@ -2,7 +2,7 @@ import { faEdit, faPrint, faShare } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { message } from "antd";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import {
   selectInvoice,
@@ -24,7 +24,7 @@ const InvoiceDetails = () => {
 
   const [sendingInvoice, setSendingInvoice] = useState(false);
   const dispatch = useAppDispatch();
-
+  const navigate = useNavigate();
   useEffect(() => {
     document.title = `${currentInvoice.senderCompanyName} - ${currentInvoice.invoiceNumber}`;
   }, [currentInvoice]);
@@ -65,7 +65,7 @@ const InvoiceDetails = () => {
         </button>
         <button
           type="button"
-          className="gap-x-2 text-white bg-coolGray-400 hover:bg-coolGray-800 focus:ring-4 focus:outline-none focus:ring-coolGray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-coolGray-600 dark:hover:bg-coolGray-700 dark:focus:ring-coolGray-800"
+          className="gap-x-2 border border-blue-700 text-blue-700  focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center "
           onClick={() => {
             window.print();
           }}
@@ -73,13 +73,18 @@ const InvoiceDetails = () => {
           <FontAwesomeIcon icon={faPrint} />
           Print
         </button>
-        <Link
-          to={`/dashboard/${selectedCompany?.id}/invoices/edit/${currentInvoice.id}`}
-          className="ml-auto gap-x-2 text-white bg-coolGray-400 hover:bg-coolGray-800 focus:ring-4 focus:outline-none focus:ring-coolGray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-coolGray-600 dark:hover:bg-coolGray-700 dark:focus:ring-coolGray-800"
+        <button
+          className="ml-auto gap-x-2 text-white bg-blue-700 disabled:bg-gray-500 disabled:cursor-not-allowed hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          disabled={currentInvoice.status === InvoiceStatus.Paid}
+          onClick={() => {
+            navigate(
+              `/dashboard/${selectedCompany?.id}/invoices/edit/${currentInvoice.id}`
+            );
+          }}
         >
           <FontAwesomeIcon icon={faEdit} />
           Edit
-        </Link>
+        </button>
       </div>
       <InvoicePrintTemplate />
     </DashboardWrapper>

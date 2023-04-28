@@ -11,7 +11,7 @@ import moment from "moment";
 import formatPrice from "../../utils/formatPrice";
 import { selectPayment } from "../../app/features/paymentSlice";
 import { useAppSelector } from "../../app/hooks";
-import { Payment } from "../../models";
+import { Payment, PaymentStatus } from "../../models";
 import { useNavigate } from "react-router-dom";
 import usePayments from "../../hooks/usePayments";
 
@@ -88,11 +88,12 @@ const PaymentsTable = () => {
           },
           {
             key: "3",
-            label: <button>Download</button>,
+            label: <button>Receipt</button>,
             icon: <DownloadOutlined />,
             onClick: () => {
               navigate(`/view-receipt/${record.id}`);
             },
+            disabled: record.status !== PaymentStatus.Paid,
           },
           {
             type: "divider",
@@ -125,12 +126,19 @@ const PaymentsTable = () => {
     },
   ];
   const { payments } = useAppSelector(selectPayment);
+
+  function sortByDate(payments_: Payment[]) {
+    payments_.sort((a, b) => b.createdAt - a.createdAt);
+    return payments_;
+  }
+  const sortedPayments = sortByDate([...payments]);
+
   return (
     <>
       <Table
         size="large"
         columns={columns}
-        dataSource={payments}
+        dataSource={sortedPayments}
         scroll={{ x: "100%" }}
       />
     </>

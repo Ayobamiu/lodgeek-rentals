@@ -80,7 +80,7 @@ const CompanySelector = () => {
             className="divide-y divide-gray-200 dark:divide-gray-700"
           >
             {companies.map((account) => (
-              <AccountItem account={account} />
+              <AccountItem key={account.id} account={account} />
             ))}
           </ul>
         </div>

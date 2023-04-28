@@ -200,6 +200,9 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
     details: transactionDescription,
     forRent: true,
     rentReceipt,
+    propertyId: rentalRecord.property,
+    propertyName: propertyTitle,
+    rentalRecordId: rentalRecord.id,
   };
 
   await createPayment(payment);

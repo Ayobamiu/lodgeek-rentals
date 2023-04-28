@@ -396,7 +396,7 @@ export default function AddRentalRecords() {
                           }
                         >
                           {bankRecords.map((record, index) => (
-                            <option value={record.id}>
+                            <option key={record.id} value={record.id}>
                               {record.accountNumber} - {record.bankName} -{" "}
                               {record.accountName}{" "}
                               {selectedCompany?.remittanceAccount ===

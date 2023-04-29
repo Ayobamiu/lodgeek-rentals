@@ -2,7 +2,12 @@ import { Dropdown, MenuProps, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
-import { EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import {
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  CopyOutlined,
+} from "@ant-design/icons";
 import moment from "moment";
 import formatPrice from "../../utils/formatPrice";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +19,7 @@ import {
   setCurrentInvoice,
 } from "../../app/features/invoiceSlice";
 import useInvoice from "../../hooks/useInvoice";
+import { copyToClipboard } from "../../utils/copyToClipboard";
 
 const InvoicesTable = () => {
   const selectedCompany = useAppSelector(selectSelectedCompany);
@@ -128,6 +134,16 @@ const InvoicesTable = () => {
               navigate(
                 `/dashboard/${selectedCompany?.id}/invoices/edit/${record.id}`
               );
+            },
+            disabled: record.status === InvoiceStatus.Paid,
+          },
+          {
+            key: "3",
+            label: <button>Payment link</button>,
+            icon: <CopyOutlined />,
+            onClick: () => {
+              const paymentLink = `${process.env.REACT_APP_BASE_URL}pay-for-invoice/${record.id}`;
+              copyToClipboard(paymentLink);
             },
             disabled: record.status === InvoiceStatus.Paid,
           },

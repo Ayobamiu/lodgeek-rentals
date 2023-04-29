@@ -4,6 +4,7 @@ import useClient from "../../hooks/useClient";
 import useInvoice from "../../hooks/useInvoice";
 import usePayments from "../../hooks/usePayments";
 import useProperties from "../../hooks/useProperties";
+import useReminders from "../../hooks/useReminders";
 import { DashboardNavbar } from "./DashboardNavbar";
 import { DashboardSideBar } from "./DashboardSideBar";
 
@@ -19,6 +20,7 @@ const DashboardWrapper = ({
   useInvoice();
   usePayments();
   useProperties();
+  useReminders();
   return (
     <div>
       <DashboardNavbar />

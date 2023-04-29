@@ -2,12 +2,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { faCreditCard } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Alert, message, Space, Table } from "antd";
+import { Alert, Button, message, Space, Table } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Invoice, InvoiceItem, InvoiceStatus } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { TableRowSelection } from "antd/es/table/interface";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getInvoice } from "../../firebase/apis/invoice";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import LostPage from "../../components/shared/LostPage";
@@ -41,6 +41,8 @@ const columns: ColumnsType<InvoiceItem> = [
 
 const PayForInvoice = () => {
   let { invoiceId } = useParams();
+  const navigate = useNavigate();
+
   const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([
     ...(currentInvoice?.lineItems.filter((i) => !i.paid).map((i) => i.key) ||
@@ -233,6 +235,19 @@ const PayForInvoice = () => {
               description="This invoice has been paid and no further payment is required. Thank you for your prompt payment. If you have any questions or concerns, please do not hesitate to contact us."
               type="success"
               showIcon
+              action={
+                <>
+                  <Button
+                    onClick={() => {
+                      navigate(`/`, { replace: true });
+                    }}
+                    type="link"
+                    key="console"
+                  >
+                    Go Home
+                  </Button>
+                </>
+              }
             />
           )}
           {paymentStatus === "success" && (

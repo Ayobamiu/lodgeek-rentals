@@ -7,6 +7,7 @@ admin.initializeApp({
   databaseURL: "https://lodgeek-rentals-default-rtdb.firebaseio.com",
 });
 import { sendRemindersForFents } from "./events/rentReminders";
+import { createRemindersForRent } from "./events/createRemindersForRent";
 
 // // Start writing functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -17,3 +18,7 @@ export const triggerSchedule = functions.pubsub
     sendRemindersForFents();
     return null;
   });
+
+exports.createReminders = functions.firestore
+  .document("rents/{rentId}")
+  .onCreate(createRemindersForRent());

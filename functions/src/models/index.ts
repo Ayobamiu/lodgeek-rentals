@@ -78,4 +78,24 @@ export enum FirebaseCollections {
   mail = "mail",
   rents = "rents",
   users = "users",
+  reminders = "reminders",
 }
+export enum ReminderType {
+  "3Months" = "3-months",
+  "1Month" = "1-month",
+  "1Week" = "1-week",
+  "3Days" = "3-days",
+  "1Day" = "1-day",
+  "dDay" = "d-day",
+}
+export type Reminder = {
+  id: string; // unique identifier for the reminder
+  type: ReminderType; // type of the reminder
+  reminderDate: number; // date when the reminder should be sent
+  rentalRecordId: string; // ID of the rental record associated with the reminder
+  propertyId: string; // ID of the property associated with the reminder
+  companyId: string; // ID of the company associated with the reminder
+  rentId: string; // ID of the rent associated with the reminder
+  sent: boolean; // flag indicating whether the reminder has been sent
+  dueDate: number; // Date the rent is due
+};

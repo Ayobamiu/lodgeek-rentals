@@ -22,7 +22,7 @@ const useRentalRecorCollaborator = () => {
       FirebaseCollections.users,
       "email",
       "in",
-      currentRentalRecord?.members.map((i) => i.email) || []
+      currentRentalRecord?.members?.map((i) => i.email) || []
     )) as User[];
 
     const currentRentalRecordMembers: TeamMemberData[] =

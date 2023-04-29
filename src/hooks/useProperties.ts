@@ -55,13 +55,13 @@ const useProperties = () => {
     if (!properties.length && selectedCompany) {
       getUsersProperties();
     }
-  }, [selectedCompany, properties.length, getUsersProperties]);
+  }, [selectedCompany, getUsersProperties]);
 
   useEffect(() => {
     if (!landlords.length) {
       getCompanyLandlords();
     }
-  }, [landlords, companyId]);
+  }, [companyId]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);

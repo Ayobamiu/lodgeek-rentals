@@ -38,6 +38,9 @@ export function RentalRecordSimpleDetails() {
         />
       </div>
       <div className="col-span-1">
+        <DetailsBox label="Unit" value={currentRentalRecord.unitNo} />
+      </div>
+      <div className="col-span-1">
         <DetailsBox
           label="Property Owner"
           value={ownerFullName}

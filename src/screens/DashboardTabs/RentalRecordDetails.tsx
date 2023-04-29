@@ -1,8 +1,3 @@
-import {
-  faExternalLink,
-  faFileDownload,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { selectUser } from "../../app/features/userSlice";
@@ -18,7 +13,6 @@ import {
 import { sendEmail } from "../../api/email";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { AcceptInvitationForm } from "./AcceptInvitationForm";
-import { KYCPreview } from "../../components/shared/KYCPreview";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { setNotification } from "../../app/features/notificationSlice";
@@ -40,10 +34,17 @@ import {
 import { AdditionalFees } from "./AdditionalFees";
 import { RentInvoiceTable } from "./RentInvoiceTable";
 import { RentalRecordSimpleDetails } from "./RentalRecordSimpleDetails";
-import { SignedAgreementPreview } from "../../components/shared/SignedAgreementPreview";
 import { UserKYCForm } from "./UserKYCForm";
 import { CompleteKYCAndSignLease } from "./CompleteKYCAndSignLease";
 import { VerifySignedLease } from "./VerifySignedLease";
+import { Tabs } from "antd";
+import {
+  AndroidOutlined,
+  AppleOutlined,
+  BellOutlined,
+} from "@ant-design/icons";
+import { RentalRecordDocuments } from "./RentalRecordDocuments";
+import RentalRecordReminder from "../RentalRecords/RentalRecordReminder";
 
 export default function RentalRecordDetails() {
   const { handleUpdateRentalRecord, sendEmailInvitationToTenant } =
@@ -253,36 +254,43 @@ export default function RentalRecordDetails() {
     }
   }, [selectedRents]);
 
-  const [showKYCPreview, setShowKYCPreview] = useState(false);
-  const [showSignedAgreement, setShowSignedAgreement] = useState(false);
   const [openKYCForm, setOpenKYCForm] = useState(false);
-  const [showReviewSignedLeaseBox, setShowReviewSignedLeaseBox] =
-    useState(false);
 
+  const tabItems = [
+    {
+      name: "Rents and Fees",
+      icon: <AppleOutlined />,
+      component: (
+        <>
+          <PaidRents showPayRentButton={showPayRentButton} />
+          <UpaidRents showPayRentButton={showPayRentButton} />
+          <AdditionalFees showPayRentButton={showPayRentButton} />
+        </>
+      ),
+    },
+    {
+      name: "Documents",
+      icon: <AndroidOutlined />,
+      component: <RentalRecordDocuments />,
+    },
+    {
+      name: "Reviews",
+      icon: <AndroidOutlined />,
+      component: (
+        <>
+          <ReviewsOnRentalRecord />
+        </>
+      ),
+    },
+    {
+      name: "Reminder",
+      icon: <BellOutlined />,
+      component: <RentalRecordReminder />,
+    },
+  ];
   return (
     <DashboardWrapper>
       <div>
-        {updatingRents && <FullScreenActivityIndicator />}
-
-        <UserKYCForm
-          open={openKYCForm}
-          closeForm={() => {
-            setOpenKYCForm(false);
-          }}
-        />
-        {/* Rent Invoice Table */}
-        <RentInvoiceTable />
-        {/* Rent Invoice Table */}
-        {/* KYC and Agreement form */}
-        {currentRentalRecord && (
-          <AcceptInvitationForm
-            openAgreementForm={openAgreementForm}
-            setOpenAgreementForm={setOpenAgreementForm}
-            rentalRecordData={currentRentalRecord}
-            acceptInvitation={acceptInvitation}
-          />
-        )}
-        {/* KYC and Agreement form */}
         <section className="container mx-auto bg-white p-8 border-b print:hidden relative">
           <div className="flex flex-wrap items-center -m-2">
             <div className="w-full md:w-1/2 p-2">
@@ -314,42 +322,6 @@ export default function RentalRecordDetails() {
         <div className="container mx-auto lg:p-8 p-3 print:hidden">
           {loadingRentalRecord && <ActivityIndicator color="black" />}
 
-          {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
-            <div className="mb-5">
-              <button
-                onClick={() => {
-                  setShowKYCPreview(true);
-                }}
-                className="text-blue-500 underline underline-offset-4"
-              >
-                View tenant's KYC <FontAwesomeIcon icon={faExternalLink} />
-              </button>
-            </div>
-          )}
-          {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
-            <div className="mb-5">
-              <button
-                onClick={() => {
-                  setShowSignedAgreement(true);
-                }}
-                className="text-blue-500 underline underline-offset-4"
-              >
-                View signed agreement <FontAwesomeIcon icon={faExternalLink} />
-              </button>
-            </div>
-          )}
-          {currentRentalRecord?.signedTenancyAgreementFile && (
-            <div className="mb-5">
-              <a
-                href={currentRentalRecord.signedTenancyAgreementFile}
-                target="_blank"
-                download="Lease agreement"
-                className="text-blue-500 underline underline-offset-4 my-2 block"
-              >
-                Download signed lease <FontAwesomeIcon icon={faFileDownload} />
-              </a>
-            </div>
-          )}
           {showAcceptInvitationButton && (
             <CompleteKYCAndSignLease
               setOpenKYCForm={setOpenKYCForm}
@@ -369,33 +341,48 @@ export default function RentalRecordDetails() {
             )}
 
           <RentalRecordSimpleDetails />
-          <PaidRents showPayRentButton={showPayRentButton} />
-          <UpaidRents showPayRentButton={showPayRentButton} />
-          <AdditionalFees showPayRentButton={showPayRentButton} />
-          <ReviewsOnRentalRecord />
+          <Tabs
+            defaultActiveKey="1"
+            items={tabItems.map((x, i) => {
+              return {
+                label: (
+                  <span>
+                    {x.icon}
+                    {x.name}
+                  </span>
+                ),
+                key: String(i + 1),
+                children: x.component,
+              };
+            })}
+          />
         </div>
-        {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
-          <KYCPreview
-            openAgreementForm={showKYCPreview}
-            setOpenAgreementForm={setShowKYCPreview}
+
+        {/* Modals Section */}
+
+        {updatingRents && <FullScreenActivityIndicator />}
+
+        <UserKYCForm
+          open={openKYCForm}
+          closeForm={() => {
+            setOpenKYCForm(false);
+          }}
+        />
+
+        {/* Rent Invoice Table */}
+        <RentInvoiceTable />
+        {/* Rent Invoice Table */}
+
+        {/* KYC and Agreement form */}
+        {currentRentalRecord && (
+          <AcceptInvitationForm
+            openAgreementForm={openAgreementForm}
+            setOpenAgreementForm={setOpenAgreementForm}
             rentalRecordData={currentRentalRecord}
-            userKYC={currentRentalRecord?.userKYC}
-            tenantFullName={tenantFullName || ""}
-            property={currentRentalRecordProperty}
-            ownerFullName={ownerFullName || ""}
+            acceptInvitation={acceptInvitation}
           />
         )}
-        {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
-          <SignedAgreementPreview
-            openAgreementForm={showSignedAgreement}
-            setOpenAgreementForm={setShowSignedAgreement}
-            rentalRecordData={currentRentalRecord}
-            userKYC={currentRentalRecord?.userKYC}
-            tenantFullName={tenantFullName || ""}
-            property={currentRentalRecordProperty}
-            ownerFullName={ownerFullName || ""}
-          />
-        )}
+        {/* KYC and Agreement form */}
       </div>
     </DashboardWrapper>
   );

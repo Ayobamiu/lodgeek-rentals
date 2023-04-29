@@ -67,7 +67,7 @@ export default function RentalRecords() {
                           fill="#D5DAE1"
                         ></path>
                       </svg>
-                      <span>Add Rental record</span>
+                      <span>Start new rent</span>
                     </button>
                   </div>
                 )}

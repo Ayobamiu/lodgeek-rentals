@@ -18,7 +18,7 @@ import { resetCurrentInvoice } from "../../app/features/invoiceSlice";
 3. Remit money after invoice is paid ✅
 4. Add, and edit payments ✅
 1. Write Cloud function to update invoices and generate recurring invoices. 
-7. Update Add payment page.
+7. Update Add payment page. ✅
 */
 // const items: MenuProps["items"] = [
 //   {

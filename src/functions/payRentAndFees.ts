@@ -47,10 +47,6 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
     rentalRecord,
   } = props;
 
-  if (!rents.length && !selectedAdditionalFees.length) {
-    return toast.error("Error getting rents or fees details.");
-  }
-
   const rentBatch = writeBatch(db);
 
   //Update fees statuses to paid
@@ -271,4 +267,6 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
       toast.success("Payment was successfully obtained.");
     });
   }
+
+  return payment;
 }

@@ -38,8 +38,9 @@ import InvoiceDetails from "./screens/InvoicingSystem/InvoiceDetails";
 import AddInvoice from "./screens/InvoicingSystem/AddInvoice";
 import PaymentsPage from "./screens/Payments/PaymentsPage";
 import ClientsPage from "./screens/Clients/ClientsPage";
-import PayForInvoice from "./screens/InvoicingSystem/PayForInvoice";
+import PayForInvoice from "./screens/Pay/PayForInvoice";
 import ReceiptPage from "./screens/Receipt/ReceiptPage";
+import PayForRent from "./screens/Pay/PayForRent";
 
 function App() {
   const [modal, setModal] = useState(false);
@@ -60,6 +61,7 @@ function App() {
             path="pay-for-invoice/:invoiceId"
             element={<PayForInvoice />}
           />
+          <Route path="pay-for-rent/:rentId" element={<PayForRent />} />
           <Route
             path="individual-registration"
             element={<IndividualRegistrationPage />}

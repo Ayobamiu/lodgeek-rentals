@@ -7,7 +7,8 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Rent, RentStatus, RentStatusColor } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { rentSelected } from "../../utils/others";
-
+import { CopyOutlined } from "@ant-design/icons";
+import { copyToClipboard } from "../../utils/copyToClipboard";
 type RentItemProps = {
   showPayRentButton: boolean;
   rent: Rent;
@@ -30,6 +31,7 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
       dispatch(setSelectedRents([...selectedRents, rent]));
     }
   };
+  const paymentLink = `${process.env.REACT_APP_BASE_URL}pay-for-rent/${rent.id}`;
 
   return (
     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -39,7 +41,7 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
             <input
               id="checkbox-table-1"
               type="checkbox"
-              onClick={onClickRentItem}
+              onChange={onClickRentItem}
               checked={rentSelected(selectedRents, rent)}
               disabled={rentNotClickable}
               className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 disabled:cursor-not-allowed"
@@ -68,13 +70,22 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
         <td className="px-6 py-4">{moment(rent.paidOn).format("ll")}</td>
       )}
       {rent.status !== RentStatus["Paid - Rent has been paid."] && (
-        <td className="px-6 py-4">
+        <td className="px-6 py-4 flex gap-3">
           <button
             onClick={onClickRentItem}
             disabled={rentNotClickable}
-            className="font-medium text-blue-600 dark:text-blue-500  disabled:cursor-not-allowed"
+            className="font-medium text-blue-600 dark:text-blue-600  disabled:cursor-not-allowed"
           >
             Pay
+          </button>
+          <button
+            onClick={() => {
+              copyToClipboard(paymentLink);
+            }}
+            disabled={rentNotClickable}
+            className="font-medium text-blue-600 dark:text-blue-600  disabled:cursor-not-allowed flex items-center gap-1"
+          >
+            Payment link <CopyOutlined />
           </button>
         </td>
       )}

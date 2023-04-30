@@ -1,6 +1,5 @@
 import { Dropdown, DropdownOptions } from "flowbite";
 import { Link } from "react-router-dom";
-import { sendSMS } from "../../api/phone";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 import SignUpBox from "./SignUpBox";
 
@@ -144,13 +143,6 @@ export default function HomepageHeader() {
               <span className="inline-block py-px px-2 mb-4 text-xs leading-5 text-white bg-green-500 font-medium uppercase rounded-9xl">
                 Rental manager
               </span>
-              <button
-                onClick={() => {
-                  sendSMS("2348036137042", "Hi there");
-                }}
-              >
-                Test SMS
-              </button>
               <h1 className="mb-6 text-3xl md:text-5xl lg:text-6xl leading-tight text-coolGray-900 font-bold tracking-tight">
                 Simplified renting experience.
               </h1>

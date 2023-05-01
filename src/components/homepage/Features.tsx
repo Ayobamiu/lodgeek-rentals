@@ -1,4 +1,3 @@
-import { FeatureItem } from "./FeatureItem";
 import {
   TeamOutlined,
   BellOutlined,
@@ -7,6 +6,7 @@ import {
   AccountBookOutlined,
   TransactionOutlined,
 } from "@ant-design/icons";
+import { FeatureItem } from "./FeatureItem";
 
 export default function Features() {
   const offerings = [
@@ -61,7 +61,7 @@ export default function Features() {
   ];
 
   return (
-    <section className="py-24 md:pb-32 bg-white pattern-white-bg">
+    <section id="features" className="py-24 md:pb-32 bg-white pattern-white-bg">
       <div className="container px-4 mx-auto">
         <div className="md:max-w-4xl mb-12 mx-auto text-center">
           <span className="inline-block py-px px-2 mb-4 text-xs leading-5 text-green-500 bg-green-100 font-medium uppercase rounded-full shadow-sm">

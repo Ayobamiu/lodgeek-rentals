@@ -11,6 +11,7 @@ const SelectPlans = () => {
     {
       name: "Free Plan",
       properties: "Up to 5 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -23,6 +24,7 @@ const SelectPlans = () => {
     {
       name: "Basic Plan",
       properties: "Up to 20 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -35,6 +37,7 @@ const SelectPlans = () => {
     {
       name: "Pro Plan",
       properties: "Up to 50 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -47,6 +50,7 @@ const SelectPlans = () => {
     {
       name: "Premium Plan",
       properties: "Unlimited properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -86,9 +90,16 @@ const SelectPlans = () => {
               rentPer={RentType.month}
               details={[
                 { text: plan.properties },
-                { text: "Rent collection", notAllowed: !plan.rentCollection },
+                {
+                  text: "Auto-rent collection",
+                  notAllowed: !plan.rentCollection,
+                },
                 { text: "Lease builder", notAllowed: !plan.leaseBuilder },
-                { text: "Rent reminders", notAllowed: !plan.rentReminders },
+                {
+                  text: "Rent reminders for tenants and managers",
+                  notAllowed: !plan.rentReminders,
+                },
+                { text: plan.invoicing },
                 {
                   text: "Financial reports",
                   notAllowed: !plan.financialReports,

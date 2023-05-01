@@ -1,7 +1,7 @@
 import { useState } from "react";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import PaymentsTable from "./PaymentsTable";
 import AddPaymentModal from "./AddPaymentModal";
 import {
@@ -100,7 +100,7 @@ const PaymentsPage = () => {
             </span>
           </button>
           <div className="ml-auto flex items-center gap-x-3">
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <FontAwesomeIcon
                   icon={faSearch}
@@ -114,7 +114,7 @@ const PaymentsPage = () => {
                 placeholder="Search"
                 required
               />
-            </div>
+            </div> */}
 
             {/* <Dropdown menu={{ items }}>
               <button

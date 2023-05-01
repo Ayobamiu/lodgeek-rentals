@@ -82,7 +82,6 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
             onClick={() => {
               copyToClipboard(paymentLink);
             }}
-            disabled={rentNotClickable}
             className="font-medium text-blue-600 dark:text-blue-600  disabled:cursor-not-allowed flex items-center gap-1"
           >
             Payment link <CopyOutlined />

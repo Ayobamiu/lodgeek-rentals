@@ -1,7 +1,7 @@
 import { Dropdown, MenuProps, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisV } from "@fortawesome/free-solid-svg-icons";
+import { faEllipsisV, faSearch } from "@fortawesome/free-solid-svg-icons";
 import {
   EditOutlined,
   DownloadOutlined,
@@ -14,7 +14,22 @@ import { useAppSelector } from "../../app/hooks";
 import { Payment, PaymentStatus } from "../../models";
 import { useNavigate } from "react-router-dom";
 import usePayments from "../../hooks/usePayments";
+import FuzzySearch from "fuzzy-search";
+import { useState } from "react";
 
+type PaymentSearchKey = keyof Payment;
+
+const paymentSearchKeys: PaymentSearchKey[] = [
+  "amount",
+  "propertyName",
+  "status",
+  "client",
+  "clientEmail",
+  "currency",
+  "details",
+  "propertyName",
+  "method",
+];
 const PaymentsTable = () => {
   const navigate = useNavigate();
   const { deletePaymentFromDatabaseAndStore } = usePayments();
@@ -133,12 +148,40 @@ const PaymentsTable = () => {
   }
   const sortedPayments = sortByDate([...payments]);
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const searcher = new FuzzySearch(sortedPayments, paymentSearchKeys, {
+    caseSensitive: false,
+  });
+  let searchResults = sortedPayments;
+  if (searchQuery) {
+    searchResults = searcher.search(searchQuery);
+  }
   return (
     <>
+      <div className="flex justify-end mb-5">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <FontAwesomeIcon
+              icon={faSearch}
+              className="  text-gray-500 dark:text-gray-400"
+            />
+          </div>
+          <input
+            type="search"
+            id="search"
+            className="block w-full pl-10 text-sm text-gray-900 border border-gray-300 rounded bg-gray-50 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
+            placeholder="Search"
+            required
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
+          />
+        </div>
+      </div>
       <Table
         size="large"
         columns={columns}
-        dataSource={sortedPayments}
+        dataSource={searchResults}
         scroll={{ x: "100%" }}
       />
     </>

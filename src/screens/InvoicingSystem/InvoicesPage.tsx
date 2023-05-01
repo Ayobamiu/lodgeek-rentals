@@ -69,7 +69,7 @@ const InvoicesPage = () => {
             </span>
           </button>
           <div className="ml-auto flex items-center gap-x-3">
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <FontAwesomeIcon
                   icon={faSearch}
@@ -83,7 +83,7 @@ const InvoicesPage = () => {
                 placeholder="Search"
                 required
               />
-            </div>
+            </div> */}
 
             {/* <Dropdown menu={{ items }}>
               <button

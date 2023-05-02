@@ -11,6 +11,7 @@ const SelectPlans = () => {
     {
       name: "Free Plan",
       properties: "Up to 5 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -23,6 +24,7 @@ const SelectPlans = () => {
     {
       name: "Basic Plan",
       properties: "Up to 20 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -35,6 +37,7 @@ const SelectPlans = () => {
     {
       name: "Pro Plan",
       properties: "Up to 50 properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -47,6 +50,7 @@ const SelectPlans = () => {
     {
       name: "Premium Plan",
       properties: "Unlimited properties",
+      invoicing: "Invoicing System",
       rentCollection: true,
       leaseBuilder: true,
       rentReminders: true,
@@ -80,14 +84,22 @@ const SelectPlans = () => {
         <div className="flex flex-wrap justify-center -mx-4 gap-5">
           {plans.map((plan) => (
             <LodgeekPlan
+              key={plan.planCode}
               name={plan.name}
               amount={plan.price}
               rentPer={RentType.month}
               details={[
                 { text: plan.properties },
-                { text: "Rent collection", notAllowed: !plan.rentCollection },
+                {
+                  text: "Auto-rent collection",
+                  notAllowed: !plan.rentCollection,
+                },
                 { text: "Lease builder", notAllowed: !plan.leaseBuilder },
-                { text: "Rent reminders", notAllowed: !plan.rentReminders },
+                {
+                  text: "Rent reminders for tenants and managers",
+                  notAllowed: !plan.rentReminders,
+                },
+                { text: plan.invoicing },
                 {
                   text: "Financial reports",
                   notAllowed: !plan.financialReports,
@@ -142,8 +154,9 @@ function LodgeekPlan(props: LodgeekPlanProp) {
       </div>
 
       <ul role="list" className="space-y-5 my-7">
-        {details.map((i) => (
+        {details.map((i, index) => (
           <li
+            key={index}
             className={`flex space-x-3 ${
               i.notAllowed ? "line-through decoration-gray-500" : ""
             }`}
@@ -161,9 +174,9 @@ function LodgeekPlan(props: LodgeekPlanProp) {
             >
               <title>Check icon</title>
               <path
-                fill-rule="evenodd"
+                fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clip-rule="evenodd"
+                clipRule="evenodd"
               ></path>
             </svg>
             <span

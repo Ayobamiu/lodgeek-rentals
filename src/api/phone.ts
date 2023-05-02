@@ -1,6 +1,29 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const sendSMS = async (phone: string, sms: string) => {
+  const url = "https://api.ng.termii.com/api/sms/send";
+  const data = {
+    to: phone,
+    from: "Lodgeek",
+    sms,
+    type: "plain",
+    channel: "generic",
+    api_key: process.env.REACT_APP_TERMII_API_KEY,
+  };
+
+  await axios
+    .post(url, data)
+    .then(() => {
+      console.log("sent");
+    })
+    .catch((error) => {
+      console.log({ error });
+
+      console.log("not sent");
+    });
+};
+
 const sendToken = async (phone: string) => {
   const url = "https://api.ng.termii.com/api/sms/otp/send";
   const data = {
@@ -61,4 +84,4 @@ const verifyToken = async (pin: string) => {
       toast.error("Error verifying code, check you number and try again!");
     });
 };
-export { sendToken, verifyToken };
+export { sendToken, verifyToken, sendSMS };

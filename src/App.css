@@ -54,3 +54,172 @@
   
   }
 }
+
+@media print {
+  /* Set the page size to A4 */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Set the content size to A4 */
+  /* html, body {
+    width: 210mm;
+    height: 297mm;
+  } */
+  body {
+    background: #F5F5F5;
+  }
+}
+
+#invoice_ .invoice_clearfix:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+#invoice_ a {
+  color: #5D6975;
+  text-decoration: underline;
+}
+
+#invoice_  {
+  position: relative;
+  width: 21cm;  
+  /* height: 29.7cm;  */
+  margin: 0 auto; 
+  color: #001028;
+  background: #FFFFFF; 
+  font-family: Arial, sans-serif; 
+  font-size: 12px; 
+  font-family: Arial;
+  padding: 10px;
+}
+
+#invoice_ header {
+  padding: 10px 0;
+  margin-bottom: 30px;
+}
+
+#invoice_logo {
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+#invoice_logo img {
+  width: 90px;
+}
+
+#invoice_ h1 {
+  border-top: 1px solid  #5D6975;
+  border-bottom: 1px solid  #5D6975;
+  color: #5D6975;
+  font-size: 2.4em;
+  line-height: 1.4em;
+  font-weight: normal;
+  text-align: center;
+  margin: 0 0 20px 0;
+  background: #F5F5F5;
+  /* background: url('https://firebasestorage.googleapis.com/v0/b/lodgeek-rentals-dev.appspot.com/o/logo%2Fdimension.png?alt=media&token=14b1b81f-101d-49f1-947c-75dbeec07775'); */
+}
+
+#invoice_project {
+  float: left;
+}
+
+#invoice_project span {
+  color: #5D6975;
+  text-align: right;
+  width: 52px;
+  margin-right: 10px;
+  display: inline-block;
+  font-size: 0.8em;
+}
+
+#invoice_company {
+  float: right;
+  text-align: right;
+}
+
+#invoice_project div,
+#invoice_company div {
+  white-space: nowrap;        
+}
+
+#invoice_ table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 20px;
+}
+
+#invoice_ table tr:nth-child(2n-1) td {
+  background: #F5F5F5;
+}
+
+#invoice_ table th,
+#invoice_ table td {
+  text-align: center;
+}
+
+#invoice_ table th {
+  padding: 5px 20px;
+  color: #5D6975;
+  border-bottom: 1px solid #C1CED9;
+  white-space: nowrap;        
+  font-weight: normal;
+}
+
+#invoice_ table .invoice_service,
+#invoice_ table .invoice_desc {
+  text-align: left;
+}
+
+#invoice_ table td {
+  padding: 20px;
+  text-align: right;
+  
+}
+
+#invoice_ table td.invoice_service,
+#invoice_ table td.invoice_desc {
+  vertical-align: top;
+}
+
+#invoice_ table td.invoice_unit,
+#invoice_ table td.invoice_qty,
+#invoice_ table td.invoice_total {
+  font-size: 1.2em;
+}
+
+#invoice_ table td.invoice_grand {
+  border-top: 1px solid #5D6975;;
+}
+
+#invoice_notices .invoice_notice {
+  color: #5D6975;
+  font-size: 1.2em;
+}
+
+#invoice_ footer {
+  color: #5D6975;
+  width: 100%;
+  height: 30px;
+  position: absolute;
+  bottom: 0;
+  border-top: 1px solid #C1CED9;
+  padding: 8px 0;
+  text-align: center;
+}
+ /* For WebKit-based browsers */
+.input_without_button::-webkit-inner-spin-button,
+.input_without_button::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
+/* For Firefox */
+.input_without_button {
+  -moz-appearance: textfield;
+}

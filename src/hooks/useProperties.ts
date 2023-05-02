@@ -52,12 +52,16 @@ const useProperties = () => {
   }, [selectedCompany, dispatch]);
 
   useEffect(() => {
-    getUsersProperties();
-  }, [selectedCompany, properties.length, getUsersProperties]);
+    if (!properties.length && selectedCompany) {
+      getUsersProperties();
+    }
+  }, [selectedCompany, getUsersProperties]);
 
   useEffect(() => {
-    getCompanyLandlords();
-  }, [landlords, companyId]);
+    if (!landlords.length) {
+      getCompanyLandlords();
+    }
+  }, [companyId]);
 
   const handleAddProperty = async (data: Property) => {
     setAddingProperty(true);

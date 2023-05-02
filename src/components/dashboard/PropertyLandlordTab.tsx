@@ -2,8 +2,6 @@ import { Property } from "../../models";
 import SinglePropertyDetail from "../property/SinglePropertyDetail";
 
 const PropertyLandlordTab = ({ property }: { property: Property }) => {
-  console.log(property);
-
   return (
     <div className="w-full ">
       {/* Property detail section */}

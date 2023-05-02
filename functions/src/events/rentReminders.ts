@@ -1,9 +1,8 @@
 import admin = require("firebase-admin");
-import { FirebaseCollections, Rent, RentStatus } from "../models";
-import moment from "moment";
-import { fetchDataAndSendAWeekNotice } from "./fetchDataAndSendAWeekNotice";
-import { fetchDataAndSendDueDateNotice } from "./fetchDataAndSendDueDateNotice";
-import { fetchDataAndSendALateRentNotice } from "./fetchDataAndSendALateRentNotice";
+import { FirebaseCollections, Reminder, Rent, RentStatus } from "../models";
+import moment = require("moment");
+import { sendLateRentReminder } from "./sendLateRentReminder";
+import { sendRentReminder } from "./sendRentReminder";
 import { sendEmail } from "../emails/email";
 
 export const db = admin.firestore();
@@ -19,30 +18,28 @@ export async function sendRemindersForFents() {
     `<p>Sending reminders due for ${new Date().toDateString()}</p>`
   );
 
-  const querySnapshot = await db
-    .collection("rents")
-    .where("status", "in", [
-      RentStatus["Upcoming - Rent is not due for payment."],
-      RentStatus["Late - Due date has passed and rent has not been paid."],
-    ])
+  const remindersQuerySnapshot = await db
+    .collection(FirebaseCollections.reminders)
+    .where("sent", "==", false)
     .get();
 
-  querySnapshot.forEach(async (snapDoc) => {
-    const rent = snapDoc.data() as Rent;
-    const dueDate = moment(rent.dueDate);
-    const today = moment();
-    const diffInWeeks = dueDate.diff(today, "weeks");
-    const diffInDays = dueDate.diff(today, "days");
+  remindersQuerySnapshot.forEach(async (snapDoc) => {
+    const reminder = snapDoc.data() as Reminder;
+    const rentRef = db
+      .collection(FirebaseCollections.rents)
+      .doc(reminder.rentId);
+    const rentDoc = await rentRef.get();
 
-    if (isUpcomingrent(rent)) {
-      if (
-        dueDateIsLessThanAWeekAndNoReminderSent(diffInWeeks, diffInDays, rent)
-      ) {
-        await fetchDataAndSendAWeekNotice(rent);
-      }
+    if (rentDoc.exists) {
+      const rent = rentDoc.data() as Rent;
+      const today = moment();
+      const dueDate = moment(rent.dueDate);
+      const diffInDays = dueDate.diff(today, "days");
 
-      if (dueDateIsTodayAndNoReminderSent(rent)) {
-        await fetchDataAndSendDueDateNotice(rent);
+      if (isUpcomingrent(rent)) {
+        if (reminderDateIsTodayAndNoReminderSent(reminder)) {
+          await sendRentReminder(reminder);
+        }
       }
 
       // If deudate has passed
@@ -53,44 +50,29 @@ export async function sendRemindersForFents() {
           ...rent,
           status:
             RentStatus[
-            "Late - Due date has passed and rent has not been paid."
+              "Late - Due date has passed and rent has not been paid."
             ],
         };
         await rentRef.update(lateRent);
       }
-    }
 
-    if (isLateRent(rent)) {
-      if (rentDueMoreThan5DaysAgo(diffInDays, rent)) {
-        await fetchDataAndSendALateRentNotice(rent);
+      if (isLateRent(rent)) {
+        if (rentDueMoreThan5DaysAgo(diffInDays, rent)) {
+          await sendLateRentReminder(rent);
+        }
       }
     }
   });
 }
 
 /**
- * Returns true if due date is less than a week and no remainder has been sent
- * @param {number} diffInWeeks Difference in week
- * @param {number} diffInDays Difference in days
- * @param {Rent} rent Rent Amount
- * @return {boolean}
- */
-function dueDateIsLessThanAWeekAndNoReminderSent(
-  diffInWeeks: number,
-  diffInDays: number,
-  rent: Rent
-): boolean {
-  return diffInWeeks < 1 && diffInDays > 1 && !rent.sentAWeekReminder;
-}
-
-/**
  * Returns true if due date is today and no remainder has been sent
- * @param {Rent} rent Rent amount
+ * @param {Reminder} reminder Reminder amount
  * @return {boolean}
  */
-function dueDateIsTodayAndNoReminderSent(rent: Rent): boolean {
+function reminderDateIsTodayAndNoReminderSent(reminder: Reminder): boolean {
   return (
-    moment(rent.dueDate).isSame(Date.now(), "day") && !rent.sentADayReminder
+    moment(reminder.reminderDate).isSame(Date.now(), "day") && !reminder.sent
   );
 }
 

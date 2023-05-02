@@ -135,6 +135,7 @@ export enum SignedTenancyAgreementStatusHelpText {
 export type RentalRecord = {
   id: string;
   property: string;
+  unitNo?: string;
   tenant: string;
   rentInstruction: string;
   owner: string;
@@ -254,7 +255,7 @@ export type SimpleEmailProps = {
   paragraphs: string[];
   buttons?: ButtonItemProps[];
 };
-export type RecieptProps = {
+export type ReceiptProps = {
   /**Title of the email. */
   title?: string;
   /**Customer who made payment: This can be the name of a company or tenant. */
@@ -298,6 +299,7 @@ export type RecieptProps = {
   totalAmountDue: string;
   /**Salutaions at the end of the receipt. Can include information about due payments */
   extraComment?: string;
+  paymentId: string;
 };
 export type ButtonItemProps = {
   text: string;
@@ -315,7 +317,11 @@ export enum FirebaseCollections {
   transaction = "transaction",
   bankReord = "bankReord",
   companies = "companies",
+  companyUser = "companyUser",
   landlord = "landlord",
+  invoice = "invoice",
+  payment = "payment",
+  reminders = "reminders",
 }
 export type UpdatePaidRentsProps = {
   rents: Rent[];
@@ -503,6 +509,8 @@ export type Company = {
   nextPaymentDate?: string;
   balance: number;
   directRemitance?: boolean;
+  numberOfInvoices: number;
+  numberOfReceipts: number;
 };
 
 export enum SettingsTab {
@@ -608,8 +616,348 @@ export type WhereCriteria = {
   criteria: any;
 };
 export enum SubscriptionPlan {
-  "Free Plan" = "Free Plan",
   "Basic Plan" = "Basic Plan",
-  "Pro Plan" = "Pro Plan",
+  "Free Plan" = "Free Plan",
   "Premium Plan" = "Premium Plan",
+  "Pro Plan" = "Pro Plan",
 }
+
+type Customer = {
+  email: string;
+  name: string;
+  photo?: string;
+};
+
+export enum InvoiceStatus {
+  Draft = "draft",
+  Sent = "sent",
+  Paid = "paid",
+  Overdue = "overdue",
+}
+export enum RecurringInvoiceStatus {
+  Active = "active",
+  Cancelled = "cancelled",
+  Completed = "completed",
+  Paused = "paused",
+}
+
+export enum InvoiceStatusColor {
+  "draft" = "gray",
+  "sent" = "blue",
+  "paid" = "green",
+  "overdue" = "red",
+}
+export enum RecurringInvoiceStatusColor {
+  "completed" = "gray",
+  "cancelled" = "red",
+  "active" = "green",
+  "paused" = "yellow",
+}
+export enum PaymentMethod {
+  Card = "card",
+  Bank = "bank",
+  Cash = "cash",
+  Other = "Other",
+  USSD = "ussd",
+  MobileMoney = "mobile_money",
+  QRCode = "qr",
+  EFT = "eft",
+}
+export enum InvoiceFrequency {
+  "Weekly" = "weekly",
+  "Every two weeks" = "biweekly",
+  "Monthly" = "monthly",
+  "Every two months" = "bimonthly",
+  "Every three months" = "quarterly",
+  "Every six months" = "biannually",
+  "Annually" = "annually",
+}
+
+export type InvoiceItem = {
+  key: string; // Name of the item or service being invoiced
+  name: string; // Name of the item or service being invoiced
+  price: number; // Price of the item or service being invoiced
+  quantity: number; // Quantity of the item or service being invoiced
+  amount: number; // Quantity of the item or service being invoiced
+  paid: boolean;
+};
+
+export type PartialPayment = {
+  date: number;
+  amount: number;
+  paymentMethod: string;
+};
+
+export type Invoice = {
+  // attachments?: Attachment[];
+  // paymentTerms: PaymentTerms;
+  /**
+   *  Bank where the invoice payment will be remitted
+   */
+  remittanceAccount: string; //id of bank record
+  /**
+   *  Total amount due on the invoice
+   */
+  amount: number;
+  /**
+   *  Whether partial payment is allowed
+   */
+  acceptPartialPayment: boolean;
+  /**
+   *  Total amount paid on the invoice
+   */
+  amountPaid: number;
+  /**
+   *  Total amount yet to be paid on the invoice i.e value for the sum of all payments made so far
+   */
+  balanceDue: number;
+  /**
+   * Array of partial payments
+   */
+  partialPayments: PartialPayment[];
+
+  /**
+   *  Date on which the invoice was created
+   */
+  createdAt: number;
+  currency: PaymentCurrency;
+  customer: Customer;
+  customerName: string;
+  customerCompanyName: string;
+  customerCompanyAddress: string;
+  customerCompanyPhone: string;
+  customerCompanyEmail: string;
+  customerAdditionalInfo: string;
+  senderCompanyLogo: string;
+  senderName: string;
+  senderCompanyName: string;
+  senderCompanyAddress: string;
+  senderCompanyPhone: string;
+  senderCompanyEmail: string;
+  senderAdditionalInfo: string;
+  /**
+   *  ID of the company issueing the invoice
+   */
+  companyId: string;
+  /**
+   *  ID of the customer to whom the invoice is being issued
+   */
+  customerId: string;
+  date: number;
+  /**
+   *  Description of the items or services being invoiced
+   */
+  description?: string;
+  /**
+   *  The total amount of discounts applied to the invoice.
+   */
+  discount: number;
+  /**
+   *  Date on which the invoice is due
+   */
+  dueDate?: number;
+  /**
+   *  End date of the recurring invoice (if applicable)
+   */
+  endDate?: number;
+  /**
+   *  Frequency of the recurring invoice (if applicable)
+   */
+  frequency: InvoiceFrequency;
+  /**
+   *  Unique ID of the invoice
+   */
+  id: string;
+  /**
+   *  Unique ID of the invoice by company
+   */
+  invoiceNumber: string;
+  /**
+   *  List of line items on the invoice
+   */
+  lineItems: InvoiceItem[];
+  /**
+   * Additional notes or comments about the invoice.
+   */
+  notes?: string;
+  /**
+   * The date the invoice was paid.
+   */
+  paymentDate?: number;
+  /**
+   *  Payment method used to pay the invoice (if applicable)
+   */
+  paymentMethod?: PaymentMethod;
+  /**
+   *  ID of the property for which the invoice is being issued
+   */
+  propertyId?: string;
+  /**
+   *  Name of the property for which the invoice is being issued
+   */
+  propertyName?: string;
+  /**
+   * The unique number assigned to the receipt generated for the invoice.
+   */
+  receiptNumber?: string;
+  /**
+   *  Indicates whether this is a recurring invoice
+   */
+  recurring: boolean;
+  /**
+   *  This indicates the status of the recurring invoice
+   */
+  recurringInvoiceStatus?: RecurringInvoiceStatus;
+  /**
+   * This shows when the next payment is due for the recurring invoice.
+   */
+  nextPaymentDate?: number;
+  /**
+   * The amount refunded for the invoice, if any.
+   */
+  refundedAmount?: number;
+  /**
+   *  Start date of the recurring invoice (if applicable)
+   */
+  startDate?: number;
+  /**
+   *  Status of the invoice
+   */
+  status: InvoiceStatus;
+  /**
+   * The total amount of the invoice before tax and discounts are applied.
+   */
+  subtotal: number;
+  /**
+   * The total amount of tax applied to the invoice.
+   */
+  tax: number;
+  /**
+   * The final amount of the invoice including tax and discounts.
+   */
+  total: number;
+  /**
+   * The fee charged for processing the payment transaction.
+   */
+  transactionFee: number;
+  /**
+   *  Reference number or transaction ID of the payment (if applicable)
+   */
+  transactionId?: string;
+  /**
+   *  Date on which the invoice was last updated
+   */
+  updatedAt: number;
+  /**
+   *  Invoice download url
+   */
+  url: string;
+};
+
+export type InvoiceReceipt = {
+  invoice?: Invoice;
+  amountPaid: number;
+  balanceDue: number;
+  datePaid: number;
+  paymentMethod: PaymentMethod;
+  itemsPaid: InvoiceItem[];
+  authorization?: PayStackAuthorization;
+  receiptNumber: string;
+  itemsDue: InvoiceItem[];
+  paymentId: string;
+  currency: PaymentCurrency;
+  senderCompanyLogo: string;
+  senderCompanyName: string;
+  customerCompanyName: string;
+};
+export enum PaymentStatus {
+  Pending = "pending",
+  Paid = "paid",
+  Failed = "failed",
+}
+
+export enum PaymentCurrency {
+  NGN = "NGN",
+  USD = "USD",
+  EUR = "EUR",
+}
+
+export type Payment = {
+  id: string;
+  invoiceId: string;
+  amount: number;
+  currency: PaymentCurrency;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  createdAt: number;
+  updatedAt: number;
+  completedAt?: number;
+  failureCode?: string;
+  failureMessage?: string;
+  receiptUrl: string;
+  companyId: string;
+  receiptData?: InvoiceReceipt;
+  details: string;
+  client: string;
+  clientEmail: string;
+  propertyName?: string;
+  forRent: boolean;
+  rentReceipt?: ReceiptProps;
+  propertyId?: string;
+  rentalRecordId?: string;
+};
+
+export enum CompanyUserRole {
+  "admin" = "admin",
+  "staff" = "staff",
+  "customer" = "customer",
+}
+export enum CompanyUserStatus {
+  "active" = "active",
+  "inactive" = "inactive",
+  "blocked" = "blocked",
+}
+export enum CompanyUserStatusColor {
+  "active" = "green",
+  "inactive" = "gray",
+  "blocked" = "red",
+}
+
+export type CompanyUser = {
+  id: string;
+  name: string;
+  email: string;
+  photoUrl: string;
+  phone: string;
+  address: string;
+  roles: CompanyUserRole[];
+  status: CompanyUserStatus;
+  createdAt: number;
+  updatedAt: number;
+  company: string;
+  companyId: string;
+  city: string;
+  country: string;
+  website: string;
+  about: string;
+  dob: number;
+};
+export enum ReminderType {
+  "3Months" = "3-months",
+  "1Month" = "1-month",
+  "1Week" = "1-week",
+  "3Days" = "3-days",
+  "1Day" = "1-day",
+  "dDay" = "d-day",
+}
+export type Reminder = {
+  id: string; // unique identifier for the reminder
+  type: ReminderType; // type of the reminder
+  reminderDate: number; // date when the reminder should be sent
+  rentalRecordId: string; // ID of the rental record associated with the reminder
+  propertyId: string; // ID of the property associated with the reminder
+  companyId: string; // ID of the company associated with the reminder
+  rentId: string; // ID of the rent associated with the reminder
+  sent: boolean; // flag indicating whether the reminder has been sent
+  dueDate: number; //Date the rent is due
+};

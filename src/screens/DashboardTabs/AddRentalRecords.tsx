@@ -31,7 +31,6 @@ import { selectBankRecords } from "../../app/features/bankRecordSlice";
 import { AddBankRecordModal } from "../../components/banks/AddBankRecordModal";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
-import useProperties from "../../hooks/useProperties";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 // import { TextEncoder } from "util";
@@ -42,7 +41,6 @@ export default function AddRentalRecords() {
   const dispatch = useAppDispatch();
   const [stage, setStage] = useState<"one" | "two">("one");
   const [showRentStarts, setShowRentStarts] = useState(false);
-  useProperties();
   const openRentStarts = () => {
     setShowRentStarts(true);
   };
@@ -277,8 +275,8 @@ export default function AddRentalRecords() {
                           Property
                         </p>
                       </div>
-                      <div className="w-full md:flex-1 p-3">
-                        <div className="w-full  text-base text-coolGray-900 font-normal outline-none focus:border-green-500   rounded-lg shadow-input">
+                      <div className="w-full md:flex-1 p-3 grid grid-cols-4 gap-3">
+                        <div className="col-span-3 text-base text-coolGray-900 font-normal outline-none focus:border-green-500   rounded-lg shadow-input">
                           <ReactSearchAutocomplete
                             items={properties.map((item, index) => {
                               return { ...item, name: item.title };
@@ -296,6 +294,19 @@ export default function AddRentalRecords() {
                             }}
                           />
                         </div>
+                        <input
+                          required
+                          className="col-span-1 px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                          type="text"
+                          placeholder="Unit No"
+                          id="unitNo"
+                          defaultValue={newRentalRecord.unitNo}
+                          onChange={(e) =>
+                            dispatch(
+                              updateNewRentalRecord({ unitNo: e.target.value })
+                            )
+                          }
+                        />
                       </div>
                     </div>
                   </div>
@@ -398,7 +409,7 @@ export default function AddRentalRecords() {
                           }
                         >
                           {bankRecords.map((record, index) => (
-                            <option value={record.id}>
+                            <option key={record.id} value={record.id}>
                               {record.accountNumber} - {record.bankName} -{" "}
                               {record.accountName}{" "}
                               {selectedCompany?.remittanceAccount ===

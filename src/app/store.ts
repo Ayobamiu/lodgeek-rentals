@@ -7,6 +7,10 @@ import rentReviewReducer from "./features/rentReviewSlice";
 import bankRecordReducer from "./features/bankRecordSlice";
 import notificationReducer from "./features/notificationSlice";
 import companyReducer from "./features/companySlice";
+import companyUserReducer from "./features/companyUserSlice";
+import invoiceReducer from "./features/invoiceSlice";
+import paymentReducer from "./features/paymentSlice";
+import reminderReducer from "./features/reminderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +22,10 @@ export const store = configureStore({
     bankRecord: bankRecordReducer,
     notification: notificationReducer,
     company: companyReducer,
+    companyUser: companyUserReducer,
+    invoice: invoiceReducer,
+    payment: paymentReducer,
+    reminder: reminderReducer,
   },
 });
 // Infer the `RootState` and `AppDispatch` types from the store itself

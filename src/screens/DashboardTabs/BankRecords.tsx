@@ -89,15 +89,15 @@ export default function BankRecords() {
             >
               <div className="pb-6 border-b border-coolGray-100">
                 <div className="flex flex-wrap items-center justify-between -m-2">
-                  <div className="w-full md:w-auto p-2">
+                  {/* <div className="w-full md:w-auto p-2">
                     <small>Available Balance</small>
                     <h2 className="text-coolGray-900 text-lg font-semibold">
                       {formatPrice(selectedCompany?.balance || 0)}
                     </h2>
-                  </div>
+                  </div> */}
                   <div className="w-full md:w-auto p-2">
                     <div className="flex flex-wrap justify-between -m-1.5">
-                      {!bankRecords.length ? (
+                      {!bankRecords.length && (
                         <div className="w-full md:w-auto p-1.5">
                           <button
                             className="flex flex-wrap justify-center w-full px-4 py-2 bg-green-500 hover:bg-green-600 font-medium text-sm text-white border border-green-500 rounded-md shadow-button"
@@ -108,16 +108,8 @@ export default function BankRecords() {
                             <p>Add Bank Record</p>
                           </button>
                         </div>
-                      ) : (
-                        <Link
-                          to={`/dashboard/${selectedCompany?.id}/withdraw`}
-                          className="w-full md:w-auto p-1.5"
-                        >
-                          <button className="flex flex-wrap justify-center w-full px-4 py-2 bg-green-500 hover:bg-green-600 font-medium text-sm text-white border border-green-500 rounded-md shadow-button">
-                            <p>Withdraw</p>
-                          </button>
-                        </Link>
                       )}
+
                       {redirectToAddRentalRecords === "addRentalRecords" && (
                         <Link
                           to={`/dashboard/${selectedCompany?.id}/rentalRecords/new`}

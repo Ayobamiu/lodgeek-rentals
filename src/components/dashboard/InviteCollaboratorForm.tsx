@@ -127,7 +127,7 @@ export function InviteCollaboratorForm() {
               </Menu.Button>
               <Menu.Items className="absolute top-[110%] right-0 bg-white shadow-lg border w-60 z-20 rounded-lg">
                 {roleOptions.map((roleItem) => (
-                  <Menu.Item>
+                  <Menu.Item key={roleItem.role}>
                     {({ active }) => (
                       <div
                         className={`${

@@ -55,7 +55,7 @@ export const verifyInvoicePayment = async (
       //Add Invoice receipt
       const invoiceReceipt: InvoiceReceipt = {
         amountPaid: totalPay,
-        authorization,
+        // authorization,
         balanceDue: totalDue,
         datePaid: Date.now(),
         invoice: currentInvoice,
@@ -97,7 +97,7 @@ export const verifyInvoicePayment = async (
         ),
         forRent: false,
         propertyId: currentInvoice.propertyId,
-        propertyName: currentInvoice.propertyName,
+        propertyName: currentInvoice.propertyName || "",
       };
 
       await createPayment(payment);

@@ -7,16 +7,19 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
+    "deployDev": "firebase deploy --only functions --project lodgeek-rentals-dev",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "engines": {},
   "main": "lib/index.js",
   "dependencies": {
+    "@types/uuid": "^9.0.1",
     "axios": "^1.4.0",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

@@ -110,8 +110,8 @@ export function RentInvoiceTable() {
   const config = {
     reference: new Date().getTime().toString(),
     email: loggedInUser?.email || "",
-    amount: 200 * 100,
-    // amount: totalAmountToPay * 100,
+    // amount: 200 * 100,
+    amount: totalAmountToPay * 100,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
   };
 

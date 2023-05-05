@@ -20,8 +20,9 @@ import { getProperty } from "../../firebase/apis/property";
 import { getCompany } from "../../firebase/apis/company";
 import { ReactComponent as FlexUIGreenLight } from "../../assets/logo-no-background.svg";
 import { getRentalRecord } from "../../firebase/apis/rentalRecord";
-import { payRentAndFees } from "../../functions/payRentAndFees";
+import { payRentAndFees } from "../../functions/Payment/payRentAndFees";
 import { usePaystackPayment } from "react-paystack";
+import { getInvoiceTransactionFee } from "../../functions/Payment/getInvoiceTransactionFee";
 
 const PayForRent = () => {
   let { rentId } = useParams();
@@ -82,6 +83,7 @@ const PayForRent = () => {
       tenantEmail: tenant?.email || "",
       selectedAdditionalFees: [],
       rentalRecord: rentalRecord,
+      transactionFee: getInvoiceTransactionFee(currentRent?.rent || 0),
     })
       .finally(() => {
         setConfirming(false);
@@ -105,7 +107,10 @@ const PayForRent = () => {
   const config = {
     reference: new Date().getTime().toString(),
     email: tenant?.email || "",
-    amount: ((currentRent?.rent || 0) + 200) * 100,
+    amount:
+      ((currentRent?.rent || 0) +
+        getInvoiceTransactionFee(currentRent?.rent || 0)) *
+      100,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
   };
 

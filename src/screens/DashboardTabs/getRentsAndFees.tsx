@@ -1,6 +1,6 @@
+import { getInvoiceTransactionFee } from "../../functions/Payment/getInvoiceTransactionFee";
 import { AdditionalFee, Company, Rent } from "../../models";
 
-const transactionFeeForFreePlan = 500;
 /* 
 Lodgeek Pricing
 For each payment made by tenants, Paystack will charge a 1.5% transaction fee, capped at N2,000. 
@@ -21,6 +21,8 @@ export function getRentsAndFees(
       .map((i) => i.feeAmount)
       .reduce((partialSum, a) => partialSum + a, 0);
 
-  const transactionFee = isFreePlan ? transactionFeeForFreePlan : 0;
+  const transactionFee = isFreePlan
+    ? getInvoiceTransactionFee(totalFeeMinusTransactionFee)
+    : 0;
   return { transactionFee, totalFeeMinusTransactionFee };
 }

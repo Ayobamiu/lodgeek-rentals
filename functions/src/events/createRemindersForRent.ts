@@ -11,7 +11,7 @@ export function createRemindersForRent(): (
   snapshot: functions.firestore.QueryDocumentSnapshot,
   context: functions.EventContext
 ) => any {
-  return async (snapshot, context) => {
+  return async (snapshot) => {
     const rentData = snapshot.data() as Rent;
     const rentId = snapshot.id;
 

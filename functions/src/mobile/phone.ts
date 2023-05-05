@@ -1,4 +1,4 @@
-const axios = require("axios");
+import axios from "axios";
 
 export const sendSMS = async (phone: string, sms: string) => {
   const url = "https://api.ng.termii.com/api/sms/send";

@@ -14,7 +14,8 @@ import LostPage from "../../components/shared/LostPage";
 import moment from "moment";
 import { usePaystackPayment } from "react-paystack";
 import { PaystackProps } from "react-paystack/dist/types";
-import { verifyInvoicePayment } from "../../functions/verifyInvoicePayment";
+import { verifyInvoicePayment } from "../../functions/Payment/verifyInvoicePayment";
+import { getInvoiceTransactionFee } from "../../functions/Payment/getInvoiceTransactionFee";
 
 const columns: ColumnsType<InvoiceItem> = [
   {
@@ -55,7 +56,7 @@ const PayForInvoice = () => {
   const config: PaystackProps = {
     reference: new Date().getTime().toString(),
     email: currentInvoice?.customerCompanyEmail || "",
-    amount: ((currentInvoice?.amount || 0) + 200) * 100, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
+    amount: (totalPay + getInvoiceTransactionFee(totalPay)) * 100, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
   };
 
@@ -80,7 +81,8 @@ const PayForInvoice = () => {
       totalPay,
       totalDue,
       itemsPaid,
-      itemsDue
+      itemsDue,
+      getInvoiceTransactionFee(totalPay)
     )
       .catch(onError)
       .finally(onFinally);

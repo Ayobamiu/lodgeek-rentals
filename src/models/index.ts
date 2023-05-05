@@ -321,6 +321,7 @@ export enum FirebaseCollections {
   landlord = "landlord",
   invoice = "invoice",
   payment = "payment",
+  payout = "payout",
   reminders = "reminders",
 }
 export type UpdatePaidRentsProps = {
@@ -332,6 +333,7 @@ export type UpdatePaidRentsProps = {
   tenantEmail: string;
   selectedAdditionalFees: AdditionalFee[];
   rentalRecord: RentalRecord;
+  transactionFee: number;
 };
 export type PayStackBank = {
   id: number;
@@ -960,4 +962,21 @@ export type Reminder = {
   rentId: string; // ID of the rent associated with the reminder
   sent: boolean; // flag indicating whether the reminder has been sent
   dueDate: number; //Date the rent is due
+};
+
+export type Payout = {
+  id: string;
+  paymentId: string;
+  type: "rent" | "invoice" | "others";
+  amount: number;
+  transactionFee: number;
+  remittanceAccoundId: string;
+  status: "pending" | "success" | "failed";
+  eta: number;
+  createdAt: number;
+  paidAt: number;
+  failedAt: number;
+  companyId: string;
+  paymentGateway: "paystack" | "others";
+  errorMessage: string;
 };

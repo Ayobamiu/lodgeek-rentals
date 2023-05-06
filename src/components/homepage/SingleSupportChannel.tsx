@@ -2,6 +2,7 @@ import { MdCall, MdMail } from "react-icons/md";
 import { IoCopy } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa";
 import { useState } from "react";
+import { message } from "antd";
 
 const SingleSupportChannel = ({
   className,
@@ -15,7 +16,9 @@ const SingleSupportChannel = ({
   const [isCopied, setIsCopied] = useState(false);
   async function copyTextToClipboard(text: string) {
     if ("clipboard" in navigator) {
-      return await navigator.clipboard.writeText(text);
+      return await navigator.clipboard.writeText(text).then(() => {
+        message.success("Copied to clipboard.");
+      });
     }
   }
 

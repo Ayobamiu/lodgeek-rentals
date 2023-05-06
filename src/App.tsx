@@ -1,16 +1,11 @@
 import "./App.css";
 import HomePage from "./screens/HomePage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useAuth from "./hooks/useAuth";
 import Dashboard from "./screens/Dashboard";
 import AuthPage from "./screens/AuthPage";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import NotificationModal from "./components/shared/NotificationModal";
-import SupportFab from "./components/shared/button/SupportFab";
-import { useState } from "react";
-import SupportChannelModal from "./components/homepage/SupportChannelModal";
 import RegistrationPage from "./screens/RegistrationPage";
 import CompanyRegistrationPage from "./screens/CompanyRegistrationPage";
 import CompanySelector from "./screens/CompanySelector";
@@ -41,17 +36,16 @@ import ClientsPage from "./screens/Clients/ClientsPage";
 import PayForInvoice from "./screens/Pay/PayForInvoice";
 import ReceiptPage from "./screens/Receipt/ReceiptPage";
 import PayForRent from "./screens/Pay/PayForRent";
+import AllAppWideModals from "./components/modals/AllAppWideModals";
+import { ToastContainer } from "react-toastify";
 
 function App() {
-  const [modal, setModal] = useState(false);
   useAuth();
 
   return (
     <div className="relative h-screen">
       <ToastContainer />
-      <SupportFab onClick={() => setModal(!modal)} />
-      <SupportChannelModal open={modal} onCancel={() => setModal(false)} />
-      <NotificationModal />
+      <AllAppWideModals />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />

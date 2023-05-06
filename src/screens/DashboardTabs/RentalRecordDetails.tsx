@@ -39,9 +39,10 @@ import { CompleteKYCAndSignLease } from "./CompleteKYCAndSignLease";
 import { VerifySignedLease } from "./VerifySignedLease";
 import { Tabs } from "antd";
 import {
-  AndroidOutlined,
-  AppleOutlined,
   BellOutlined,
+  CreditCardOutlined,
+  FileOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import { RentalRecordDocuments } from "./RentalRecordDocuments";
 import RentalRecordReminder from "../RentalRecords/RentalRecordReminder";
@@ -259,7 +260,7 @@ export default function RentalRecordDetails() {
   const tabItems = [
     {
       name: "Rents and Fees",
-      icon: <AppleOutlined />,
+      icon: <CreditCardOutlined />,
       component: (
         <>
           <PaidRents showPayRentButton={showPayRentButton} />
@@ -270,12 +271,12 @@ export default function RentalRecordDetails() {
     },
     {
       name: "Documents",
-      icon: <AndroidOutlined />,
+      icon: <FileOutlined />,
       component: <RentalRecordDocuments />,
     },
     {
       name: "Reviews",
-      icon: <AndroidOutlined />,
+      icon: <EditOutlined />,
       component: (
         <>
           <ReviewsOnRentalRecord />

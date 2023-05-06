@@ -1,14 +1,19 @@
 import moment from "moment";
 import {
   selectSelectedRents,
+  setOpenReduceRent,
+  setRentToEdit,
   setSelectedRents,
 } from "../../app/features/rentSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Rent, RentStatus, RentStatusColor } from "../../models";
+import { CompanyRole, Rent, RentStatus, RentStatusColor } from "../../models";
 import formatPrice from "../../utils/formatPrice";
 import { rentSelected } from "../../utils/others";
 import { CopyOutlined } from "@ant-design/icons";
 import { copyToClipboard } from "../../utils/copyToClipboard";
+import { selectUser } from "../../app/features/userSlice";
+import { selectRentalRecord } from "../../app/features/rentalRecordSlice";
+import { useMemo } from "react";
 type RentItemProps = {
   showPayRentButton: boolean;
   rent: Rent;
@@ -17,6 +22,10 @@ type RentItemProps = {
 export function RentItemForTable(props: RentItemProps): JSX.Element {
   const { rent, showPayRentButton } = props;
   const selectedRents = useAppSelector(selectSelectedRents);
+  const loggedInUser = useAppSelector(selectUser);
+  const { currentRentalRecord, currentRentalRecordMembers } =
+    useAppSelector(selectRentalRecord);
+
   const dispatch = useAppDispatch();
   const statusColor = RentStatusColor[rent.status];
 
@@ -32,6 +41,22 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
     }
   };
   const paymentLink = `${process.env.REACT_APP_BASE_URL}pay-for-rent/${rent.id}`;
+  const hasAdminRole = useMemo(() => {
+    const myMemberObject = currentRentalRecordMembers.find(
+      (i) => i.memberData.email === loggedInUser?.email
+    );
+    return myMemberObject?.memberData.role === CompanyRole.admin ?? false;
+  }, [currentRentalRecordMembers, loggedInUser]);
+
+  const hasOwnersRole = useMemo(() => {
+    const myMemberObject = currentRentalRecordMembers.find(
+      (i) => i.memberData.email === loggedInUser?.email
+    );
+    return (
+      myMemberObject?.memberData.role === CompanyRole.admin ||
+      loggedInUser?.email === currentRentalRecord.owner
+    );
+  }, [currentRentalRecordMembers, currentRentalRecord, loggedInUser]);
 
   return (
     <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -78,6 +103,18 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
           >
             Pay
           </button>
+          {(hasAdminRole || hasOwnersRole) && (
+            <button
+              onClick={() => {
+                dispatch(setOpenReduceRent(true));
+                dispatch(setRentToEdit(rent));
+              }}
+              disabled={rentNotClickable}
+              className="font-medium text-blue-600 dark:text-blue-600  disabled:cursor-not-allowed"
+            >
+              Reduce rent
+            </button>
+          )}
           <button
             onClick={() => {
               copyToClipboard(paymentLink);

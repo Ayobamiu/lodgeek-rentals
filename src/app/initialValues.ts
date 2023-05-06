@@ -12,9 +12,11 @@ import {
   Property,
   propertyConditionType,
   propertyFurnishing,
+  Rent,
   RentalRecord,
   RentReview,
   RentReviewStatus,
+  RentStatus,
   RentType,
   SignedTenancyAgreementStatus,
   UserKYC,
@@ -242,4 +244,19 @@ export const initialPayment: Payment = {
     senderCompanyLogo: "",
     senderCompanyName: "",
   },
+};
+
+export const initialRent: Rent = {
+  company: "",
+  dueDate: Date.now(),
+  id: "",
+  owner: "",
+  paidOn: Date.now(),
+  property: "",
+  rent: 0,
+  rentPer: RentType.year,
+  rentalRecord: "",
+  status: RentStatus["Upcoming - Rent is not due for payment."],
+  tenant: "",
+  sentADayReminder: false,
 };

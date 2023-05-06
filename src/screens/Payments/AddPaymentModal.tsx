@@ -7,6 +7,7 @@ import {
   FirebaseCollections,
   InvoiceItem,
   Payment,
+  PaymentCategories,
   PaymentCurrency,
   PaymentMethod,
   PaymentStatus,
@@ -37,6 +38,7 @@ const AddPaymentModal = ({
   const { addPaymentToDatabaseAndStore, addingPayment } = usePayments();
   const [client, setClient] = useState<CompanyUser>();
   const [type, setType] = useState<PaymentMethod>();
+  const [category, setCategory] = useState<PaymentCategories>();
   const [itemsPaid, setItemsPaid] = useState<InvoiceItem[]>([]);
   const [currency, setCurrency] = useState<PaymentCurrency>(
     PaymentCurrency.NGN
@@ -47,6 +49,7 @@ const AddPaymentModal = ({
   const [newPrice, setNewPrice] = useState(0);
   const [newAmount, setNewAmount] = useState(0);
   const [transactionFee, setTransactionFee] = useState(0);
+  const paymentCategoriesArray = Object.values(PaymentCategories);
 
   const { total } = useMemo(() => {
     const subTotal = itemsPaid.reduce(
@@ -56,12 +59,7 @@ const AddPaymentModal = ({
     return { subTotal, total: subTotal + transactionFee };
   }, [itemsPaid]);
 
-  const payMethods = [
-    PaymentMethod.Bank,
-    PaymentMethod.Cash,
-    PaymentMethod.Card,
-    PaymentMethod.Other,
-  ];
+  const payMethods = Object.values(PaymentMethod);
   const currencyOptions = [
     { value: PaymentCurrency.NGN, label: PaymentCurrency.NGN },
     // { value: PaymentCurrency.USD, label: PaymentCurrency.USD },
@@ -78,6 +76,9 @@ const AddPaymentModal = ({
     }
     if (!type) {
       return message.error("Select Payment Type");
+    }
+    if (!category) {
+      return message.error("Select Payment Category");
     }
     if (!itemsPaid.length) {
       return message.error("Add at least one item.");
@@ -112,6 +113,7 @@ const AddPaymentModal = ({
       receiptUrl: "",
       status: PaymentStatus.Paid,
       completedAt: Date.now(),
+      category,
       receiptData: {
         amountPaid: total,
         balanceDue: 0,
@@ -242,6 +244,29 @@ const AddPaymentModal = ({
                 {currencyOptions.map((i, index) => (
                   <option key={index} value={i.value}>
                     {i.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="col-span-1">
+              <label
+                htmlFor="paymentType"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Payment Category
+              </label>
+              <select
+                required
+                id="paymentCategory"
+                onChange={(e) => {
+                  setCategory(e.target.value as PaymentCategories);
+                }}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option selected>Select Payment Category</option>
+                {paymentCategoriesArray.map((i) => (
+                  <option key={i} value={i}>
+                    {i}
                   </option>
                 ))}
               </select>

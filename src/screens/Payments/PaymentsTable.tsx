@@ -1,4 +1,4 @@
-import { Dropdown, MenuProps, Table, Tag } from "antd";
+import { Dropdown, MenuProps, Select, Table, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisV, faSearch } from "@fortawesome/free-solid-svg-icons";
@@ -6,12 +6,13 @@ import {
   EditOutlined,
   DownloadOutlined,
   DeleteOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 import formatPrice from "../../utils/formatPrice";
 import { selectPayment } from "../../app/features/paymentSlice";
 import { useAppSelector } from "../../app/hooks";
-import { Payment, PaymentStatus } from "../../models";
+import { Payment, PaymentCategories, PaymentStatus } from "../../models";
 import { useNavigate } from "react-router-dom";
 import usePayments from "../../hooks/usePayments";
 import FuzzySearch from "fuzzy-search";
@@ -52,13 +53,13 @@ const PaymentsTable = () => {
       ),
     },
     {
-      title: "PAYMENT DETAILS",
-      dataIndex: "details",
-      key: "details",
+      title: "PAYMENT CATEGORY",
+      dataIndex: "category",
+      key: "category",
       responsive: ["md"],
       render: (text) => (
         <div className="truncate max-w-[200px]">
-          <a>{text}</a>
+          <a>{text || "No Category"}</a>
         </div>
       ),
     },
@@ -140,6 +141,7 @@ const PaymentsTable = () => {
       },
     },
   ];
+
   const { payments } = useAppSelector(selectPayment);
 
   function sortByDate(payments_: Payment[]) {
@@ -149,16 +151,63 @@ const PaymentsTable = () => {
   const sortedPayments = sortByDate([...payments]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("All");
   const searcher = new FuzzySearch(sortedPayments, paymentSearchKeys, {
     caseSensitive: false,
   });
   let searchResults = sortedPayments;
+  if (category !== "All") {
+    searchResults = sortedPayments.filter((i) => i.category === category);
+  }
   if (searchQuery) {
     searchResults = searcher.search(searchQuery);
   }
+
+  const categories: string[] | PaymentCategories[] = [
+    "All",
+    ...Object.values(PaymentCategories),
+  ];
+
+  /**
+   * If you have a very long list and you need to frequently count the number of items in each category,
+   * it might be more efficient to precompute the counts and store them in an object or a Map.
+   * This would avoid the need to iterate over the entire list every time you need to get a count.
+   * We first create a new Map called paymentCounts to store the counts for each category.
+   * We then loop through each payment in sortedPayments and increment the count for its category in the paymentCounts Map.
+   * Note that we use the nullish coalescing operator ?? to handle cases where the payment category is undefined.
+   * Once the counts have been precomputed, we can easily get the count for a specific category by looking it up in the paymentCounts Map.
+   * If the category is not found in the Map, we return 0.
+   */
+  const paymentCounts = new Map<PaymentCategories, number>();
+  sortedPayments.forEach((payment) => {
+    const category = payment.category;
+    if (category) {
+      paymentCounts.set(category, (paymentCounts.get(category) ?? 0) + 1);
+    }
+  });
+
   return (
     <>
-      <div className="flex justify-end mb-5">
+      <div className="flex justify-between mb-5 items-center">
+        <Select
+          size="large"
+          defaultValue={category}
+          onChange={setCategory}
+          style={{ width: 200 }}
+          options={categories.map((i) => {
+            const count =
+              i === "All"
+                ? sortedPayments.length
+                : paymentCounts.get(i as PaymentCategories) ?? 0;
+
+            return {
+              value: i,
+              label: `${i} (${count})`,
+            };
+          })}
+          suffixIcon={<FilterOutlined />}
+        />
+
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <FontAwesomeIcon

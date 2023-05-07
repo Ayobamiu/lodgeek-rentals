@@ -13,25 +13,11 @@ import { ExportOutlined } from "@ant-design/icons";
 import { convertPaymentDataToExcel } from "../../functions/convertToExcel";
 import { Payment } from "../../models";
 import moment from "moment";
-
-// const items: MenuProps["items"] = [
-//   {
-//     key: "1",
-//     label: <button>All</button>,
-//   },
-//   {
-//     key: "2",
-//     label: <button>Last Week</button>,
-//   },
-//   {
-//     key: "3",
-//     label: <button>Last Month</button>,
-//   },
-//   {
-//     key: "4",
-//     label: <button>Last Year</button>,
-//   },
-// ];
+import { getPaymentsBetweenDates } from "../../utils/getPaymentsBetweenDates";
+import { Button, DatePicker, Dropdown, MenuProps, message, Modal } from "antd";
+import { dateRanges } from "../../utils/getDateRangeLabel";
+import ActivityIndicator from "../../components/shared/ActivityIndicator";
+import { RangePickerProps } from "antd/es/date-picker";
 
 const PaymentsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,37 +30,116 @@ const PaymentsPage = () => {
   }
   const sortedPayments = sortByDate([...payments]);
 
-  const paymentToExport = [...sortedPayments].map((i) => {
-    const pay = {
-      id: i.id,
-      client: i.client,
-      amount: i.amount,
-      clientEmail: i.clientEmail,
-      createdAt: moment(i.createdAt).format("ll"),
-      currency: i.currency,
-      details: i.details,
-      method: i.method,
-      status: i.status,
-      updatedAt: i.updatedAt,
-      propertyName: i.propertyName,
-    };
-    return pay;
-  });
+  function paymentToExport(_payments_: Payment[]): any[] {
+    return [..._payments_].map((i) => {
+      const pay = {
+        id: i.id,
+        client: i.client,
+        amount: i.amount,
+        clientEmail: i.clientEmail,
+        createdAt: moment(i.createdAt).format("ll"),
+        currency: i.currency,
+        details: i.details,
+        method: i.method,
+        status: i.status,
+        updatedAt: i.updatedAt,
+        propertyName: i.propertyName,
+      };
+      return pay;
+    });
+  }
 
-  function handleExport() {
-    const excelBuffer = convertPaymentDataToExcel(paymentToExport);
+  const [exporting, setExporting] = useState(false);
+  function handleExportByDate(startDate: number, endDate: number) {
+    setExporting(true);
+    const targetedPayments = getPaymentsBetweenDates(
+      startDate,
+      endDate,
+      sortedPayments
+    );
+    const excelBuffer = convertPaymentDataToExcel(
+      paymentToExport(targetedPayments)
+    );
     const fileName = "payments.xlsx";
     const blob = new Blob([excelBuffer], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
+    setExporting(false);
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
   }
 
+  const items: MenuProps["items"] = [
+    ...dateRanges.map((i, index) => {
+      return {
+        key: (index + 1).toString(),
+        label: i.label,
+        onClick: () => {
+          handleExportByDate(i.startDate, i.endDate);
+        },
+      };
+    }),
+    {
+      label: "Custom Date range",
+      key: "0",
+      onClick: () => showDateRangeModal(),
+    },
+  ];
+
+  const [openDateRangeModal, setOpenDateRangeModal] = useState(false);
+  const showDateRangeModal = () => {
+    setOpenDateRangeModal(true);
+  };
+  const handleCancel = () => {
+    setOpenDateRangeModal(false);
+  };
+  const { RangePicker } = DatePicker;
+  const [startDate, setStartDate] = useState<number>();
+  const [endDate, setEndDate] = useState<number>();
+  const onChangeDateRange = (value: RangePickerProps["value"]) => {
+    const startDate_ = value && value[0];
+    const endDate_ = value && value[1];
+
+    setStartDate(startDate_?.toDate().getTime());
+    setEndDate(endDate_?.toDate().getTime());
+  };
+
   return (
     <DashboardWrapper className="px-0">
+      {/* Date range */}
+      <Modal
+        open={openDateRangeModal}
+        title="Select date range"
+        width={400}
+        onCancel={handleCancel}
+        footer={[
+          <Button key="back" onClick={handleCancel}>
+            Cancel
+          </Button>,
+
+          <Button
+            type="primary"
+            loading={exporting}
+            className="bg-blue-500"
+            onClick={() => {
+              if (startDate && endDate) {
+                handleExportByDate(startDate, endDate);
+                handleCancel();
+              } else {
+                message.warning("Select start and end dates.");
+              }
+            }}
+          >
+            Export
+          </Button>,
+        ]}
+      >
+        <RangePicker onChange={onChangeDateRange} className="w-full" />
+      </Modal>
+      {/* Date range */}
+
       <AddPaymentModal
         isModalOpen={isModalOpen}
         closeModal={() => {
@@ -100,41 +165,16 @@ const PaymentsPage = () => {
             </span>
           </button>
           <div className="ml-auto flex items-center gap-x-3">
-            {/* <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <FontAwesomeIcon
-                  icon={faSearch}
-                  className="  text-gray-500 dark:text-gray-400"
-                />
-              </div>
-              <input
-                type="search"
-                id="search"
-                className="block w-full pl-10 text-sm text-gray-900 border border-gray-300 rounded bg-gray-50 focus:ring-green-500 focus:border-green-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-green-500 dark:focus:border-green-500"
-                placeholder="Search"
-                required
-              />
-            </div> */}
-
-            {/* <Dropdown menu={{ items }}>
+            <Dropdown trigger={["click"]} menu={{ items }} disabled={exporting}>
               <button
                 type="button"
-                className="text-green-500 justify-center w-9 bg-green-100 hover:bg-green-400 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded text-sm p-2.5 text-center inline-flex items-center mr-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
+                title="Export to Excel"
+                className="text-green-500 disabled:text-gray-500 justify-center gap-3 bg-green-100 disabled:bg-gray-400 hover:bg-green-500 disabled:hover:bg-gray-500 hover:text-white disabled:hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded text-sm p-2.5 text-center inline-flex items-center mr-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
               >
-                <FontAwesomeIcon icon={faEllipsisV} />
-                <span className="sr-only">Icon description</span>
+                <span className="lg:block hidden">Export to Excel</span>
+                <ExportOutlined /> {exporting && <ActivityIndicator size="4" />}
               </button>
-            </Dropdown> */}
-            <button
-              type="button"
-              onClick={handleExport}
-              title="Export to Excel"
-              className="text-green-500 justify-center gap-3 bg-green-100 hover:bg-green-500 hover:text-white focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded text-sm p-2.5 text-center inline-flex items-center mr-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-            >
-              <span className="lg:block hidden">Export to Excel</span>
-              <ExportOutlined />
-              <span className="sr-only">Icon description</span>
-            </button>
+            </Dropdown>
           </div>
         </div>
 

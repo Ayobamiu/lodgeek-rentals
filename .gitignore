@@ -24,3 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 functions/.env
 functions/src/json/lodgeek-rentals-dev-firebase-adminsdk-sfrgm-8649af40bf.json
+functions/.env.dev
+functions/.env.prod
+.gitignore

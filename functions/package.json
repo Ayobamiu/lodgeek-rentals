@@ -7,8 +7,8 @@
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
-    "deployDev": "firebase deploy --only functions --project lodgeek-rentals-dev",
-    "deploy": "firebase deploy --only functions",
+    "deployDev": "firebase use lodgeek-rentals-dev && firebase deploy --only functions --project lodgeek-rentals-dev",
+    "deploy": "firebase use lodgeek-rentals && firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
   "engines": {},

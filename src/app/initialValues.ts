@@ -34,6 +34,7 @@ export const initialNewRentalRecord: RentalRecord = {
   status: "created",
   fees: [],
   rentInstruction: "",
+  rentReviewFrequency: "yearly",
   tenantAgreed: false,
   tenantAgreedOn: -1,
   company: "",

@@ -432,6 +432,13 @@ export const facilitiesList = [
   "Interlocking",
 ];
 
+export const rentReviewOptions = [
+  { type: "Yearly", slug: "yearly" },
+  { type: "Bi-Annually", slug: "bi-annually" },
+  { type: "Every 5years", slug: "every-5years" },
+  { type: "Every 10years", slug: "every-10years" },
+];
+
 // export const bedroomsData = [
 //   "1 Bedroom",
 //   "2 Bedrooms",

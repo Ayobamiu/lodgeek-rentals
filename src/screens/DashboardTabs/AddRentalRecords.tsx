@@ -3,7 +3,13 @@ import CurrencyInput from "react-currency-input-field";
 import { ReactSearchAutocomplete } from "react-search-autocomplete";
 import { toast } from "react-toastify";
 import Header from "../../assets/flex-ui-assets/images/headers/header.jpg";
-import { AdditionalFee, Rent, RentStatus, RentType } from "../../models";
+import {
+  AdditionalFee,
+  Rent,
+  RentStatus,
+  RentType,
+  rentReviewFrequencyType,
+} from "../../models";
 import { useNavigate } from "react-router-dom";
 import { selectProperties } from "../../app/features/propertySlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
@@ -33,6 +39,8 @@ import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import { UploadPhotoAsync } from "../../firebase/storage_upload_blob";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
+import InputSelect from "../../components/shared/input/InputSelect";
+import { rentReviewOptions } from "../../utils/prodData";
 // import { TextEncoder } from "util";
 // import TextEditor from "../../components/lib/rental/TextEditor";
 
@@ -359,6 +367,45 @@ export default function AddRentalRecords() {
                     </div>
                   </div>
                 </div>
+                {/* Rent review frequency */}
+                <div className="py-6 border-b border-coolGray-100">
+                  <div className="w-full md:w-9/12">
+                    <div className="flex flex-wrap -m-3">
+                      <div className="w-full md:w-1/3 p-3">
+                        <p className="text-sm text-coolGray-800 font-semibold">
+                          Rent Review Frequency
+                        </p>
+                      </div>
+                      <div className="w-full md:flex-1 p-3">
+                        <select
+                          required
+                          className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg shadow-input"
+                          placeholder="Doe"
+                          value={newRentalRecord.rentReviewFrequency}
+                          onChange={(e) =>
+                            dispatch(
+                              updateNewRentalRecord({
+                                rentReviewFrequency: e.target
+                                  .value as rentReviewFrequencyType,
+                              })
+                            )
+                          }
+                        >
+                          {rentReviewOptions.map((record, index) => (
+                            <option key={index} value={record.slug}>
+                              {record.type}
+                            </option>
+                          ))}
+                        </select>
+                        <small className="text-coolGray-400">
+                          This determines the time interval at which tenant
+                          rents is reviewed
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* End of rent review frequency */}
                 <div className="py-6 border-b border-coolGray-100">
                   <div className="w-full md:w-9/12">
                     <div className="flex flex-wrap -m-3">
@@ -385,6 +432,7 @@ export default function AddRentalRecords() {
                     </div>
                   </div>
                 </div>
+                {/* Remittance Account */}
                 <div className="py-6 border-b border-coolGray-100">
                   <div className="w-full md:w-9/12">
                     <div className="flex flex-wrap -m-3">

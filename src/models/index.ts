@@ -5,6 +5,11 @@ export enum UserType {
   "company" = "company",
 }
 
+export type rentReviewFrequencyType =
+  | "yearly"
+  | "bi-annually"
+  | "every-5years"
+  | "every-10years";
 export type User = {
   firstName: string;
   lastName: string;
@@ -138,6 +143,7 @@ export type RentalRecord = {
   unitNo?: string;
   tenant: string;
   rentInstruction: string;
+  rentReviewFrequency: rentReviewFrequencyType;
   owner: string;
   company: string;
   createdDate: number;

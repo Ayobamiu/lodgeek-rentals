@@ -6,7 +6,17 @@ export type User = {
   createdDate: number;
   photoURL?: string;
   lastUpdated: number;
+  balance: number;
+  directRemitance?: boolean;
+  remittanceAccount?: string;
+  defaultCompany?: string;
+  userType?: UserType;
 };
+export enum UserType {
+  "individual" = "individual",
+  "company" = "company",
+}
+
 export type RentType = "month" | "year";
 
 export type Property = {
@@ -77,7 +87,17 @@ export enum FirebaseCollections {
   rentalRecords = "rentalRecords",
   mail = "mail",
   rents = "rents",
+  rentReview = "rentReview",
   users = "users",
+  userKYC = "userKYC",
+  transaction = "transaction",
+  bankReord = "bankReord",
+  companies = "companies",
+  companyUser = "companyUser",
+  landlord = "landlord",
+  invoice = "invoice",
+  payment = "payment",
+  payout = "payout",
   reminders = "reminders",
 }
 export enum ReminderType {
@@ -98,4 +118,63 @@ export type Reminder = {
   rentId: string; // ID of the rent associated with the reminder
   sent: boolean; // flag indicating whether the reminder has been sent
   dueDate: number; // Date the rent is due
+};
+export type Payout = {
+  id: string;
+  paymentId: string;
+  type: "rent" | "invoice" | "others";
+  amount: number;
+  transactionFee: number;
+  remittanceAccoundId: string;
+  status: "pending" | "success" | "failed";
+  eta: number;
+  createdAt: number;
+  paidAt: number;
+  failedAt: number;
+  companyId: string;
+  paymentGateway: "paystack" | "others";
+  errorMessage: string;
+  owner: string;
+};
+export interface BankRecord {
+  bank: PayStackBank;
+  id: string;
+  accountNumber: string;
+  bankName: string;
+  accountName: string;
+  user: string;
+  createdAt: number;
+  updatedAt: number;
+  company: string;
+}
+export type PayStackBank = {
+  id: number;
+  name: string;
+  slug: string;
+  code: string;
+  longcode: string;
+  gateway: string;
+  pay_with_bank: boolean;
+  active: boolean;
+  country: string;
+  currency: string;
+  type: string;
+  is_deleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+export type MoneyTransaction = {
+  id: string;
+  description: string;
+  amount: number;
+  currency: string;
+  createdAt: number;
+  updatedAt: number;
+  status: "success" | "failed" | "pending";
+  type: "minus" | "plus";
+  serviceFee: number;
+  payer: string;
+  payee: string;
+  receiptNumber: string;
+  company?: string;
 };

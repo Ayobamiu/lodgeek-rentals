@@ -1,15 +1,15 @@
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
-import { db, generateFirebaseId, transactionRef } from "../firebase/config";
+import { db, generateFirebaseId, transactionRef } from "../../firebase/config";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import {
   BankRecord,
   FirebaseCollections,
   MoneyTransaction,
   User,
-} from "../models";
-import { sendEmail } from "../api/email";
-import formatPrice from "../utils/formatPrice";
+} from "../../models";
+import { sendEmail } from "../../api/email";
+import formatPrice from "../../utils/formatPrice";
 type ProcessItProps = {
   amount: number;
   senderUserEmail: string;

@@ -321,6 +321,7 @@ export enum FirebaseCollections {
   landlord = "landlord",
   invoice = "invoice",
   payment = "payment",
+  payout = "payout",
   reminders = "reminders",
 }
 export type UpdatePaidRentsProps = {
@@ -332,6 +333,7 @@ export type UpdatePaidRentsProps = {
   tenantEmail: string;
   selectedAdditionalFees: AdditionalFee[];
   rentalRecord: RentalRecord;
+  transactionFee: number;
 };
 export type PayStackBank = {
   id: number;
@@ -654,14 +656,14 @@ export enum RecurringInvoiceStatusColor {
   "paused" = "yellow",
 }
 export enum PaymentMethod {
-  Card = "card",
   Bank = "bank",
+  Card = "card",
   Cash = "cash",
-  Other = "Other",
-  USSD = "ussd",
-  MobileMoney = "mobile_money",
-  QRCode = "qr",
   EFT = "eft",
+  MobileMoney = "mobile_money",
+  Other = "Other",
+  QRCode = "qr",
+  USSD = "ussd",
 }
 export enum InvoiceFrequency {
   "Weekly" = "weekly",
@@ -905,7 +907,34 @@ export type Payment = {
   rentReceipt?: ReceiptProps;
   propertyId?: string;
   rentalRecordId?: string;
+  category?: PaymentCategories;
 };
+
+export enum PaymentCategories {
+  AmenitiesFees = "Amenities fees",
+  ApplicationFees = "Application fees",
+  CableTVFees = "Cable TV fees",
+  CleaningFees = "Cleaning fees",
+  FurnishingFees = "Furnishing fees",
+  InsuranceFees = "Insurance fees",
+  InternetFees = "Internet fees",
+  KeyReplacementFees = "Key replacement fees",
+  LateFees = "Late fees",
+  LatePaymentCharges = "Late payment charges",
+  LeaseBreakFee = "Lease break fee",
+  MaintenanceFees = "Maintenance fees",
+  MoveInFees = "Move-in fees",
+  MoveOutFees = "Move-out fees",
+  ParkingFees = "Parking fees",
+  PestControlFees = "Pest control fees",
+  PetFees = "Pet fees",
+  Rent = "Rent",
+  RepairsFees = "Repairs fees",
+  SecurityDeposit = "Security deposit",
+  SecuritySystemFees = "Security system fees",
+  UtilityFees = "Utility fees",
+  Other = "Other",
+}
 
 export enum CompanyUserRole {
   "admin" = "admin",
@@ -960,4 +989,21 @@ export type Reminder = {
   rentId: string; // ID of the rent associated with the reminder
   sent: boolean; // flag indicating whether the reminder has been sent
   dueDate: number; //Date the rent is due
+};
+
+export type Payout = {
+  id: string;
+  paymentId: string;
+  type: "rent" | "invoice" | "others";
+  amount: number;
+  transactionFee: number;
+  remittanceAccoundId: string;
+  status: "pending" | "success" | "failed";
+  eta: number;
+  createdAt: number;
+  paidAt: number;
+  failedAt: number;
+  companyId: string;
+  paymentGateway: "paystack" | "others";
+  errorMessage: string;
 };

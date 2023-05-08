@@ -21,7 +21,7 @@ import { getRentsAndFees } from "./getRentsAndFees";
 import { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
-import { payRentAndFees } from "../../functions/payRentAndFees";
+import { payRentAndFees } from "../../functions/Payment/payRentAndFees";
 
 export function RentInvoiceTable() {
   const {
@@ -69,6 +69,7 @@ export function RentInvoiceTable() {
       tenantEmail: currentRentalRecordTenant?.email || "",
       selectedAdditionalFees,
       rentalRecord: currentRentalRecord!,
+      transactionFee,
     })
       .finally(() => {
         updateSelectedRents([]);
@@ -109,6 +110,7 @@ export function RentInvoiceTable() {
   const config = {
     reference: new Date().getTime().toString(),
     email: loggedInUser?.email || "",
+    // amount: 200 * 100,
     amount: totalAmountToPay * 100,
     publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY || "",
   };

@@ -8,20 +8,25 @@ import {
   MoneyTransaction,
   Payment,
   PaymentStatus,
-} from "../models";
-import formatPrice from "../utils/formatPrice";
-import { updateInvoiceInDatabase } from "../firebase/apis/invoice";
+  Payout,
+} from "../../models";
+import formatPrice from "../../utils/formatPrice";
+import { updateInvoiceInDatabase } from "../../firebase/apis/invoice";
 import axios from "axios";
-import { generateFirebaseId } from "../firebase/config";
-import { getCompany, updateCompanyInDatabase } from "../firebase/apis/company";
-import { generateReceiptNumber } from "../utils/generateInvoiceNumber";
-import { generateReceiptEmailForInvoice } from "../utils/generateReceiptForInvoice";
-import { htmlStringToImage } from "../utils/generateInvoicePDF";
-import { sendEmail } from "../api/email";
-import { createPayment } from "../firebase/apis/payment";
-import { createTransaction } from "../firebase/apis/transaction";
-import { summarizeList } from "../utils/summarizeList";
-import { withdrawFundToRemittanceAccount } from "./withdrawFunds";
+import { generateFirebaseId } from "../../firebase/config";
+import {
+  getCompany,
+  updateCompanyInDatabase,
+} from "../../firebase/apis/company";
+import { generateReceiptNumber } from "../../utils/generateInvoiceNumber";
+import { generateReceiptEmailForInvoice } from "../../utils/generateReceiptForInvoice";
+import { htmlStringToImage } from "../../utils/generateInvoicePDF";
+import { sendEmail } from "../../api/email";
+import { createPayment } from "../../firebase/apis/payment";
+import { createTransaction } from "../../firebase/apis/transaction";
+import { summarizeList } from "../../utils/summarizeList";
+import moment from "moment";
+import { createPayout } from "../../firebase/apis/payout";
 
 export const verifyInvoicePayment = async (
   transactionReference: string,
@@ -29,7 +34,8 @@ export const verifyInvoicePayment = async (
   totalPay: number,
   totalDue: number,
   itemsPaid: InvoiceItem[],
-  itemsDue: InvoiceItem[]
+  itemsDue: InvoiceItem[],
+  transactionFee: number
 ) => {
   const options = {
     headers: {
@@ -55,7 +61,7 @@ export const verifyInvoicePayment = async (
       //Add Invoice receipt
       const invoiceReceipt: InvoiceReceipt = {
         amountPaid: totalPay,
-        authorization,
+        // authorization,
         balanceDue: totalDue,
         datePaid: Date.now(),
         invoice: currentInvoice,
@@ -97,7 +103,7 @@ export const verifyInvoicePayment = async (
         ),
         forRent: false,
         propertyId: currentInvoice.propertyId,
-        propertyName: currentInvoice.propertyName,
+        propertyName: currentInvoice.propertyName || "",
       };
 
       await createPayment(payment);
@@ -162,25 +168,30 @@ export const verifyInvoicePayment = async (
         balance: (company.balance || 0) + totalPay,
       };
 
-      //Remit into company account
-      if (currentInvoice.remittanceAccount) {
-        await withdrawFundToRemittanceAccount({
-          amount: totalPay,
-          remittanceAccount: currentInvoice.remittanceAccount,
-          senderUserEmail: currentInvoice.senderCompanyEmail,
-          description: "",
-        });
-      } else {
-        if (company.directRemitance && company.remittanceAccount) {
-          await withdrawFundToRemittanceAccount({
-            amount: totalPay,
+      /* Add payout record */
+      const remittanceAccount =
+        currentInvoice.remittanceAccount || company.remittanceAccount || "";
+      const payoutId = generateFirebaseId(FirebaseCollections.payout);
+      const payout: Payout = {
+        id: payoutId,
+        amount: totalPay,
+        companyId: company.id,
+        createdAt: Date.now(),
+        errorMessage: "",
+        eta: moment().add(3, "hour").toDate().getTime(),
+        failedAt: 0,
+        paidAt: 0,
+        paymentGateway: "paystack",
+        paymentId,
+        remittanceAccoundId: remittanceAccount,
+        status: "pending",
+        transactionFee,
+        type: "invoice",
+      };
 
-            remittanceAccount: company.remittanceAccount,
-            senderUserEmail: currentInvoice.senderCompanyEmail,
-            description: "",
-          });
-        }
-      }
+      await createPayout(payout);
+      /* Add payout record */
+
       await updateCompanyInDatabase(updatedCompany);
 
       /* Send receipt email */

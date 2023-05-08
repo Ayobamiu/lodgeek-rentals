@@ -14,14 +14,8 @@ const sendSMS = async (phone: string, sms: string) => {
 
   await axios
     .post(url, data)
-    .then(() => {
-      console.log("sent");
-    })
-    .catch((error) => {
-      console.log({ error });
-
-      console.log("not sent");
-    });
+    .then(() => {})
+    .catch((error) => {});
 };
 
 const sendToken = async (phone: string) => {

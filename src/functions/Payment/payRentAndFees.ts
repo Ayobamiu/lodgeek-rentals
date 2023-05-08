@@ -8,13 +8,13 @@ import {
 } from "firebase/firestore";
 import moment from "moment";
 import { toast } from "react-toastify";
-import { sendEmail } from "../api/email";
+import { sendEmail } from "../../api/email";
 import {
   db,
   generateFirebaseId,
   RENT_PATH,
   transactionRef,
-} from "../firebase/config";
+} from "../../firebase/config";
 import {
   Company,
   FirebaseCollections,
@@ -23,19 +23,20 @@ import {
   PaymentCurrency,
   PaymentMethod,
   PaymentStatus,
+  Payout,
   ReceiptProps,
   Rent,
   RentalRecord,
   RentStatus,
   UpdatePaidRentsProps,
-} from "../models";
-import formatPrice from "../utils/formatPrice";
-import { generateReceipt } from "../utils/generateReceipt";
-import { createPayment } from "../firebase/apis/payment";
-import { withdrawFundToRemittanceAccount } from "../functions/withdrawFunds";
-import { getTransactionDescriptionAndAmount } from "../hooks/getTransactionDescriptionAndAmount";
-import { generateReceiptNumber } from "../utils/generateInvoiceNumber";
-import { updateCompanyInDatabase } from "../firebase/apis/company";
+} from "../../models";
+import formatPrice from "../../utils/formatPrice";
+import { generateReceipt } from "../../utils/generateReceipt";
+import { createPayment } from "../../firebase/apis/payment";
+import { getTransactionDescriptionAndAmount } from "../../hooks/getTransactionDescriptionAndAmount";
+import { generateReceiptNumber } from "../../utils/generateInvoiceNumber";
+import { updateCompanyInDatabase } from "../../firebase/apis/company";
+import { createPayout } from "../../firebase/apis/payout";
 
 export async function payRentAndFees(props: UpdatePaidRentsProps) {
   const {
@@ -45,6 +46,7 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
     tenantEmail,
     selectedAdditionalFees,
     rentalRecord,
+    transactionFee,
   } = props;
 
   const rentBatch = writeBatch(db);
@@ -204,31 +206,29 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
   await createPayment(payment);
   /* Add payment record */
 
-  /*Start: Process Direct Remittance */
-  if (propertyCompany) {
-    //If there is a remitance specified for this rental record, send it there here, else send to the property company's default.
-    if (rentalRecord.remittanceAccount) {
-      await withdrawFundToRemittanceAccount({
-        amount: totalAmount,
-        remittanceAccount: rentalRecord.remittanceAccount,
-        senderUserEmail: propertyCompany.email,
-        description: transactionDescription,
-      });
-    } else {
-      if (
-        propertyCompany.directRemitance &&
-        propertyCompany.remittanceAccount
-      ) {
-        await withdrawFundToRemittanceAccount({
-          amount: totalAmount,
-          remittanceAccount: propertyCompany.remittanceAccount,
-          senderUserEmail: propertyCompany.email,
-          description: transactionDescription,
-        });
-      }
-    }
-  }
-  /*End: Process Direct Remittance */
+  /* Add payout record */
+  const remittanceAccount =
+    rentalRecord.remittanceAccount || propertyCompany.remittanceAccount || "";
+  const payoutId = generateFirebaseId(FirebaseCollections.payout);
+  const payout: Payout = {
+    id: payoutId,
+    amount: totalAmount,
+    companyId: propertyCompany.id,
+    createdAt: Date.now(),
+    errorMessage: "",
+    eta: moment().add(3, "hour").toDate().getTime(),
+    failedAt: 0,
+    paidAt: 0,
+    paymentGateway: "paystack",
+    paymentId,
+    remittanceAccoundId: remittanceAccount,
+    status: "pending",
+    transactionFee,
+    type: "rent",
+  };
+
+  await createPayout(payout);
+  /* Add payout record */
 
   const paragraphsForLandlord = [
     "The payment details are as follows:",

@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AdditionalFee, Rent } from "../../models";
 import filterUniqueByKey from "../../utils/filterUniqueIds";
+import { initialRent } from "../initialValues";
 import { RootState } from "../store";
 
 interface RentState {
@@ -8,6 +9,8 @@ interface RentState {
   selectedRents: Rent[];
   selectedAdditionalFees: AdditionalFee[];
   openRentPayment: boolean;
+  openReduceRent: boolean;
+  rentToEdit: Rent;
 }
 
 const initialState: RentState = {
@@ -15,6 +18,8 @@ const initialState: RentState = {
   selectedRents: [],
   selectedAdditionalFees: [],
   openRentPayment: false,
+  rentToEdit: initialRent,
+  openReduceRent: false,
 };
 export const propertySlice = createSlice({
   name: "rent",
@@ -47,8 +52,17 @@ export const propertySlice = createSlice({
     setSelectedRents: (state, action: PayloadAction<Rent[]>) => {
       state.selectedRents = action.payload;
     },
+    setRentToEdit: (state, action: PayloadAction<Rent>) => {
+      state.rentToEdit = action.payload;
+    },
+    updateRentToEdit: (state, action: PayloadAction<Partial<Rent>>) => {
+      state.rentToEdit = { ...state.rentToEdit, ...action.payload };
+    },
     setOpenRentPayment: (state, action: PayloadAction<boolean>) => {
       state.openRentPayment = action.payload;
+    },
+    setOpenReduceRent: (state, action: PayloadAction<boolean>) => {
+      state.openReduceRent = action.payload;
     },
     setSelectedAdditionalFees: (
       state,
@@ -67,6 +81,9 @@ export const {
   setSelectedRents,
   setSelectedAdditionalFees,
   setOpenRentPayment,
+  setRentToEdit,
+  updateRentToEdit,
+  setOpenReduceRent,
 } = propertySlice.actions;
 
 export const selectRent = (state: RootState) => state.rent;

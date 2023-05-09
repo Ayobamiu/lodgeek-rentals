@@ -1,8 +1,7 @@
-import { faExternalLink } from "@fortawesome/free-solid-svg-icons";
+import { faFileDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   RentalRecord,
-  SignedTenancyAgreementStatusColor,
   SignedTenancyAgreementStatusHelpText,
   SignedTenancyAgreementStatusType,
   UserKYC,
@@ -18,7 +17,6 @@ export function CompleteKYCAndSignLease({
 }: {
   setOpenKYCForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentUserKYC: UserKYC;
-  setOpenAgreementForm: React.Dispatch<React.SetStateAction<boolean>>;
   currentRentalRecord: RentalRecord;
 }) {
   const [openMModal, setOpenMModal] = useState(false);
@@ -97,10 +95,24 @@ export function CompleteKYCAndSignLease({
             href={currentRentalRecord.tenancyAgreementFile}
             target="_blank"
             download="Lease agreement"
-            className="text-blue-500 underline underline-offset-4 my-2 block"
+            className="text-blue-500 underline underline-offset-4 my-2 inline-block"
           >
-            Download lease <FontAwesomeIcon icon={faExternalLink} />
+            Download lease <FontAwesomeIcon icon={faFileDownload} />
           </a>
+          <br />
+          {currentRentalRecord.signedTenancyAgreementFile && (
+            <>
+              <a
+                href={currentRentalRecord.tenancyAgreementFile}
+                target="_blank"
+                download="Lease agreement"
+                className="text-blue-500 underline underline-offset-4 my-2 inline-block"
+              >
+                Download signed lease <FontAwesomeIcon icon={faFileDownload} />
+              </a>
+              <br />
+            </>
+          )}
           <br />
           <Alert
             message={currentRentalRecord.signedTenancyAgreementStatus}

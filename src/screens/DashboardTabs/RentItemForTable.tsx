@@ -32,6 +32,10 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
   const rentNotClickable =
     !showPayRentButton ||
     rent.status === RentStatus["Paid - Rent has been paid."];
+
+  const showPaymentLink =
+    currentRentalRecord?.status === "inviteAccepted" &&
+    rent.status !== RentStatus["Paid - Rent has been paid."];
   const onClickRentItem = () => {
     if (rentNotClickable) return;
     if (rentSelected(selectedRents, rent)) {
@@ -119,6 +123,7 @@ export function RentItemForTable(props: RentItemProps): JSX.Element {
             onClick={() => {
               copyToClipboard(paymentLink);
             }}
+            disabled={!showPaymentLink}
             className="font-medium text-blue-600 dark:text-blue-600  disabled:cursor-not-allowed flex items-center gap-1"
           >
             Payment link <CopyOutlined />

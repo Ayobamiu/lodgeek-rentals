@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useRestrictions from "../../hooks/useRestrictions";
+import { sortRentalRecords } from "../../utils/sort/sortRentalRecords";
 
 export default function RentalRecords() {
   const navigate = useNavigate();
@@ -80,12 +81,14 @@ export default function RentalRecords() {
           <div className="container px-4 mx-auto">
             <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
               <div className="flex flex-wrap -m-2">
-                {rentalRecords.map((rentalRecord, index) => (
-                  <RentalRecordItem
-                    rentalRecordData={rentalRecord}
-                    key={index}
-                  />
-                ))}
+                {sortRentalRecords([...rentalRecords]).map(
+                  (rentalRecord, index) => (
+                    <RentalRecordItem
+                      rentalRecordData={rentalRecord}
+                      key={index}
+                    />
+                  )
+                )}
                 {!rentalRecords.length && (
                   <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">
                     No rental records

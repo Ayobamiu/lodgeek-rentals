@@ -60,7 +60,11 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
         return i;
       }
     });
-    const updatedRentalRecord: RentalRecord = { ...rentalRecord, fees };
+    const updatedRentalRecord: RentalRecord = {
+      ...rentalRecord,
+      fees,
+      updatedDate: Date.now(),
+    };
     const thisRentalRecordRef = doc(
       db,
       FirebaseCollections.rentalRecords,

@@ -4,23 +4,13 @@ import { selectUser } from "../../app/features/userSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ActivityIndicator from "../../components/shared/ActivityIndicator";
 import useRentalRecords from "../../hooks/useRentalRecords";
-import {
-  AdditionalFee,
-  RentalRecord,
-  SignedTenancyAgreementStatus,
-  UserKYC,
-} from "../../models";
-import { sendEmail } from "../../api/email";
-import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
-import { AcceptInvitationForm } from "./AcceptInvitationForm";
-import FullScreenActivityIndicator from "../../components/shared/FullScreenActivityIndicator";
+import { AdditionalFee, SignedTenancyAgreementStatus } from "../../models";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { setNotification } from "../../app/features/notificationSlice";
 import { RentalRecordCollaboration } from "../../components/dashboard/RentalRecordCollaboration";
 import {
   selectRentalRecord,
   selectUserKYC,
-  setCurrentRentalRecord,
 } from "../../app/features/rentalRecordSlice";
 import useCurrentRentalRecord from "../../hooks/useCurrentRentalRecord";
 import { ReviewsOnRentalRecord } from "./ReviewsOnRentalRecord";
@@ -48,8 +38,7 @@ import { RentalRecordDocuments } from "./RentalRecordDocuments";
 import RentalRecordReminder from "../RentalRecords/RentalRecordReminder";
 
 export default function RentalRecordDetails() {
-  const { handleUpdateRentalRecord, sendEmailInvitationToTenant } =
-    useRentalRecords();
+  const { sendEmailInvitationToTenant } = useRentalRecords();
 
   const dispatch = useAppDispatch();
 
@@ -61,23 +50,9 @@ export default function RentalRecordDetails() {
     currentRentalRecord,
     currentRentalRecordCompany,
     currentRentalRecordProperty,
-    currentRentalRecordOwner,
-    currentRentalRecordTenant,
   } = useAppSelector(selectRentalRecord);
 
   const { loadingRentalRecord } = useCurrentRentalRecord();
-
-  const ownerFullName = currentRentalRecordOwner
-    ? `${currentRentalRecordOwner?.firstName || "-"} ${
-        currentRentalRecordOwner?.lastName || "-"
-      }`
-    : currentRentalRecord?.owner;
-
-  const tenantFullName = currentRentalRecordTenant
-    ? `${currentRentalRecordTenant?.firstName || "-"} ${
-        currentRentalRecordTenant?.lastName || "-"
-      }`
-    : currentRentalRecord?.tenant;
 
   const updateSelectedAdditionalFees = (value: AdditionalFee[]) => {
     dispatch(setSelectedAdditionalFees(value));
@@ -127,8 +102,6 @@ export default function RentalRecordDetails() {
     dispatch(setOpenRentPayment(true));
   };
 
-  const [updatingRents, setUpdatingRents] = useState(false);
-
   const PayRentButton = () => {
     const unpaidFees = currentRentalRecord?.fees?.filter((i) => !i.paid) || [];
     return (
@@ -140,64 +113,6 @@ export default function RentalRecordDetails() {
           Pay Rent
           {unpaidFees.length ? " and Fees" : ""}
         </span>
-      </button>
-    );
-  };
-
-  const [acceptingInvite, setAcceptingInvite] = useState(false);
-  const [openAgreementForm, setOpenAgreementForm] = useState(false);
-
-  const acceptInvitation = async (userKYC: UserKYC) => {
-    if (!userKYC) return toast.error("You need to complete your KYC.");
-    if (!currentRentalRecord) return toast.error("Error Accepting Invite");
-    setAcceptingInvite(true);
-    const agreeedRecord: RentalRecord = {
-      ...currentRentalRecord,
-      status: "inviteAccepted",
-      tenantAgreed: true,
-      userKYC,
-      tenantAgreedOn: Date.now(),
-    };
-
-    await handleUpdateRentalRecord(agreeedRecord)
-      .then(async () => {
-        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}dashboard/rentalRecords/${currentRentalRecord.id}`;
-        const email = generateSimpleEmail({
-          paragraphs: [
-            `Click on the link below to manage your rent at ${currentRentalRecordProperty?.title}.`,
-          ],
-          buttons: [{ text: "View details", link: rentalRecordLink }],
-        });
-        await sendEmail(
-          currentRentalRecord.owner,
-          `${loggedInUser?.firstName} ${loggedInUser?.lastName} accepted your invitation to manage rent for ${currentRentalRecordProperty?.title}`,
-          `Click on the link below to manage your rent at ${currentRentalRecordProperty?.title}.\n ${rentalRecordLink}`,
-          email
-        );
-        dispatch(setCurrentRentalRecord(agreeedRecord));
-
-        toast.success("Invite Accepted, you can now proceed to pay rents.");
-      })
-      .catch(() => {
-        toast.error("Error Accepting Invite, try again.");
-      })
-      .finally(() => {
-        setAcceptingInvite(false);
-      });
-  };
-
-  const AcceptInvitationButton = () => {
-    return (
-      <button
-        onClick={() => setOpenAgreementForm(true)}
-        disabled={acceptingInvite}
-        className="flex flex-wrap items-center justify-center py-3 px-4 w-full text-base text-white font-medium bg-green-500 hover:bg-green-600 rounded-md shadow-button"
-      >
-        {acceptingInvite ? (
-          <ActivityIndicator />
-        ) : (
-          <span>Accept Invitation</span>
-        )}
       </button>
     );
   };
@@ -308,7 +223,7 @@ export default function RentalRecordDetails() {
                 <div className="w-full md:w-auto p-2"></div>
                 <div className="w-full md:w-auto p-2">
                   {showPayRentButton && <PayRentButton />}
-                  {showAcceptInvitationButton && <AcceptInvitationButton />}
+                  {/* {showAcceptInvitationButton && <AcceptInvitationButton />} */}
                   {showEmailTenantButton && <EmailTenantButton />}
                   {showResendInviteButton && <ResendInviteButton />}
                 </div>
@@ -327,7 +242,6 @@ export default function RentalRecordDetails() {
             <CompleteKYCAndSignLease
               setOpenKYCForm={setOpenKYCForm}
               currentUserKYC={currentUserKYC}
-              setOpenAgreementForm={setOpenAgreementForm}
               currentRentalRecord={currentRentalRecord}
             />
           )}
@@ -361,7 +275,7 @@ export default function RentalRecordDetails() {
 
         {/* Modals Section */}
 
-        {updatingRents && <FullScreenActivityIndicator />}
+        {/* {updatingRents && <FullScreenActivityIndicator />} */}
 
         <UserKYCForm
           open={openKYCForm}
@@ -375,14 +289,14 @@ export default function RentalRecordDetails() {
         {/* Rent Invoice Table */}
 
         {/* KYC and Agreement form */}
-        {currentRentalRecord && (
+        {/* {currentRentalRecord && (
           <AcceptInvitationForm
             openAgreementForm={openAgreementForm}
             setOpenAgreementForm={setOpenAgreementForm}
             rentalRecordData={currentRentalRecord}
             acceptInvitation={acceptInvitation}
           />
-        )}
+        )} */}
         {/* KYC and Agreement form */}
       </div>
     </DashboardWrapper>

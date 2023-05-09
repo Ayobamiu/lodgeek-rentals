@@ -147,6 +147,7 @@ export type RentalRecord = {
   owner: string;
   company: string;
   createdDate: number;
+  updatedDate?: number;
   rentStarts: number;
   rent: number;
   rentPer: RentType;

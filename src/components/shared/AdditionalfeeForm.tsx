@@ -7,6 +7,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { AdditionalFee } from "../../models";
 import { v4 as uuidv4 } from "uuid";
+import { roundUpTo2Decimals } from "../../utils/roundUpTo2Decimals";
 
 const AdditionalfeeForm = () => {
   const [feeTitle, setFeeTitle] = useState("");
@@ -91,7 +92,7 @@ const AdditionalfeeForm = () => {
                 setFeeAmount(valueToNumber);
                 const percentEq =
                   (valueToNumber / Number(newRentalRecord.rent)) * 100;
-                setPercent(percentEq);
+                setPercent(roundUpTo2Decimals(percentEq));
               }}
               required
               prefix="₦ "
@@ -115,7 +116,7 @@ const AdditionalfeeForm = () => {
               onValueChange={(value, name) => {
                 const valueToNumber = Number(value || 0);
 
-                setPercent(valueToNumber);
+                setPercent(roundUpTo2Decimals(valueToNumber));
                 const amountEq =
                   (valueToNumber * Number(newRentalRecord.rent)) / 100;
                 setFeeAmount(amountEq);
@@ -135,7 +136,6 @@ const AdditionalfeeForm = () => {
                 type="checkbox"
                 value=""
                 className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
-                required
                 onClick={(e) => {
                   setFeeIsRequired(e.currentTarget.checked);
                 }}

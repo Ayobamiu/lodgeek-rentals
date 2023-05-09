@@ -95,7 +95,7 @@ export function VerifySignedLease() {
             the platform.
           </p>
           <a
-            href={currentRentalRecord.tenancyAgreementFile}
+            href={currentRentalRecord.signedTenancyAgreementFile}
             target="_blank"
             download="Lease agreement"
             className="text-blue-500 underline underline-offset-4 my-2 block"

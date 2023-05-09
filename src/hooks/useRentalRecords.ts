@@ -43,6 +43,7 @@ import base64 from "base-64";
 import { selectSelectedCompany } from "../app/features/companySlice";
 import { getRentReviewsForRentalRecord } from "../firebase/apis/rentReview";
 import { setRentReviews } from "../app/features/rentReviewSlice";
+import { message } from "antd";
 
 const useRentalRecords = () => {
   const [addingRentalRecord, setAddingRentalRecord] = useState(false);
@@ -193,10 +194,11 @@ const useRentalRecords = () => {
       return toast.error("Error getting data.");
     }
 
-    await updateDoc(doc(rentalRecordRef, data.id), data)
+    const updatedData: RentalRecord = { ...data, updatedDate: Date.now() };
+    await updateDoc(doc(rentalRecordRef, data.id), updatedData)
       .then(() => {
-        dispatch(updateRentalRecord(data));
-        dispatch(updateCurrentRentalRecord(data));
+        dispatch(updateRentalRecord(updatedData));
+        dispatch(updateCurrentRentalRecord(updatedData));
       })
       .finally(() => {});
   }
@@ -225,7 +227,7 @@ const useRentalRecords = () => {
       });
     } else {
       if (!loggedInUser?.email) {
-        return toast.error(
+        return message.error(
           "Can't resolve logged in user. Reload and try again."
         );
       }
@@ -245,7 +247,9 @@ const useRentalRecords = () => {
 
   async function loadUserKYC() {
     if (!loggedInUser?.email) {
-      return toast.error("Can't resolve logged in user. Reload and try again.");
+      return message.error(
+        "Can't resolve logged in user. Reload and try again."
+      );
     }
     const userKYCRef = doc(
       db,

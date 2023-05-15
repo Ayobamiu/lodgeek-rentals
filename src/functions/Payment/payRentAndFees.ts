@@ -37,6 +37,7 @@ import { getTransactionDescriptionAndAmount } from "../../hooks/getTransactionDe
 import { generateReceiptNumber } from "../../utils/generateInvoiceNumber";
 import { updateCompanyInDatabase } from "../../firebase/apis/company";
 import { createPayout } from "../../firebase/apis/payout";
+import { sendWebNotification } from "../../api/webNotification";
 
 export async function payRentAndFees(props: UpdatePaidRentsProps) {
   const {
@@ -269,6 +270,15 @@ export async function payRentAndFees(props: UpdatePaidRentsProps) {
       emailForReceiver
     ).then(() => {
       toast.success("Payment was successfully obtained.");
+    });
+    sendWebNotification({
+      title: emailSubjectForReceiver,
+      description: emailSubjectForReceiver,
+      recipientIDs: [
+        propertyCompany.primaryOwner,
+        ...propertyCompany.team,
+        propertyCompany.email,
+      ],
     });
   }
 

@@ -17,6 +17,7 @@ import { RentReviewResponse, RentReviewStatus } from "../../models";
 import moment from "moment";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { sendEmail } from "../../api/email";
+import { sendWebNotification } from "../../api/webNotification";
 
 export function ReviewConversations() {
   let { reviewId } = useParams();
@@ -28,6 +29,8 @@ export function ReviewConversations() {
     currentRentalRecordOwner,
     currentRentalRecordProperty,
     currentRentalRecordTenant,
+    currentRentalRecordCompany,
+    currentRentalRecord,
   } = useAppSelector(selectRentalRecord);
   const [message, setMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -70,6 +73,23 @@ export function ReviewConversations() {
       paragraphs.join(" \n"),
       generatedEmail
     );
+
+    const emails = [
+      currentRentalRecordCompany?.email || "",
+      ...(currentRentalRecordCompany?.team || ""),
+      currentRentalRecord.owner,
+      currentRentalRecord.tenant,
+      currentRentalRecordCompany?.primaryOwner || "",
+    ].filter((i) => i !== loggedInUser?.email);
+
+    const uniqueEmails = [...new Set(emails)];
+
+    sendWebNotification({
+      title: `${loggedInUser?.firstName} commented on Rent review.`,
+      description: message,
+      recipientIDs: uniqueEmails,
+      link: reviewLink,
+    });
   };
 
   const submitResponse = async (e: FormEvent) => {

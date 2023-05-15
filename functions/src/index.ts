@@ -16,6 +16,7 @@ admin.initializeApp(firebaseConfig);
 import { sendRemindersForFents } from "./events/rentReminders";
 import { createRemindersForRent } from "./events/createRemindersForRent";
 import { processPayouts } from "./events/payment/processPayouts";
+import { createNotifications } from "./events/notification/createNotifications";
 
 // // Start writing functions
 // // https://firebase.google.com/docs/functions/typescript
@@ -41,3 +42,5 @@ export const triggerPayouts = functions.pubsub
 exports.createReminders = functions.firestore
   .document("rents/{rentId}")
   .onCreate(createRemindersForRent());
+
+exports.addNotificationMessage = functions.https.onCall(createNotifications);

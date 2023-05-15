@@ -7,6 +7,7 @@ import { useAppSelector } from "../../app/hooks";
 import { selectUser } from "../../app/features/userSlice";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useAuth from "../../hooks/useAuth";
+import { NotificationMenu } from "../notification/NotificationMenu";
 
 export function DashboardNavbar() {
   const loggedInUser = useAppSelector(selectUser);
@@ -53,7 +54,8 @@ export function DashboardNavbar() {
             <CompanyLogo />
           </div>
           <div className="flex items-center">
-            <div className="flex items-center ml-3 relative">
+            <div className="flex items-center ml-3 relative gap-x-5">
+              <NotificationMenu />
               <Popover className="relative">
                 <Popover.Button>
                   <div className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600">

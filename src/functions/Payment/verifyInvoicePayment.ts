@@ -27,6 +27,7 @@ import { createTransaction } from "../../firebase/apis/transaction";
 import { summarizeList } from "../../utils/summarizeList";
 import moment from "moment";
 import { createPayout } from "../../firebase/apis/payout";
+import { sendWebNotification } from "../../api/webNotification";
 
 export const verifyInvoicePayment = async (
   transactionReference: string,
@@ -217,6 +218,11 @@ export const verifyInvoicePayment = async (
         textForPayer.join(" \n"),
         emailForReceiver
       );
+      sendWebNotification({
+        title: emailSubjectForReceiver,
+        description: emailSubjectForReceiver,
+        recipientIDs: [company.primaryOwner, ...company.team, company.email],
+      });
       return updatedInvoice;
     });
 };

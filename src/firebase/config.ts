@@ -4,8 +4,10 @@ import { getAnalytics } from "firebase/analytics";
 import "firebase/compat/auth";
 import { collection, doc, getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
 import { FirebaseCollections } from "../models";
 import "firebase/storage";
+import "firebase/functions";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -28,6 +30,7 @@ const db = getFirestore(app);
 // const fv = firebase.firestore.FieldValue;
 
 const auth = getAuth();
+export const functions = getFunctions(app);
 
 const analytics = getAnalytics(app);
 // const firestore = firebase.firestore();
@@ -57,6 +60,7 @@ const rentRef = collection(db, FirebaseCollections.rents);
 const landlordRef = collection(db, FirebaseCollections.landlord);
 const reminderRef = collection(db, FirebaseCollections.reminders);
 const payoutRef = collection(db, FirebaseCollections.payout);
+const notificationRef = collection(db, FirebaseCollections.notifications);
 
 export {
   analytics,
@@ -81,4 +85,5 @@ export {
   paymentRef,
   reminderRef,
   payoutRef,
+  notificationRef,
 };

@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useRestrictions from "../../hooks/useRestrictions";
-import { sortRentalRecords } from "../../utils/sort/sortRentalRecords";
+import { sortRentalRecords } from "../../utils/sort";
 
 export default function RentalRecords() {
   const navigate = useNavigate();

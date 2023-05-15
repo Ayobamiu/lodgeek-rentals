@@ -1,4 +1,4 @@
-import { RentalRecord } from "../../models";
+import { NotificationMessage, RentalRecord } from "../../models";
 
 export const sortRentalRecords = (rentalRecords: RentalRecord[]) => {
   return rentalRecords.sort((a, b) => {
@@ -13,3 +13,8 @@ export const sortRentalRecords = (rentalRecords: RentalRecord[]) => {
     }
   });
 };
+export function sortNotificationsByTimestamp(
+  notifications: NotificationMessage[]
+): NotificationMessage[] {
+  return notifications.sort((a, b) => b.timestamp - a.timestamp);
+}

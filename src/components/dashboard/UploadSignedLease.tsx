@@ -17,6 +17,7 @@ import base64 from "base-64";
 import { generateSimpleEmail } from "../../utils/generateSimpleEmail";
 import { sendEmail } from "../../api/email";
 import { SignedTenancyAgreementStatus } from "../../models";
+import { sendWebNotification } from "../../api/webNotification";
 
 const UploadSignedLease = ({
   closeModal,
@@ -66,6 +67,57 @@ const UploadSignedLease = ({
       }
     }
   };
+
+  const handleUploadSignedLease = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    e.preventDefault();
+    setUploadingSignedLease(true);
+    await handleUpdateRentalRecord({
+      ...currentRentalRecord,
+      signedTenancyAgreementFile,
+      tenancyAgreementFileSignedOn: Date.now(),
+      signedTenancyAgreementStatus: SignedTenancyAgreementStatus["underReview"],
+    })
+      .then(async () => {
+        const redirectURL = `/dashboard/rentalRecords/${currentRentalRecord.id}`;
+        const encodedRedirectUrl = base64.encode(redirectURL);
+        const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard/rentalRecords/${currentRentalRecord.id}?redirect=${encodedRedirectUrl}`;
+        const emailSubjectForTenant = "Signed Lease Agreement Uploaded";
+        const paragraphs = [
+          `Dear ${currentRentalRecordCompany?.name}`,
+          `I hope this email finds you well. I wanted to inform you that ${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName} has uploaded a signed copy of the lease agreement for ${currentRentalRecordProperty?.address}. You can find the document on the <a href="${rentalRecordLink}">rental page</a>.`,
+          `Please take a moment to verify the information and ensure that everything is in order. If you have any questions or concerns, please do not hesitate to contact us.`,
+          `Thank you for your attention to this matter.`,
+          `Best regards,`,
+          `Lodgeek Admin`,
+        ];
+
+        const emailText = generateSimpleEmail({
+          paragraphs,
+          buttons: [{ text: "Rental page", link: rentalRecordLink }],
+        });
+
+        await sendEmail(
+          currentRentalRecord.owner,
+          emailSubjectForTenant,
+          paragraphs.join(" \n"),
+          emailText
+        );
+        sendWebNotification({
+          title: emailSubjectForTenant,
+          description: `${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName} has uploaded a signed copy of the lease agreement for ${currentRentalRecordProperty?.address}.`,
+          recipientIDs: [currentRentalRecord.owner],
+          icon: currentRentalRecordTenant?.photoURL || "",
+          link: rentalRecordLink,
+        });
+        closeModal();
+      })
+      .finally(() => {
+        setUploadingSignedLease(false);
+      });
+  };
+
   return (
     <>
       <Modal
@@ -77,49 +129,7 @@ const UploadSignedLease = ({
         okText="Upload"
         footer={null}
       >
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setUploadingSignedLease(true);
-            await handleUpdateRentalRecord({
-              ...currentRentalRecord,
-              signedTenancyAgreementFile,
-              tenancyAgreementFileSignedOn: Date.now(),
-              signedTenancyAgreementStatus:
-                SignedTenancyAgreementStatus["underReview"],
-            })
-              .then(async () => {
-                const redirectURL = `/dashboard/rentalRecords/${currentRentalRecord.id}`;
-                const encodedRedirectUrl = base64.encode(redirectURL);
-                const rentalRecordLink = `${process.env.REACT_APP_BASE_URL}/dashboard/rentalRecords/${currentRentalRecord.id}?redirect=${encodedRedirectUrl}`;
-                const emailSubjectForTenant = "Signed Lease Agreement Uploaded";
-                const paragraphs = [
-                  `Dear ${currentRentalRecordCompany?.name}`,
-                  `I hope this email finds you well. I wanted to inform you that ${currentRentalRecordTenant?.firstName} ${currentRentalRecordTenant?.lastName} has uploaded a signed copy of the lease agreement for ${currentRentalRecordProperty?.address}. You can find the document on the <a href="${rentalRecordLink}">rental page</a>.`,
-                  `Please take a moment to verify the information and ensure that everything is in order. If you have any questions or concerns, please do not hesitate to contact us.`,
-                  `Thank you for your attention to this matter.`,
-                  `Best regards,`,
-                  `Lodgeek Admin`,
-                ];
-
-                const emailText = generateSimpleEmail({
-                  paragraphs,
-                  buttons: [{ text: "Rental page", link: rentalRecordLink }],
-                });
-
-                await sendEmail(
-                  currentRentalRecord.owner,
-                  emailSubjectForTenant,
-                  paragraphs.join(" \n"),
-                  emailText
-                );
-                closeModal();
-              })
-              .finally(() => {
-                setUploadingSignedLease(false);
-              });
-          }}
-        >
+        <form onSubmit={handleUploadSignedLease}>
           <label
             className=" mb-2 text-sm font-medium text-gray-900 dark:text-white"
             htmlFor="file_input"

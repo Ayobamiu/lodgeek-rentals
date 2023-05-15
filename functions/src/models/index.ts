@@ -99,6 +99,7 @@ export enum FirebaseCollections {
   payment = "payment",
   payout = "payout",
   reminders = "reminders",
+  notifications = "notifications",
 }
 export enum ReminderType {
   "3Months" = "3-months",
@@ -177,4 +178,26 @@ export type MoneyTransaction = {
   payee: string;
   receiptNumber: string;
   company?: string;
+};
+export type NotificationMessage = {
+  id: string; // A unique identifier for the notification
+  type: "email" | "sms" | "push"; // The type of notification (email, SMS, or push)
+  title: string; // The title of the notification
+  description: string; // The description of the notification
+  icon?: string; // An optional icon to display with the notification
+  image?: string; // An optional image to display with the notification
+  link?: string; // An optional link for the notification
+  sound?: string; // An optional sound to play with the notification
+  recipientId: string; // An array of recipient IDs for the notification
+  status: "pending" | "sent" | "delivered" | "read"; // The status of the notification
+  timestamp: number; // The timestamp for when the notification was created
+};
+export type NotificationOrder = {
+  title: string; // The title of the notification
+  description: string; // The description of the notification
+  icon?: string; // An optional icon to display with the notification
+  image?: string; // An optional image to display with the notification
+  link?: string; // An optional link for the notification
+  sound?: string; // An optional sound to play with the notification
+  recipientIDs: string[]; // An array of recipient IDs for the notification
 };

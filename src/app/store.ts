@@ -6,6 +6,7 @@ import rentReducer from "./features/rentSlice";
 import rentReviewReducer from "./features/rentReviewSlice";
 import bankRecordReducer from "./features/bankRecordSlice";
 import notificationReducer from "./features/notificationSlice";
+import notificationMessageReducer from "./features/notificationMessage";
 import companyReducer from "./features/companySlice";
 import companyUserReducer from "./features/companyUserSlice";
 import invoiceReducer from "./features/invoiceSlice";
@@ -21,6 +22,7 @@ export const store = configureStore({
     rentReview: rentReviewReducer,
     bankRecord: bankRecordReducer,
     notification: notificationReducer,
+    notificationMessage: notificationMessageReducer,
     company: companyReducer,
     companyUser: companyUserReducer,
     invoice: invoiceReducer,

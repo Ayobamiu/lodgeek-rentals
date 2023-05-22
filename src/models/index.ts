@@ -137,6 +137,14 @@ export enum SignedTenancyAgreementStatusHelpText {
   "Verified" = "Your signed lease documents have been verified and accepted. You can now proceed to pay rent.",
   "Rejected" = "Unfortunately, your signed lease document was rejected. Please check your email for instructions on how to upload an acceptable copy.",
 }
+
+export enum RentalrecordStatusType {
+  "created" = "default",
+  "inviteSent" = "processing",
+  "inviteAccepted" = "success",
+  "cancelled" = "error",
+  "inviteRejected" = "warning",
+}
 export type RentalRecord = {
   id: string;
   property: string;

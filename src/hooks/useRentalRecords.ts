@@ -288,11 +288,11 @@ const useRentalRecords = () => {
     dispatch(setRentReviews(data));
   }
   const rentalRecordStatuses = {
-    created: "🔵 Created",
-    inviteSent: "⌛️ Invite Sent - Pending Approval",
-    inviteAccepted: "🟢 In Progress",
-    cancelled: "🔴 Cancelled",
-    inviteRejected: "🔴 Invite Rejected",
+    created: "Created",
+    inviteSent: "Pending Approval",
+    inviteAccepted: "In Progress",
+    cancelled: "Cancelled",
+    inviteRejected: "Invite Rejected",
   };
   return {
     handleAddRentalRecord,

@@ -1,13 +1,19 @@
+import { Avatar, Badge, List, Skeleton } from "antd";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useProperties from "../../hooks/useProperties";
 import useRentalRecords from "../../hooks/useRentalRecords";
 import useRents from "../../hooks/useRents";
-import { Property, Rent, RentalRecord, User } from "../../models";
+import {
+  Property,
+  Rent,
+  RentalRecord,
+  RentalrecordStatusType,
+  User,
+} from "../../models";
 import formatPrice from "../../utils/formatPrice";
-import ActivityIndicator from "./ActivityIndicator";
 
 type RentalRecordItemProp = {
   rentalRecordData: RentalRecord;
@@ -73,32 +79,43 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
       : rent.status === "late"
       ? "bg-red-200 text-red-500"
       : "bg-gray-200 text-coolGray-500";
+
+  const image = (property?.images && property?.images[0].url) || "";
   return (
-    <Link
-      to={`/dashboard/rentalRecords/${rentalRecordData.id}`}
-      className="w-full p-2 hover:shadow-lg border-b border-coolGray-400"
+    <List.Item
+      actions={[
+        <Link
+          to={`/dashboard/rentalRecords/${rentalRecordData.id}`}
+          key="list-loadmore-edit"
+        >
+          open
+        </Link>,
+      ]}
     >
-      <h3 className="mb-1 font-medium text-lg text-coolGray-900">
-        {loadingTenant ? <ActivityIndicator color="black" /> : tenantFullName}
-      </h3>
-      <div className="flex gap-x-3 items-center flex-wrap lg:gap-3 gap-2">
-        <h3 className="mb-1 font-medium text-lg text-coolGray-900 flex">
-          {loadingProperty ? (
-            <ActivityIndicator color="black" />
-          ) : (
-            property?.title || "--"
-          )}
-        </h3>
-        <p className="text-xs font-medium text-coolGray-500">
+      <Skeleton
+        avatar
+        title={false}
+        loading={loadingTenant || loadingProperty || loadingRents}
+        active
+        round={false}
+      >
+        <List.Item.Meta
+          avatar={
+            image ? <Avatar size={64} src={image} shape="square" /> : null
+          }
+          title={`Tenant: ${tenantFullName}`}
+          description={property?.title}
+        />
+        <div>
           {formatPrice(rentalRecordData.rent)}/{rentalRecordData.rentPer}
-        </p>
-      </div>
-      <p className="text-xs font-medium text-coolGray-500 mb-2">Rents</p>
-      <div className="flex gap-x-5 items-center mb-4 justify-start flex-wrap gap-3">
-        {loadingRents ? (
-          <ActivityIndicator color="black" />
-        ) : (
-          rents
+        </div>
+        <Badge
+          status={RentalrecordStatusType[rentalRecordData.status]}
+          text={rentalRecordStatuses[rentalRecordData.status]}
+        />
+
+        <div className="flex gap-x-5 items-center my-4 justify-start flex-wrap gap-3">
+          {rents
             .sort((a: Rent, b: Rent) => a.dueDate - b.dueDate)
             .map((rent, index) => (
               <button
@@ -111,12 +128,9 @@ export default function RentalRecordItem(props: RentalRecordItemProp) {
                   {moment(rent.dueDate).format("MMM YYYY")}
                 </p>
               </button>
-            ))
-        )}
-      </div>
-      <p className="text-xs font-medium text-coolGray-500 mb-2">
-        Status: {rentalRecordStatuses[rentalRecordData.status]}
-      </p>
-    </Link>
+            ))}
+        </div>
+      </Skeleton>
+    </List.Item>
   );
 }

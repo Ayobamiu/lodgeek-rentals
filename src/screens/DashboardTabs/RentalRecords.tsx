@@ -10,6 +10,7 @@ import DashboardWrapper from "../../components/dashboard/DashboardWrapper";
 import { selectSelectedCompany } from "../../app/features/companySlice";
 import useRestrictions from "../../hooks/useRestrictions";
 import { sortRentalRecords } from "../../utils/sort";
+import { List } from "antd";
 
 export default function RentalRecords() {
   const navigate = useNavigate();
@@ -80,21 +81,16 @@ export default function RentalRecords() {
         <section className="bg-coolGray-50 py-4">
           <div className="container px-4 mx-auto">
             <div className="p-6 mx-auto bg-white border border-coolGray-100 rounded-md shadow-dashboard">
-              <div className="flex flex-wrap -m-2">
-                {sortRentalRecords([...rentalRecords]).map(
-                  (rentalRecord, index) => (
-                    <RentalRecordItem
-                      rentalRecordData={rentalRecord}
-                      key={index}
-                    />
-                  )
+              <List
+                itemLayout="vertical"
+                dataSource={sortRentalRecords([...rentalRecords])}
+                renderItem={(rentalRecord, index) => (
+                  <RentalRecordItem
+                    rentalRecordData={rentalRecord}
+                    key={index}
+                  />
                 )}
-                {!rentalRecords.length && (
-                  <div className="flex justify-center text-lg font-medium text-coolGray-500 mb-2 w-full">
-                    No rental records
-                  </div>
-                )}
-              </div>
+              />
             </div>
           </div>
         </section>

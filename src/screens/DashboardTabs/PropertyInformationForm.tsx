@@ -8,7 +8,6 @@ import {
   furnishingList,
   propertyTypeList,
 } from "../../utils/prodData";
-import NaijaStates from "naija-state-local-government";
 import TextAreaInput from "../../components/shared/input/TextAreaInput";
 import {
   selectNewProperty,
@@ -17,23 +16,33 @@ import {
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RentType } from "../../models";
 import { Select } from "antd";
+import { getNigeriaStates, getLGAs, StateCodes } from "geo-ng";
 
 export function PropertyInformationForm() {
   const dispatch = useAppDispatch();
   const newProperty = useAppSelector(selectNewProperty);
+  const nigeriaStates = getNigeriaStates();
   const [lgaData, setLgaData] = useState<string[]>([]);
+
   useEffect(() => {
     if (newProperty.state) {
-      setLgaData(NaijaStates.lgas(newProperty.state)?.lgas);
+      const selectedStateObj = nigeriaStates.find(
+        (i) => i.name === newProperty.state
+      );
+      if (selectedStateObj) {
+        setLgaData(getLGAs(selectedStateObj.code as StateCodes));
+      }
     }
   }, [newProperty.state]);
 
-  const mappedFacilities = facilitiesList.map((item: string) => {
-    return {
-      label: item,
-      value: item,
-    };
-  });
+  const mappedFacilities = facilitiesList
+    ? facilitiesList.map((item: string) => {
+        return {
+          label: item,
+          value: item,
+        };
+      })
+    : [];
 
   return (
     <section className="w-full mt-5">
@@ -98,7 +107,7 @@ export function PropertyInformationForm() {
           label="Property State"
           required
           placeholder="Select state location of property"
-          options={NaijaStates.states()}
+          options={nigeriaStates.map((i) => i.name)}
         />
         <InputSelect
           value={newProperty.lga}

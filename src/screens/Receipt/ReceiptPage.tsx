@@ -30,7 +30,7 @@ const ReceiptPage = () => {
   }, [paymentId]);
 
   useEffect(() => {
-    document.title = `Receipt - ${receiptData?.receiptNumber}`;
+    document.title = `Receipt - ${receiptData?.receiptNumber || ""}`;
   }, [receiptData]);
 
   return (

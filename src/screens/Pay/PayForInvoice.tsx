@@ -53,6 +53,27 @@ const PayForInvoice = () => {
   const [paymentStatus, setPaymentStatus] = useState<"success" | "failed">();
   const [confirming, setConfirming] = useState(false);
 
+  //Do caculations of totalPay, totalDue, itemsPaid, itemsDue based on selections
+  const { totalPay, totalDue, itemsPaid, itemsDue } = useMemo(() => {
+    const itemsPaid =
+      currentInvoice?.lineItems.filter((i) =>
+        selectedRowKeys.includes(i.key)
+      ) || [];
+    const allItemsDue =
+      currentInvoice?.lineItems.filter(
+        (i) => !selectedRowKeys.includes(i.key) && !i.paid
+      ) || [];
+    const total = itemsPaid.reduce(
+      (n, { price, quantity }) => n + price * quantity,
+      0
+    );
+    const totalDue = allItemsDue.reduce(
+      (n, { price, quantity }) => n + price * quantity,
+      0
+    );
+    return { totalPay: total, totalDue, itemsPaid, itemsDue: allItemsDue };
+  }, [selectedRowKeys]);
+
   const config: PaystackProps = {
     reference: new Date().getTime().toString(),
     email: currentInvoice?.customerCompanyEmail || "",
@@ -115,27 +136,6 @@ const PayForInvoice = () => {
       }
     })();
   }, [invoiceId]);
-
-  //Do caculations of totalPay, totalDue, itemsPaid, itemsDue based on selections
-  const { totalPay, totalDue, itemsPaid, itemsDue } = useMemo(() => {
-    const itemsPaid =
-      currentInvoice?.lineItems.filter((i) =>
-        selectedRowKeys.includes(i.key)
-      ) || [];
-    const allItemsDue =
-      currentInvoice?.lineItems.filter(
-        (i) => !selectedRowKeys.includes(i.key) && !i.paid
-      ) || [];
-    const total = itemsPaid.reduce(
-      (n, { price, quantity }) => n + price * quantity,
-      0
-    );
-    const totalDue = allItemsDue.reduce(
-      (n, { price, quantity }) => n + price * quantity,
-      0
-    );
-    return { totalPay: total, totalDue, itemsPaid, itemsDue: allItemsDue };
-  }, [selectedRowKeys]);
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
     setSelectedRowKeys(newSelectedRowKeys);

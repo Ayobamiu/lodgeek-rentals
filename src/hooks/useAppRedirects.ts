@@ -71,7 +71,7 @@ const useAppRedirects = () => {
             dispatch(setSelectedCompany(company));
           } else {
             //show no-access indicator
-            toast.error("You don't access to this account");
+            toast.error("You don't have access to this account");
             //send to select-account page
             sendToSelectAccountPage();
           }

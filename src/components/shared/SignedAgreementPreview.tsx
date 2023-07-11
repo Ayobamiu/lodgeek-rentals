@@ -116,13 +116,14 @@ export function SignedAgreementPreview(props: KYCPreviewProps) {
               value={moment(rentalRecordData.tenantAgreedOn).format("ll")}
             />
 
-            <DetailsBox
-              label="Lease Agreement"
-              value="Lease Agreement"
-              isLink
-              link={rentalRecordData.tenancyAgreementFile}
-            />
-
+            {rentalRecordData.tenancyAgreementFile && (
+              <DetailsBox
+                label="Lease Agreement"
+                value="Lease Agreement"
+                isLink
+                link={rentalRecordData.tenancyAgreementFile}
+              />
+            )}
             <div className="mt-10">
               <div className="text-xs font-medium text-coolGray-500 text-justify my-2">
                 As an online property management platform, Lodgeek serves as a

@@ -46,18 +46,19 @@ export function RentalRecordDocuments() {
           </button>
         </div>
       )}
-      {currentRentalRecord?.userKYC && currentRentalRecordProperty && (
-        <div className="mb-5">
-          <button
-            onClick={() => {
-              setShowSignedAgreement(true);
-            }}
-            className="text-blue-500 underline underline-offset-4"
-          >
-            View signed agreement <FontAwesomeIcon icon={faExternalLink} />
-          </button>
-        </div>
-      )}
+      {currentRentalRecord?.tenancyAgreementFile &&
+        currentRentalRecordProperty && (
+          <div className="mb-5">
+            <button
+              onClick={() => {
+                setShowSignedAgreement(true);
+              }}
+              className="text-blue-500 underline underline-offset-4"
+            >
+              View signed agreement <FontAwesomeIcon icon={faExternalLink} />
+            </button>
+          </div>
+        )}
       {currentRentalRecord?.signedTenancyAgreementFile && (
         <div className="mb-5">
           <a

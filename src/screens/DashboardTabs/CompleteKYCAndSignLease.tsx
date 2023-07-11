@@ -91,19 +91,21 @@ export function CompleteKYCAndSignLease({
             records accordingly. Please note that your tenancy is not complete
             until we receive your signed copy of the lease agreement.
           </p>
-          <a
-            href={currentRentalRecord.tenancyAgreementFile}
-            target="_blank"
-            download="Lease agreement"
-            className="text-blue-500 underline underline-offset-4 my-2 inline-block"
-          >
-            Download lease <FontAwesomeIcon icon={faFileDownload} />
-          </a>
+          {currentRentalRecord.tenancyAgreementFile && (
+            <a
+              href={currentRentalRecord.tenancyAgreementFile}
+              target="_blank"
+              download="Lease agreement"
+              className="text-blue-500 underline underline-offset-4 my-2 inline-block"
+            >
+              Download lease <FontAwesomeIcon icon={faFileDownload} />
+            </a>
+          )}
           <br />
           {currentRentalRecord.signedTenancyAgreementFile && (
             <>
               <a
-                href={currentRentalRecord.tenancyAgreementFile}
+                href={currentRentalRecord.signedTenancyAgreementFile}
                 target="_blank"
                 download="Lease agreement"
                 className="text-blue-500 underline underline-offset-4 my-2 inline-block"

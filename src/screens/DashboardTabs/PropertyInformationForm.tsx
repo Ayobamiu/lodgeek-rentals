@@ -242,10 +242,10 @@ export function PropertyInformationForm() {
             placeholder="₦ 500,000.00"
             decimalsLimit={2}
             onValueChange={(value, name) => {
-              dispatch(updateNewProperty({ rent: Number(value) }));
+              dispatch(updateNewProperty({ rent: Number(value) || 0 }));
             }}
             value={newProperty.rent}
-            defaultValue={newProperty.rent}
+            defaultValue={newProperty.rent || 0}
             required
             prefix="₦ "
             className="w-full px-4 py-2.5 text-base text-coolGray-900 font-normal outline-none focus:border-green-500 border border-coolGray-200 rounded-lg "

@@ -3,10 +3,13 @@ import useSubscription from "../../hooks/useSubscription";
 
 export function UpgradeToUseCollaborationTool() {
   const { subscription } = useSubscription();
+  const basicPlans = [
+    process.env.REACT_APP_PAYSTACK_BASIC_PLAN_CODE,
+    process.env.REACT_APP_PAYSTACK_BASIC_PLAN_BIANNUALLY_CODE,
+    process.env.REACT_APP_PAYSTACK_BASIC_PLAN_YEARLY_CODE,
+  ];
   const onFreeOrBasicPlan =
-    !subscription ||
-    subscription?.subscription_code ===
-      process.env.REACT_APP_PAYSTACK_BASIC_PLAN_CODE;
+    !subscription || basicPlans.includes(subscription?.subscription_code);
 
   if (!onFreeOrBasicPlan) return null;
   return (

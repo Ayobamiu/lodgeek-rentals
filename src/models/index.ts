@@ -1038,3 +1038,9 @@ export type NotificationOrder = {
   sound?: string; // An optional sound to play with the notification
   recipientIDs: string[]; // An array of recipient IDs for the notification
 };
+
+export enum PlanDuration {
+  "Monthly" = "Monthly",
+  "Bi-Annually" = "Bi-Annually",
+  "Yearly" = "Yearly",
+}

@@ -45,9 +45,9 @@ const CompanyBillingSettingsPage = () => {
             />
 
             {/* Button to cancel subscription */}
-            <button className="bg-red-500 text-white px-4 py-2 rounded-lg my-5">
+            {/* <button className="bg-red-500 text-white px-4 py-2 rounded-lg my-5">
               Cancel Subscription
-            </button>
+            </button> */}
           </>
         )}
         {(subIsNonRenewing || subIsCompleted || subIsCancelled) && (

@@ -18,14 +18,28 @@ const useRestrictions = () => {
     let propertyRestrictionType: SubscriptionPlan =
       SubscriptionPlan["Free Plan"];
 
+    const basicPlans = [
+      process.env.REACT_APP_PAYSTACK_BASIC_PLAN_CODE,
+      process.env.REACT_APP_PAYSTACK_BASIC_PLAN_BIANNUALLY_CODE,
+      process.env.REACT_APP_PAYSTACK_BASIC_PLAN_YEARLY_CODE,
+    ];
+    const proPlans = [
+      process.env.REACT_APP_PAYSTACK_PRO_PLAN_CODE,
+      process.env.REACT_APP_PAYSTACK_PRO_PLAN_BIANNUALLY_CODE,
+      process.env.REACT_APP_PAYSTACK_PRO_PLAN_YEARLY_CODE,
+    ];
+    // const premiumPlans = [
+    //   process.env.REACT_APP_PAYSTACK_PREMIUM_PLAN_CODE,
+    //   process.env.REACT_APP_PAYSTACK_PREMIUM_PLAN_BIANNUALLY_CODE,
+    //   process.env.REACT_APP_PAYSTACK_PREMIUM_PLAN_YEARLY_CODE,
+    // ];
     //Free plan
     if (!subscription && properties.length >= 5) {
       canUploadMoreProperties = false;
     }
     //Basic plan
     if (
-      subscription?.subscription_code ===
-        process.env.REACT_APP_PAYSTACK_BASIC_PLAN_CODE &&
+      basicPlans.includes(subscription?.subscription_code) &&
       properties.length >= 20
     ) {
       canUploadMoreProperties = false;
@@ -33,8 +47,7 @@ const useRestrictions = () => {
     }
     //Pro plan
     if (
-      subscription?.subscription_code ===
-        process.env.REACT_APP_PAYSTACK_PRO_PLAN_CODE &&
+      proPlans.includes(subscription?.subscription_code) &&
       properties.length >= 50
     ) {
       canUploadMoreProperties = false;

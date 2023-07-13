@@ -346,6 +346,7 @@ export const propertyTypeList = [
   "Studio Apartment",
   "Townhouse / Terrace",
   "Villa",
+  "Other",
 ];
 export const conditionList = [
   propertyConditionType["Fairly Used"],

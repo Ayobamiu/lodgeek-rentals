@@ -1,12 +1,27 @@
-import { RentType } from "../models";
+import { PlanDuration, RentType } from "../models";
 import { ReactComponent as FlexUIGreenLight } from "../assets/logo-no-background.svg";
 import { SubScribeButton } from "./SubScribeButton";
 import { selectSelectedCompany } from "../app/features/companySlice";
 import { useAppSelector } from "../app/hooks";
 import { useNavigate } from "react-router-dom";
 import { selectUser } from "../app/features/userSlice";
+import { useMemo, useState } from "react";
+import { getPlanPriceAndCode } from "../functions/Payment/getPlanPriceAndCode";
 
 const SelectPlans = () => {
+  const [duration, setDuration] = useState(PlanDuration.Yearly);
+  const {
+    basicPlanPrice,
+    premiumPlanPrice,
+    proPlanPrice,
+    basicPlanDiscountedPrice,
+    premiumPlanDiscountedPrice,
+    proPlanDiscountedPrice,
+    basicPlanCode,
+    premiumPlanCode,
+    proPlanCode,
+  } = useMemo(getPlanPriceAndCode(duration), [duration]);
+
   const plans = [
     {
       name: "Free Plan",
@@ -19,6 +34,7 @@ const SelectPlans = () => {
       teamManagement: false,
       googleCalendarIntegration: false,
       price: 0,
+      discountedPrice: 0,
       planCode: "",
     },
     {
@@ -31,8 +47,9 @@ const SelectPlans = () => {
       financialReports: true,
       teamManagement: false,
       googleCalendarIntegration: false,
-      price: 10000,
-      planCode: process.env.REACT_APP_PAYSTACK_BASIC_PLAN_CODE,
+      price: basicPlanPrice,
+      discountedPrice: basicPlanDiscountedPrice,
+      planCode: basicPlanCode,
     },
     {
       name: "Pro Plan",
@@ -44,8 +61,9 @@ const SelectPlans = () => {
       financialReports: true,
       teamManagement: true,
       googleCalendarIntegration: false,
-      price: 25000,
-      planCode: process.env.REACT_APP_PAYSTACK_PRO_PLAN_CODE,
+      price: proPlanPrice,
+      discountedPrice: proPlanDiscountedPrice,
+      planCode: proPlanCode,
     },
     {
       name: "Premium Plan",
@@ -57,10 +75,19 @@ const SelectPlans = () => {
       financialReports: true,
       teamManagement: true,
       googleCalendarIntegration: true,
-      price: 50000,
-      planCode: process.env.REACT_APP_PAYSTACK_PREMIUM_PLAN_CODE,
+      price: premiumPlanPrice,
+      discountedPrice: premiumPlanDiscountedPrice,
+      planCode: premiumPlanCode,
     },
   ];
+
+  const getButtonStyle = (d: PlanDuration) => {
+    const selectedButtonStyle =
+      "hover:text-blue-700 z-10 ring-2 ring-blue-700 text-blue-700 dark:ring-blue-500 dark:text-white";
+    return `px-4 py-2 text-sm lg:px-6 lg:py-3.5 lg:text-base font-medium text-gray-900 bg-white border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 ${
+      d === duration ? selectedButtonStyle : ""
+    }`;
+  };
 
   return (
     <section className="py-20 xl:py-24 bg-white pattern-white-bg px-5">
@@ -81,6 +108,41 @@ const SelectPlans = () => {
             budget.
           </p>
         </div>
+        <div className="flex justify-center w-full">
+          <div
+            className="inline-flex rounded-md shadow-sm justify-center my-5"
+            role="group"
+          >
+            <button
+              type="button"
+              onClick={() => setDuration(PlanDuration.Monthly)}
+              className={`border ${getButtonStyle(
+                PlanDuration.Monthly
+              )} rounded-l-lg`}
+            >
+              {PlanDuration.Monthly}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDuration(PlanDuration["Bi-Annually"])}
+              className={`border-t border-b ${getButtonStyle(
+                PlanDuration["Bi-Annually"]
+              )}`}
+            >
+              {PlanDuration["Bi-Annually"]}
+            </button>
+            <button
+              type="button"
+              onClick={() => setDuration(PlanDuration.Yearly)}
+              className={`border ${getButtonStyle(
+                PlanDuration.Yearly
+              )} rounded-r-md`}
+            >
+              {PlanDuration.Yearly}
+            </button>
+          </div>
+        </div>
+
         <div className="flex flex-wrap justify-center -mx-4 gap-5">
           {plans.map((plan) => (
             <LodgeekPlan
@@ -88,6 +150,8 @@ const SelectPlans = () => {
               name={plan.name}
               amount={plan.price}
               rentPer={RentType.month}
+              duration={duration}
+              discountedAmount={plan.discountedPrice}
               details={[
                 { text: plan.properties },
                 {
@@ -125,15 +189,17 @@ type LodgeekPlanProp = {
   name: string;
   rentPer: RentType;
   amount: number;
+  discountedAmount: number;
   details: {
     text: string;
     notAllowed?: boolean;
   }[];
   planCode: string;
+  duration: PlanDuration;
 };
 
 function LodgeekPlan(props: LodgeekPlanProp) {
-  const { amount, details, name, rentPer, planCode } = props;
+  const { amount, details, name, planCode, duration, discountedAmount } = props;
   const selectedCompany = useAppSelector(selectSelectedCompany);
   const loggedInUser = useAppSelector(selectUser);
   const navigate = useNavigate();
@@ -146,12 +212,20 @@ function LodgeekPlan(props: LodgeekPlanProp) {
       <div className="flex items-baseline text-gray-900 dark:text-white">
         <span className="text-3xl font-semibold">₦</span>
         <span className="text-5xl font-extrabold tracking-tight">
-          {amount.toLocaleString()}
+          {discountedAmount.toLocaleString()}
         </span>
-        <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400">
-          /{rentPer}
+        <span className="ml-1 text-xl font-normal text-gray-500 dark:text-gray-400 lowercase">
+          {duration}
         </span>
       </div>
+      {amount !== discountedAmount && (
+        <div className="text-gray-300 dark:text-gray-200">
+          <span className="text-3xl font-semibold">₦</span>
+          <span className="text-5xl font-extrabold line-through">
+            {amount.toLocaleString()}
+          </span>
+        </div>
+      )}
 
       <ul role="list" className="space-y-5 my-7">
         {details.map((i, index) => (
@@ -203,8 +277,8 @@ function LodgeekPlan(props: LodgeekPlanProp) {
         </>
       ) : (
         <>
-          {amount > 0 ? (
-            <SubScribeButton amount={amount} planCode={planCode} />
+          {discountedAmount > 0 ? (
+            <SubScribeButton amount={discountedAmount} planCode={planCode} />
           ) : (
             <button
               className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-900 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex justify-center w-full text-center"

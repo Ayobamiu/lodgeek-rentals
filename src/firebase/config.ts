@@ -2,7 +2,12 @@
 import firebase from "firebase/compat/app";
 import { getAnalytics } from "firebase/analytics";
 import "firebase/compat/auth";
-import { collection, doc, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  enableIndexedDbPersistence,
+  getFirestore,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getFunctions } from "firebase/functions";
 import { FirebaseCollections } from "../models";
@@ -27,6 +32,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = firebase.initializeApp(firebaseConfig);
 const db = getFirestore(app);
+// Enable offline persistence
+enableIndexedDbPersistence(db)
+  .then(() => {
+    // Offline persistence enabled successfully
+    console.log("Offline persistence enabled.");
+  })
+  .catch((err) => {
+    // Error occurred while enabling offline persistence
+    console.error("Error enabling offline persistence:", err);
+  });
+
 // const fv = firebase.firestore.FieldValue;
 
 const auth = getAuth();
